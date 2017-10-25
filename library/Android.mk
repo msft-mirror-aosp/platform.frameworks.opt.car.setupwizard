@@ -30,6 +30,8 @@ LOCAL_AAPT_FLAGS += --auto-add-overlay
 LOCAL_PROGUARD_ENABLED := disabled
 
 # TODO: Replace with Car Support Library
-include packages/apps/Car/libs/car-stream-ui-lib/car-stream-ui-lib.mk
+ifneq ($(wildcard frameworks/base/Android.mk),)
+	include packages/apps/Car/libs/car-stream-ui-lib/car-stream-ui-lib.mk
+endif
 
 include $(BUILD_STATIC_JAVA_LIBRARY)
