@@ -14,8 +14,8 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 -->
-<!-- Default text colors for SUW buttons when enabled/disabled. -->
+<!-- Default text colors for car setup wizard buttons when enabled/disabled. -->
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:state_enabled="false" android:color="@color/car_grey_700" />
-    <item android:color="@android:color/white"/>
+    <item android:color="@color/car_suw_blue"/>
 </selector>

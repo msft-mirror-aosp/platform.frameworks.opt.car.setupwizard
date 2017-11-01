@@ -37,7 +37,8 @@ LOCAL_AAPT_FLAGS += --auto-add-overlay
 endif
 
 ifeq (,$(findstring car-setup-wizard-lib, $(LOCAL_STATIC_JAVA_LIBRARIES)))
-LOCAL_RESOURCE_DIR += frameworks/opt/car/setupwizard/library/res
+LOCAL_RESOURCE_DIR += frameworks/opt/car/setupwizard/library/res \
+    frameworks/support/car/res
 LOCAL_AAPT_FLAGS += --extra-packages com.android.car.setupwizardlib
 LOCAL_STATIC_JAVA_LIBRARIES += car-setup-wizard-lib
 endif

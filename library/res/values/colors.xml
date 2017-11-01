@@ -15,5 +15,14 @@
     limitations under the License.
 -->
 <resources>
-    <color name="button_ripple_color">@color/car_card_ripple_light_color_background_dark</color>
+    <color name="car_suw_blue">#4285F4</color>
+
+    <!-- The default color for all activities in the SetupWizard. -->
+    <color name="windowBackground">@color/car_grey_50</color>
+
+    <!-- The color of the status bar. -->
+    <color name="colorPrimaryDark">@color/car_grey_300</color>
+
+    <!-- The accent color for the SetupWizard. -->
+    <color name="accentColor">@color/car_yellow_500</color>
 </resources>
