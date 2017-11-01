@@ -71,6 +71,7 @@ public class CarSetupWizardLayout extends LinearLayout {
         boolean showBackButton;
         boolean showContinueButton;
         String continueButtonText;
+        boolean continueButtonEnabled;
         try {
             showBackButton = attrArray.getBoolean(
                     R.styleable.CarSetupWizardLayout_showBackButton, true);
@@ -78,6 +79,8 @@ public class CarSetupWizardLayout extends LinearLayout {
                     R.styleable.CarSetupWizardLayout_showContinueButton, true);
             continueButtonText = attrArray.getString(
                     R.styleable.CarSetupWizardLayout_continueButtonText);
+            continueButtonEnabled = attrArray.getBoolean(
+                    R.styleable.CarSetupWizardLayout_continueButtonEnabled, true);
         } finally {
             attrArray.recycle();
         }
@@ -97,6 +100,7 @@ public class CarSetupWizardLayout extends LinearLayout {
         mContinueButton = findViewById(R.id.continue_button);
         if (showContinueButton) {
             setContinueButtonText(continueButtonText);
+            setContinueButtonEnabled(continueButtonEnabled);
         } else {
             setContinueButtonVisibility(View.GONE);
         }
@@ -109,6 +113,14 @@ public class CarSetupWizardLayout extends LinearLayout {
      */
     public void setBackButtonVisibility(int visibility) {
         mBackButton.setVisibility(visibility);
+    }
+
+    /**
+     * Set the back button onClickListener to given listener. Can be null if the listener should
+     * be overridden so no callback is made.
+     */
+    public void setBackButtonListener(@Nullable View.OnClickListener listener) {
+        mBackButton.setOnClickListener(listener);
     }
 
     /**
@@ -126,11 +138,10 @@ public class CarSetupWizardLayout extends LinearLayout {
     }
 
     /**
-     * Set the back button onClickListener to given listener. Can be null if the listener should
-     * be overridden so no callback is made.
+     * Set whether the continue button is enabled.
      */
-    public void setBackButtonListener(@Nullable View.OnClickListener listener) {
-        mBackButton.setOnClickListener(listener);
+    public void setContinueButtonEnabled(boolean enabled) {
+        mContinueButton.setEnabled(enabled);
     }
 
     /**

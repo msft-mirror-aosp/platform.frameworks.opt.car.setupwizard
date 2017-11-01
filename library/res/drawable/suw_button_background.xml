@@ -14,14 +14,18 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 -->
-<resources>
-
-    <!-- The top and bottom padding for a button. -->
-    <dimen name="suw_button_vertical_padding">16dp</dimen>
-
-    <!-- The left and right padding for a button. -->
-    <dimen name="suw_button_horizontal_padding">32dp</dimen>
-
-    <!-- Border radius for buttons -->
-    <dimen name="suw_button_border_radius">10dp</dimen>
-</resources>
+<!-- Default background styles for SUW buttons when enabled/disabled. -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_enabled="false">
+        <shape android:shape="rectangle"  >
+            <corners android:radius="@dimen/suw_button_border_radius" />
+            <solid android:color="@color/car_grey_300"/>
+        </shape>
+    </item>
+    <item>
+        <shape android:shape="rectangle"  >
+            <corners android:radius="@dimen/suw_button_border_radius" />
+            <solid android:color="@color/car_light_blue_700"/>
+        </shape>
+    </item>
+</selector>
