@@ -27,18 +27,19 @@
 #
 #   include frameworks/opt/car/setupwizard/library/common.mk
 #
+
 ifeq (,$(LOCAL_RESOURCE_DIR))
-$(error LOCAL_RESOURCE_DIR must be defined)
+    $(error LOCAL_RESOURCE_DIR must be defined)
 endif
 
 # Add --auto-add-overlay flag if not present
 ifeq (,$(findstring --auto-add-overlay, $(LOCAL_AAPT_FLAGS)))
-LOCAL_AAPT_FLAGS += --auto-add-overlay
+    LOCAL_AAPT_FLAGS += --auto-add-overlay
 endif
 
 ifeq (,$(findstring car-setup-wizard-lib, $(LOCAL_STATIC_JAVA_LIBRARIES)))
-LOCAL_RESOURCE_DIR += frameworks/opt/car/setupwizard/library/res \
-    frameworks/support/car/res
-LOCAL_AAPT_FLAGS += --extra-packages com.android.car.setupwizardlib
-LOCAL_STATIC_JAVA_LIBRARIES += car-setup-wizard-lib
+    LOCAL_RESOURCE_DIR += frameworks/opt/car/setupwizard/library/res \
+        frameworks/support/car/res
+    LOCAL_AAPT_FLAGS += --extra-packages com.android.car.setupwizardlib
+    LOCAL_STATIC_JAVA_LIBRARIES += car-setup-wizard-lib
 endif

@@ -136,36 +136,8 @@ public class CarSetupWizardLayout extends LinearLayout {
     /**
      * Set a given button's visibility.
      */
-    private void setButtonVisible(View button, boolean visible) {
+    private void setViewVisible(View button, boolean visible) {
         button.setVisibility(visible ? View.VISIBLE : View.GONE);
-    }
-
-    /**
-     * Set a given button's click listener.
-     */
-    private void setButtonListener(View button, @Nullable View.OnClickListener listener) {
-        button.setOnClickListener(listener);
-    }
-
-    /**
-     * Set a given button's text.
-     */
-    private void setButtonText(Button button, String buttonText) {
-        button.setText(buttonText);
-    }
-
-    /**
-     * Set whether the given button is enabled.
-     */
-    private void setButtonEnabled(Button button, boolean enabled) {
-        button.setEnabled(enabled);
-    }
-
-    /**
-     * Set the back button visibility to the given visibility.
-     */
-    public void setBackButtonVisible(boolean visible) {
-        setButtonVisible(mBackButton, visible);
     }
 
     /**
@@ -173,21 +145,21 @@ public class CarSetupWizardLayout extends LinearLayout {
      * be overridden so no callback is made.
      */
     public void setBackButtonListener(@Nullable View.OnClickListener listener) {
-        setButtonListener(mBackButton, listener);
+        mBackButton.setOnClickListener(listener);
     }
 
     /**
-     * Set the primary continue button text to the given text.
+     * Set the back button visibility to the given visibility.
      */
-    public void setPrimaryContinueButtonText(String text) {
-        setButtonText(mPrimaryContinueButton, text);
+    public void setBackButtonVisible(boolean visible) {
+        setViewVisible(mBackButton, visible);
     }
 
     /**
-     * Set the primary continue button visibility to the given visibility.
+     * Set whether the primary continue button is enabled.
      */
-    public void setPrimaryContinueButtonVisible(boolean visible) {
-        setButtonVisible(mPrimaryContinueButton, visible);
+    public void setPrimaryContinueButtonEnabled(boolean enabled) {
+        mPrimaryContinueButton.setEnabled(enabled);
     }
 
     /**
@@ -195,28 +167,28 @@ public class CarSetupWizardLayout extends LinearLayout {
      * listener should be overridden so no callback is made.
      */
     public void setPrimaryContinueButtonListener(@Nullable View.OnClickListener listener) {
-        setButtonListener(mPrimaryContinueButton, listener);
+        mPrimaryContinueButton.setOnClickListener(listener);
     }
 
     /**
-     * Set whether the primary continue button is enabled.
+     * Set the primary continue button text to the given text.
      */
-    public void setPrimaryContinueButtonEnabled(boolean enabled) {
-        setButtonEnabled(mPrimaryContinueButton, enabled);
+    public void setPrimaryContinueButtonText(String text) {
+        mPrimaryContinueButton.setText(text);
     }
 
     /**
-     * Set the secondary continue button text to the given text.
+     * Set the primary continue button visibility to the given visibility.
      */
-    public void setSecondaryContinueButtonText(String text) {
-        setButtonText(mSecondaryContinueButton, text);
+    public void setPrimaryContinueButtonVisible(boolean visible) {
+        setViewVisible(mPrimaryContinueButton, visible);
     }
 
     /**
-     * Set the secondary continue button visibility to the given visibility.
+     * Set whether the secondary continue button is enabled.
      */
-    public void setSecondaryContinueButtonVisible(boolean visible) {
-        setButtonVisible(mSecondaryContinueButton, visible);
+    public void setSecondaryContinueButtonEnabled(boolean enabled){
+        mSecondaryContinueButton.setEnabled(enabled);
     }
 
     /**
@@ -224,13 +196,20 @@ public class CarSetupWizardLayout extends LinearLayout {
      * listener should be overridden so no callback is made.
      */
     public void setSecondaryContinueButtonListener(@Nullable View.OnClickListener listener) {
-        setButtonListener(mSecondaryContinueButton, listener);
+        mSecondaryContinueButton.setOnClickListener(listener);
     }
 
     /**
-     * Set whether the secondary continue button is enabled.
+     * Set the secondary continue button text to the given text.
      */
-    public void setSecondaryContinueButtonEnabled(boolean enabled) {
-        setButtonEnabled(mSecondaryContinueButton, enabled);
+    public void setSecondaryContinueButtonText(String text) {
+        mSecondaryContinueButton.setText(text);
+    }
+
+    /**
+     * Set the secondary continue button visibility to the given visibility.
+     */
+    public void setSecondaryContinueButtonVisible(boolean visible) {
+        setViewVisible(mSecondaryContinueButton, visible);
     }
 }
