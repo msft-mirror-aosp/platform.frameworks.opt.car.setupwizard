@@ -19,9 +19,14 @@
     <declare-styleable name="CarSetupWizardLayout">
         <!-- Attributes related to the visibility of the back button -->
         <attr name="showBackButton" format="boolean" />
-        <!--  Attributes related to the visibility and text of the continue button -->
-        <attr name="showContinueButton" format="boolean" />
-        <attr name="continueButtonText" format="string" />
-        <attr name="continueButtonEnabled" format="boolean" />
+        <!--  Attributes related to the visibility and text of primary continue button -->
+        <attr name="showPrimaryContinueButton" format="boolean" />
+        <attr name="primaryContinueButtonText" format="string" />
+        <attr name="primaryContinueButtonEnabled" format="boolean" />
+
+        <!--  Attributes related to the visibility and text of secondary continue button -->
+        <attr name="showSecondaryContinueButton" format="boolean" />
+        <attr name="secondaryContinueButtonText" format="string" />
+        <attr name="secondaryContinueButtonEnabled" format="boolean" />
     </declare-styleable>
 </resources>

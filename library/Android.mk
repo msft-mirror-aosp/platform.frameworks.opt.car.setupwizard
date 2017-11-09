@@ -20,18 +20,30 @@ include $(CLEAR_VARS)
 
 LOCAL_SRC_FILES := $(call all-java-files-under, src)
 
-LOCAL_RESOURCE_DIR := $(LOCAL_PATH)/res
+LOCAL_RESOURCE_DIR := $(LOCAL_PATH)/res \
+    frameworks/support/car/res \
+    frameworks/support/core-ui/res \
+    frameworks/support/design/res
 
 LOCAL_MODULE := car-setup-wizard-lib
 LOCAL_MODULE_TAGS := optional
 
-LOCAL_AAPT_FLAGS += --auto-add-overlay
+LOCAL_STATIC_JAVA_LIBRARIES += android-support-v4 \
+    android-support-design \
+    android-support-car \
+
+LOCAL_AAPT_FLAGS += --extra-packages android.support.coreui \
+    --extra-packages android.support.car \
+    --extra-packages android.support.design \
+    --auto-add-overlay
+
+# Include support-v7-appcompat, if not already included
+ifeq (,$(findstring android-support-v7-appcompat,$(LOCAL_STATIC_JAVA_LIBRARIES)))
+LOCAL_RESOURCE_DIR += frameworks/support/v7/appcompat/res
+LOCAL_AAPT_FLAGS += --extra-packages android.support.v7.appcompat
+LOCAL_STATIC_JAVA_LIBRARIES += android-support-v7-appcompat
+endif
 
 LOCAL_PROGUARD_ENABLED := disabled
-
-# TODO: Replace with Car Support Library
-ifneq ($(wildcard frameworks/base/Android.mk),)
-	include packages/apps/Car/libs/car-stream-ui-lib/car-stream-ui-lib.mk
-endif
 
 include $(BUILD_STATIC_JAVA_LIBRARY)
