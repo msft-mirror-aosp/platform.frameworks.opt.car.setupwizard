@@ -39,11 +39,16 @@ LOCAL_AAPT_FLAGS += --extra-packages android.support.coreui \
 
 # Include support-v7-appcompat, if not already included
 ifeq (,$(findstring android-support-v7-appcompat,$(LOCAL_STATIC_JAVA_LIBRARIES)))
-LOCAL_RESOURCE_DIR += frameworks/support/v7/appcompat/res
-LOCAL_AAPT_FLAGS += --extra-packages android.support.v7.appcompat
-LOCAL_STATIC_JAVA_LIBRARIES += android-support-v7-appcompat
+    LOCAL_RESOURCE_DIR += frameworks/support/v7/appcompat/res
+    LOCAL_AAPT_FLAGS += --extra-packages android.support.v7.appcompat
+    LOCAL_STATIC_JAVA_LIBRARIES += android-support-v7-appcompat
 endif
 
 LOCAL_PROGUARD_ENABLED := disabled
 
 include $(BUILD_STATIC_JAVA_LIBRARY)
+
+# Use the following include to make our test apk.
+ifeq (,$(ONE_SHOT_MAKEFILE))
+    include $(call all-makefiles-under,$(LOCAL_PATH))
+endif
