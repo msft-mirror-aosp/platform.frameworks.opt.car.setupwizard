@@ -21,6 +21,7 @@ import static com.google.common.truth.Truth.assertThat;
 import android.content.Context;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ProgressBar;
 
 import com.android.car.setupwizardlib.robolectric.BaseRobolectricTest;
 import com.android.car.setupwizardlib.robolectric.CarSetupWizardLibRobolectricTestRunner;
@@ -44,6 +45,7 @@ public class CarSetupWizardLayoutTest extends BaseRobolectricTest {
     private View mBackButton;
     private Button mPrimaryContinueButton;
     private Button mSecondaryContinueButton;
+    private ProgressBar mProgressBar;
 
     @Before
     public void setUp() {
@@ -63,6 +65,8 @@ public class CarSetupWizardLayoutTest extends BaseRobolectricTest {
 
         mSecondaryContinueButton = mCarSetupWizardLayout.
                 findViewById(R.id.secondary_continue_button);
+
+        mProgressBar = mCarSetupWizardLayout.findViewById(R.id.progress_bar);
 
         isClicked = false;
     }
@@ -198,5 +202,17 @@ public class CarSetupWizardLayoutTest extends BaseRobolectricTest {
 
         mCarSetupWizardLayout.setSecondaryContinueButtonVisible(false);
         assertThat(mSecondaryContinueButton.getVisibility()).isEqualTo(View.GONE);
+    }
+
+    /**
+     * Test that setProgressBarVisible does set the progress bar visibility
+     */
+    @Test
+    public void testSetProgressBarVisible() {
+        mCarSetupWizardLayout.setProgressBarVisible(true);
+        assertThat(mProgressBar.getVisibility()).isEqualTo(View.VISIBLE);
+
+        mCarSetupWizardLayout.setProgressBarVisible(false);
+        assertThat(mProgressBar.getVisibility()).isEqualTo(View.GONE);
     }
 }
