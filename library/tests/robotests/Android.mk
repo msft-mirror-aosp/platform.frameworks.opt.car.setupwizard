@@ -5,16 +5,16 @@ LOCAL_PATH := $(call my-dir)
 ############################################################
 include $(CLEAR_VARS)
 
-LOCAL_RESOURCE_DIR := \
-    $(LOCAL_PATH)/res \
-    frameworks/support/v7/appcompat/res
+LOCAL_RESOURCE_DIR := $(LOCAL_PATH)/res
 
 LOCAL_PACKAGE_NAME := CarSetupWizardLib
 LOCAL_MODULE_TAGS := optional
 
+LOCAL_USE_AAPT2 := true
+
 LOCAL_PRIVILEGED_MODULE := true
 
-LOCAL_STATIC_JAVA_LIBRARIES := \
+LOCAL_STATIC_ANDROID_LIBRARIES := \
     android-support-v7-appcompat \
     android-support-v7-recyclerview
 
