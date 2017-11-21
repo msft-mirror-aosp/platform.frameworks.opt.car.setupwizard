@@ -27,15 +27,15 @@ LOCAL_MODULE_TAGS := optional
 
 LOCAL_USE_AAPT2 := true
 
+# Car Support Library
+# CardView library is needed for proper custom attribute namespacing
 LOCAL_STATIC_ANDROID_LIBRARIES += \
-    android-support-v4 \
-    android-support-design \
-    android-support-car
+    android-support-car \
+    android-support-v7-cardview
 
-# Include support-v7-appcompat, if not already included
-ifeq (,$(findstring android-support-v7-appcompat,$(LOCAL_STATIC_ANDROID_LIBRARIES)))
-    LOCAL_STATIC_ANDROID_LIBRARIES += android-support-v7-appcompat
-endif
+# Needed in order extend Theme.Material.Light.NoActionBar
+# TODO: Remove once CarSetupWizardTheme extends Car Support Library Theme
+LOCAL_STATIC_ANDROID_LIBRARIES += android-support-v7-appcompat
 
 LOCAL_PROGUARD_ENABLED := disabled
 

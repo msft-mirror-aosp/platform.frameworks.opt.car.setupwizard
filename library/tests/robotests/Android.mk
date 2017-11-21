@@ -15,7 +15,7 @@ LOCAL_USE_AAPT2 := true
 LOCAL_PRIVILEGED_MODULE := true
 
 LOCAL_STATIC_ANDROID_LIBRARIES := \
-    android-support-v7-appcompat \
+    android-support-v4 \
     android-support-v7-recyclerview
 
 include frameworks/opt/car/setupwizard/library/common.mk
