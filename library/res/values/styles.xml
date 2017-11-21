@@ -21,10 +21,14 @@
         <item name="android:background">@drawable/car_suw_button_background</item>
     </style>
 
-    <!-- Style for the buttons used across the Car Setup Wizard. -->
-    <style name="CarSetupWizardBorderlessButton" parent="CarBorderlessButton">
+    <!-- Style for the buttons used in the Car Setup Wizard. -->
+    <style name="CarSetupWizardButton.Borderless" parent="CarBorderlessButton">
         <item name="android:textColor">@drawable/car_suw_borderless_button_text_color</item>
     </style>
+
+    <!-- Style for the progress bars used in the Car Setup Wizard. -->
+    <style name="CarSetupWizardProgressBar.Horizontal"
+           parent="android:Widget.Material.ProgressBar.Horizontal"/>
 
     <!-- The main theme for all activities within the Car Setup Wizard. -->
     <style name="CarSetupWizardTheme" parent="android:Theme.Material.Light.NoActionBar">
@@ -32,6 +36,10 @@
         <item name="android:colorAccent">@color/accentColor</item>
         <item name="android:colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="android:buttonStyle">@style/CarSetupWizardButton</item>
+        <item name="android:borderlessButtonStyle">@style/CarSetupWizardButton.Borderless</item>
+        <item name="android:progressBarStyleHorizontal">
+            @style/CarSetupWizardProgressBar.Horizontal
+        </item>
         <item name="android:windowLightStatusBar">true</item>
     </style>
 </resources>
