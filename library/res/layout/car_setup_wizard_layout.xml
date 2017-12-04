@@ -14,16 +14,8 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 -->
-<merge xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
     <include
         android:id="@+id/application_bar"
         layout="@layout/car_setup_wizard_toolbar"/>
-
-    <FrameLayout
-        android:id="@+id/content_container"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
 </merge>
