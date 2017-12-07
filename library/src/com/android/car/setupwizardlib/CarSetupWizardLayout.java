@@ -21,10 +21,10 @@ import android.content.res.TypedArray;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-
 
 /**
  * Custom layout for the Car Setup Wizard.
@@ -70,13 +70,12 @@ public class CarSetupWizardLayout extends LinearLayout {
                 0, 0);
 
         init(attrArray);
-
     }
 
     /**
      * Inflates the layout and sets the custom views (e.g. back button, continue button).
      */
-    void init(TypedArray attrArray) {
+    private void init(TypedArray attrArray) {
         boolean showBackButton;
 
         boolean showPrimaryContinueButton;
@@ -140,6 +139,8 @@ public class CarSetupWizardLayout extends LinearLayout {
         mProgressBar = findViewById(R.id.progress_bar);
         setProgressBarVisible(showProgressBar);
 
+        // Set orientation programmatically since the inflated layout uses <merge>
+        setOrientation(LinearLayout.VERTICAL);
     }
 
     /**
@@ -196,7 +197,7 @@ public class CarSetupWizardLayout extends LinearLayout {
     /**
      * Set whether the secondary continue button is enabled.
      */
-    public void setSecondaryContinueButtonEnabled(boolean enabled){
+    public void setSecondaryContinueButtonEnabled(boolean enabled) {
         mSecondaryContinueButton.setEnabled(enabled);
     }
 

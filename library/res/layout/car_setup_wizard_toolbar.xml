@@ -18,51 +18,54 @@
      standard Car Toolbar/Application Bar, it doesn't require the same functionality, so it
      doesn't extend it.
 -->
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="@dimen/car_app_bar_height">
 
     <FrameLayout
-        android:layout_alignParentStart="true"
         android:layout_width="@dimen/car_margin"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_alignParentStart="true">
 
         <ImageView
             android:id="@+id/back_button"
-            android:background="@drawable/button_ripple_bg"
-            android:layout_gravity="center"
             android:layout_width="@dimen/car_primary_icon_size"
             android:layout_height="@dimen/car_primary_icon_size"
-            android:src="@drawable/ic_arrow_back" />
+            android:layout_gravity="center"
+            android:background="@drawable/button_ripple_bg"
+            android:src="@drawable/ic_arrow_back"/>
     </FrameLayout>
 
     <Button
         android:id="@+id/primary_continue_button"
-        android:layout_alignParentEnd="true"
-        android:layout_centerVertical="true"
         android:layout_width="wrap_content"
         android:layout_height="@dimen/car_button_height"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"
         android:layout_marginEnd="@dimen/car_keyline_1"
         android:ellipsize="end"
-        android:maxLines="1" />
+        android:maxLines="1"/>
 
     <Button
         android:id="@+id/secondary_continue_button"
-        android:layout_centerVertical="true"
-        android:layout_toStartOf="@id/primary_continue_button"
+        style="?android:attr/borderlessButtonStyle"
         android:layout_width="wrap_content"
         android:layout_height="@dimen/car_button_height"
-        android:layout_marginEnd="@dimen/car_keyline_1"
+        android:layout_centerVertical="true"
+        android:layout_marginEnd="@dimen/car_padding_4"
+        android:layout_toStartOf="@id/primary_continue_button"
         android:ellipsize="end"
-        android:maxLines="1"
-        style="?android:attr/borderlessButtonStyle" />
+        android:maxLines="1"/>
 
     <ProgressBar
         android:id="@+id/progress_bar"
         style="@style/CarSetupWizardProgressBar.Horizontal"
-        android:indeterminate="true"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_marginBottom="@dimen/progress_bar_bottom_margin"/>
+        android:layout_marginBottom="@dimen/progress_bar_bottom_margin"
+        android:indeterminate="true"
+        android:indeterminateTint="?android:colorPrimary"
+        android:indeterminateTintMode="src_atop"/>
 </RelativeLayout>
