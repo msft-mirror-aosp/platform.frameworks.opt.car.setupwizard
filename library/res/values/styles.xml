@@ -22,5 +22,8 @@
     <style name="CarSetupWizardButton.Borderless" parent="CarButton.Borderless"/>
 
     <!-- Style for the progress bars used in the Car Setup Wizard. -->
-    <style name="CarSetupWizardProgressBar.Horizontal" parent="CarProgressBar.Horizontal"/>
+    <style name="CarSetupWizardProgressBar.Horizontal" parent="CarProgressBar.Horizontal">
+        <item name="android:minHeight">@dimen/car_progress_bar_height</item>
+        <item name="android:maxHeight">@dimen/car_progress_bar_height</item>
+    </style>
 </resources>
