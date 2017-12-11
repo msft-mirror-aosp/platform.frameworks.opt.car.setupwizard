@@ -21,16 +21,18 @@ import android.content.res.TypedArray;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 /**
  * Custom layout for the Car Setup Wizard.
  */
 public class CarSetupWizardLayout extends LinearLayout {
     private View mBackButton;
+
+    private TextView mToolbarTitle;
 
     /* The Primary Continue Button should always be used when there is only a single action that
      * moves the wizard to the next screen (e.g. Only need a 'Skip' button).
@@ -78,6 +80,9 @@ public class CarSetupWizardLayout extends LinearLayout {
     private void init(TypedArray attrArray) {
         boolean showBackButton;
 
+        boolean showToolbarTitle;
+        String toolbarTitleText;
+
         boolean showPrimaryContinueButton;
         String primaryContinueButtonText;
         boolean primaryContinueButtonEnabled;
@@ -91,6 +96,10 @@ public class CarSetupWizardLayout extends LinearLayout {
         try {
             showBackButton = attrArray.getBoolean(
                     R.styleable.CarSetupWizardLayout_showBackButton, true);
+            showToolbarTitle = attrArray.getBoolean(
+                    R.styleable.CarSetupWizardLayout_showToolbarTitle, false);
+            toolbarTitleText = attrArray.getString(
+                    R.styleable.CarSetupWizardLayout_toolbarTitleText);
             showPrimaryContinueButton = attrArray.getBoolean(
                     R.styleable.CarSetupWizardLayout_showPrimaryContinueButton, true);
             primaryContinueButtonText = attrArray.getString(
@@ -116,6 +125,14 @@ public class CarSetupWizardLayout extends LinearLayout {
         mBackButton = findViewById(R.id.back_button);
         if (!showBackButton) {
             setBackButtonVisible(false);
+        }
+
+        // Set the toolbar title visibility and text based on the custom attributes.
+        mToolbarTitle = findViewById(R.id.toolbar_title);
+        if (showToolbarTitle) {
+            setToolbarTitleText(toolbarTitleText);
+        } else {
+            setToolbarTitleVisibile(false);
         }
 
         // Set the primary continue button visibility and text based on the custom attributes.
@@ -166,6 +183,20 @@ public class CarSetupWizardLayout extends LinearLayout {
      */
     public void setBackButtonVisible(boolean visible) {
         setViewVisible(mBackButton, visible);
+    }
+
+    /**
+     * Sets the header title visibility to given value.
+     */
+    public void setToolbarTitleVisibile(boolean visible) {
+        setViewVisible(mToolbarTitle, visible);
+    }
+
+    /**
+     * Sets the header title text to the provided text.
+     */
+    public void setToolbarTitleText(String text) {
+        mToolbarTitle.setText(text);
     }
 
     /**
