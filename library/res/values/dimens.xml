@@ -18,5 +18,5 @@
     <!-- In order for the progress bar to properly align with the bottom of the toolbar, a negative
          margin needs to be applied.
     -->
-    <dimen name="progress_bar_bottom_margin">-5dp</dimen>
+    <dimen name="progress_bar_bottom_margin">-4dp</dimen>
 </resources>
