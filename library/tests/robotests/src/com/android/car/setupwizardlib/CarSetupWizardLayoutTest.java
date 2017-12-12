@@ -111,10 +111,10 @@ public class CarSetupWizardLayoutTest extends BaseRobolectricTest {
      */
     @Test
     public void testSetToolbarTitleVisible() {
-        mCarSetupWizardLayout.setToolbarTitleVisibile(true);
+        mCarSetupWizardLayout.setToolbarTitleVisible(true);
         assertThat(mToolbarTitleView.getVisibility()).isEqualTo(View.VISIBLE);
 
-        mCarSetupWizardLayout.setToolbarTitleVisibile(false);
+        mCarSetupWizardLayout.setToolbarTitleVisible(false);
         assertThat(mToolbarTitleView.getVisibility()).isEqualTo(View.GONE);
     }
 
