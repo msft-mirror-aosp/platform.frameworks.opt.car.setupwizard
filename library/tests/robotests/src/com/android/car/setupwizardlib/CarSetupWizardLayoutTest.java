@@ -22,6 +22,7 @@ import android.content.Context;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.android.car.setupwizardlib.robolectric.BaseRobolectricTest;
 import com.android.car.setupwizardlib.robolectric.CarSetupWizardLibRobolectricTestRunner;
@@ -43,6 +44,7 @@ public class CarSetupWizardLayoutTest extends BaseRobolectricTest {
     private CarSetupWizardLayout mCarSetupWizardLayout;
     private CarSetupWizardLayoutTestActivity mCarSetupWizardLayoutTestActivity;
     private View mBackButton;
+    private TextView mToolbarTitleView;
     private Button mPrimaryContinueButton;
     private Button mSecondaryContinueButton;
     private ProgressBar mProgressBar;
@@ -102,6 +104,27 @@ public class CarSetupWizardLayoutTest extends BaseRobolectricTest {
 
         mCarSetupWizardLayout.setBackButtonVisible(false);
         assertThat(mBackButton.getVisibility()).isEqualTo(View.GONE);
+    }
+
+    /**
+     * Tests that setToolbarTitleVisible sets the toolbar title visibility
+     */
+    @Test
+    public void testSetToolbarTitleVisible() {
+        mCarSetupWizardLayout.setToolbarTitleVisibile(true);
+        assertThat(mToolbarTitleView.getVisibility()).isEqualTo(View.VISIBLE);
+
+        mCarSetupWizardLayout.setToolbarTitleVisibile(false);
+        assertThat(mToolbarTitleView.getVisibility()).isEqualTo(View.GONE);
+    }
+
+    /**
+     * Tests that setToolbarTitleText does set the toolbar title text
+     */
+    @Test
+    public void testSetToolbarTitleText() {
+        mCarSetupWizardLayout.setToolbarTitleText(getTestString());
+        assertThat(mToolbarTitleView.getText()).isEqualTo(getTestString());
     }
 
     /**
