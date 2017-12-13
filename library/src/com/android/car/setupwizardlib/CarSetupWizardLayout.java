@@ -158,9 +158,6 @@ public class CarSetupWizardLayout extends LinearLayout {
 
         // Set orientation programmatically since the inflated layout uses <merge>
         setOrientation(LinearLayout.VERTICAL);
-
-        // The ProgressBar is drawn under the layout, so clip children should be false
-        setClipChildren(false);
     }
 
     /**

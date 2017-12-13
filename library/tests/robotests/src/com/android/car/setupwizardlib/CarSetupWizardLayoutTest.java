@@ -68,6 +68,9 @@ public class CarSetupWizardLayoutTest extends BaseRobolectricTest {
         mSecondaryContinueButton = mCarSetupWizardLayout.
                 findViewById(R.id.secondary_continue_button);
 
+        mToolbarTitleView = mCarSetupWizardLayout.
+                findViewById(R.id.toolbar_title);
+
         mProgressBar = mCarSetupWizardLayout.findViewById(R.id.progress_bar);
 
         isClicked = false;
