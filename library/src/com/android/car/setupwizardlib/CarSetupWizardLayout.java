@@ -132,7 +132,7 @@ public class CarSetupWizardLayout extends LinearLayout {
         if (showToolbarTitle) {
             setToolbarTitleText(toolbarTitleText);
         } else {
-            setToolbarTitleVisibile(false);
+            setToolbarTitleVisible(false);
         }
 
         // Set the primary continue button visibility and text based on the custom attributes.
@@ -188,7 +188,7 @@ public class CarSetupWizardLayout extends LinearLayout {
     /**
      * Sets the header title visibility to given value.
      */
-    public void setToolbarTitleVisibile(boolean visible) {
+    public void setToolbarTitleVisible(boolean visible) {
         setViewVisible(mToolbarTitle, visible);
     }
 
