@@ -18,31 +18,43 @@ package com.android.car.setupwizardlib;
 import android.annotation.Nullable;
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewStub;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
 /**
- * Custom layout for the Car Setup Wizard.
+ * Custom layout for the Car Setup Wizard. Provides interfaces for setting basic functionality
+ * such as the toolbar, toolbar buttons, and themes. Any modifications to elements built by
+ * the CarSetupWizardLayout should be done through methods provided by this class unless that is
+ * not possible so as to keep the state internally consistent.
  */
 public class CarSetupWizardLayout extends LinearLayout {
     private View mBackButton;
 
     private TextView mToolbarTitle;
 
-    /* The Primary Continue Button should always be used when there is only a single action that
+    /* <p>The Primary Toolbar Button should always be used when there is only a single action that
      * moves the wizard to the next screen (e.g. Only need a 'Skip' button).
      *
      * When there are two actions that can move the wizard to the next screen (e.g. either 'Skip'
      * or 'Let's Go' are the two options), then the Primary is used for the positive action
-     * while the Secondary is used for the negative action.
+     * while the Secondary is used for the negative action.</p>
      */
-    private Button mPrimaryContinueButton;
-    private Button mSecondaryContinueButton;
+    private Button mPrimaryToolbarButton;
+    /*
+     * Flag to track the flat state.
+     */
+    private boolean mPrimaryToolbarButtonFlat;
+    private View.OnClickListener mPrimaryToolbarButtonOnClick;
+    private Button mSecondaryToolbarButton;
+
 
     private ProgressBar mProgressBar;
 
@@ -83,13 +95,13 @@ public class CarSetupWizardLayout extends LinearLayout {
         boolean showToolbarTitle;
         String toolbarTitleText;
 
-        boolean showPrimaryContinueButton;
-        String primaryContinueButtonText;
-        boolean primaryContinueButtonEnabled;
+        boolean showPrimaryToolbarButton;
+        String primaryToolbarButtonText;
+        boolean primaryToolbarButtonEnabled;
 
-        boolean showSecondaryContinueButton;
-        String secondaryContinueButtonText;
-        boolean secondaryContinueButtonEnabled;
+        boolean showSecondaryToolbarButton;
+        String secondaryToolbarButtonText;
+        boolean secondaryToolbarButtonEnabled;
 
         boolean showProgressBar;
 
@@ -100,18 +112,20 @@ public class CarSetupWizardLayout extends LinearLayout {
                     R.styleable.CarSetupWizardLayout_showToolbarTitle, false);
             toolbarTitleText = attrArray.getString(
                     R.styleable.CarSetupWizardLayout_toolbarTitleText);
-            showPrimaryContinueButton = attrArray.getBoolean(
-                    R.styleable.CarSetupWizardLayout_showPrimaryContinueButton, true);
-            primaryContinueButtonText = attrArray.getString(
-                    R.styleable.CarSetupWizardLayout_primaryContinueButtonText);
-            primaryContinueButtonEnabled = attrArray.getBoolean(
-                    R.styleable.CarSetupWizardLayout_primaryContinueButtonEnabled, true);
-            showSecondaryContinueButton = attrArray.getBoolean(
-                    R.styleable.CarSetupWizardLayout_showSecondaryContinueButton, false);
-            secondaryContinueButtonText = attrArray.getString(
-                    R.styleable.CarSetupWizardLayout_secondaryContinueButtonText);
-            secondaryContinueButtonEnabled = attrArray.getBoolean(
-                    R.styleable.CarSetupWizardLayout_secondaryContinueButtonEnabled, true);
+            showPrimaryToolbarButton = attrArray.getBoolean(
+                    R.styleable.CarSetupWizardLayout_showPrimaryToolbarButton, true);
+            primaryToolbarButtonText = attrArray.getString(
+                    R.styleable.CarSetupWizardLayout_primaryToolbarButtonText);
+            primaryToolbarButtonEnabled = attrArray.getBoolean(
+                    R.styleable.CarSetupWizardLayout_primaryToolbarButtonEnabled, true);
+            mPrimaryToolbarButtonFlat = attrArray.getBoolean(
+                    R.styleable.CarSetupWizardLayout_primaryToolbarButtonFlat, false);
+            showSecondaryToolbarButton = attrArray.getBoolean(
+                    R.styleable.CarSetupWizardLayout_showSecondaryToolbarButton, false);
+            secondaryToolbarButtonText = attrArray.getString(
+                    R.styleable.CarSetupWizardLayout_secondaryToolbarButtonText);
+            secondaryToolbarButtonEnabled = attrArray.getBoolean(
+                    R.styleable.CarSetupWizardLayout_secondaryToolbarButtonEnabled, true);
             showProgressBar = attrArray.getBoolean(
                     R.styleable.CarSetupWizardLayout_showProgressBar, false);
         } finally {
@@ -136,21 +150,30 @@ public class CarSetupWizardLayout extends LinearLayout {
         }
 
         // Set the primary continue button visibility and text based on the custom attributes.
-        mPrimaryContinueButton = findViewById(R.id.primary_continue_button);
-        if (showPrimaryContinueButton) {
-            setPrimaryContinueButtonText(primaryContinueButtonText);
-            setPrimaryContinueButtonEnabled(primaryContinueButtonEnabled);
+        ViewStub primaryToolbarButtonStub =
+                (ViewStub) findViewById(R.id.primary_toolbar_button_stub);
+        // Set the button layout to flat if that attribute was set.
+        if (mPrimaryToolbarButtonFlat) {
+            primaryToolbarButtonStub.setLayoutResource(R.layout.flat_button);
+        }
+        primaryToolbarButtonStub.inflate();
+        mPrimaryToolbarButton = findViewById(R.id.primary_toolbar_button);
+        if (showPrimaryToolbarButton) {
+            setPrimaryToolbarButtonText(primaryToolbarButtonText);
+            setPrimaryToolbarButtonEnabled(primaryToolbarButtonEnabled);
         } else {
-            setPrimaryContinueButtonVisible(false);
+            setPrimaryToolbarButtonVisible(false);
         }
 
         // Set the secondary continue button visibility and text based on the custom attributes.
-        mSecondaryContinueButton = findViewById(R.id.secondary_continue_button);
-        if (showSecondaryContinueButton) {
-            setSecondaryContinueButtonText(secondaryContinueButtonText);
-            setSecondaryContinueButtonEnabled(secondaryContinueButtonEnabled);
-        } else {
-            setSecondaryContinueButtonVisible(false);
+        ViewStub secondaryToolbarButtonStub =
+                (ViewStub) findViewById(R.id.secondary_toolbar_button_stub);
+        if (showSecondaryToolbarButton || !TextUtils.isEmpty(secondaryToolbarButtonText)) {
+            secondaryToolbarButtonStub.inflate();
+            mSecondaryToolbarButton = findViewById(R.id.secondary_toolbar_button);
+            setSecondaryToolbarButtonText(secondaryToolbarButtonText);
+            setSecondaryToolbarButtonEnabled(secondaryToolbarButtonEnabled);
+            setSecondaryToolbarButtonVisible(showSecondaryToolbarButton);
         }
 
         mProgressBar = findViewById(R.id.progress_bar);
@@ -199,59 +222,102 @@ public class CarSetupWizardLayout extends LinearLayout {
     /**
      * Set whether the primary continue button is enabled.
      */
-    public void setPrimaryContinueButtonEnabled(boolean enabled) {
-        mPrimaryContinueButton.setEnabled(enabled);
+    public void setPrimaryToolbarButtonEnabled(boolean enabled) {
+        mPrimaryToolbarButton.setEnabled(enabled);
     }
 
     /**
      * Set the primary continue button onClickListener to the given listener. Can be null if the
-     * listener should be overridden so no callback is made.
+     * listener should be overridden so no callback is made. All changes to primary toolbar
+     * button's onClickListener should be made here so they can be stored through changes to the
+     * button.
      */
-    public void setPrimaryContinueButtonListener(@Nullable View.OnClickListener listener) {
-        mPrimaryContinueButton.setOnClickListener(listener);
+    public void setPrimaryToolbarButtonListener(@Nullable View.OnClickListener listener) {
+        mPrimaryToolbarButtonOnClick = listener;
+        mPrimaryToolbarButton.setOnClickListener(listener);
     }
 
     /**
      * Set the primary continue button text to the given text.
      */
-    public void setPrimaryContinueButtonText(String text) {
-        mPrimaryContinueButton.setText(text);
+    public void setPrimaryToolbarButtonText(String text) {
+        mPrimaryToolbarButton.setText(text);
     }
 
     /**
      * Set the primary continue button visibility to the given visibility.
      */
-    public void setPrimaryContinueButtonVisible(boolean visible) {
-        setViewVisible(mPrimaryContinueButton, visible);
+    public void setPrimaryToolbarButtonVisible(boolean visible) {
+        setViewVisible(mPrimaryToolbarButton, visible);
+    }
+
+    /**
+     * Changes the button in the primary slot to a flat theme, maintaining the text, visibility,
+     * whether it is enabled, and id.
+     * <p>NOTE: that other attributes set manually on the primaryToolbarButton will be lost on calls
+     * to this method as the button will be replaced.</p>
+     */
+    public void setPrimaryToolbarButtonFlat(boolean isFlat) {
+        // Do nothing if the state isn't changing.
+        if (isFlat == mPrimaryToolbarButtonFlat) {
+            return;
+        }
+        int layoutId = isFlat ? R.layout.flat_button : R.layout.primary_button;
+        Button newPrimaryButton = (Button) inflate(mContext, layoutId, null);
+        newPrimaryButton.setId(mPrimaryToolbarButton.getId());
+        newPrimaryButton.setVisibility(mPrimaryToolbarButton.getVisibility());
+        newPrimaryButton.setEnabled(mPrimaryToolbarButton.isEnabled());
+        newPrimaryButton.setText(mPrimaryToolbarButton.getText());
+        if (mPrimaryToolbarButtonOnClick != null) {
+            newPrimaryButton.setOnClickListener(mPrimaryToolbarButtonOnClick);
+        }
+        newPrimaryButton.setLayoutParams(mPrimaryToolbarButton.getLayoutParams());
+
+        ViewGroup parent = (ViewGroup) findViewById(R.id.button_container);
+        int buttonIndex = parent.indexOfChild(mPrimaryToolbarButton);
+        parent.removeViewAt(buttonIndex);
+        parent.addView(newPrimaryButton, buttonIndex);
+
+        // Update state of layout
+        mPrimaryToolbarButton = newPrimaryButton;
+        mPrimaryToolbarButtonFlat = isFlat;
     }
 
     /**
      * Set whether the secondary continue button is enabled.
      */
-    public void setSecondaryContinueButtonEnabled(boolean enabled) {
-        mSecondaryContinueButton.setEnabled(enabled);
+    public void setSecondaryToolbarButtonEnabled(boolean enabled) {
+        maybeInflateSecondaryToolbarButton();
+        mSecondaryToolbarButton.setEnabled(enabled);
     }
 
     /**
      * Set the secondary continue button onClickListener to the given listener. Can be null if the
      * listener should be overridden so no callback is made.
      */
-    public void setSecondaryContinueButtonListener(@Nullable View.OnClickListener listener) {
-        mSecondaryContinueButton.setOnClickListener(listener);
+    public void setSecondaryToolbarButtonListener(@Nullable View.OnClickListener listener) {
+        maybeInflateSecondaryToolbarButton();
+        mSecondaryToolbarButton.setOnClickListener(listener);
     }
 
     /**
      * Set the secondary continue button text to the given text.
      */
-    public void setSecondaryContinueButtonText(String text) {
-        mSecondaryContinueButton.setText(text);
+    public void setSecondaryToolbarButtonText(String text) {
+        maybeInflateSecondaryToolbarButton();
+        mSecondaryToolbarButton.setText(text);
     }
 
     /**
      * Set the secondary continue button visibility to the given visibility.
      */
-    public void setSecondaryContinueButtonVisible(boolean visible) {
-        setViewVisible(mSecondaryContinueButton, visible);
+    public void setSecondaryToolbarButtonVisible(boolean visible) {
+        // If not setting it visible and it hasn't been inflated yet then don't inflate.
+        if (!visible && mSecondaryToolbarButton == null) {
+            return;
+        }
+        maybeInflateSecondaryToolbarButton();
+        setViewVisible(mSecondaryToolbarButton, visible);
     }
 
     /**
@@ -259,5 +325,22 @@ public class CarSetupWizardLayout extends LinearLayout {
      */
     public void setProgressBarVisible(boolean visible) {
         setViewVisible(mProgressBar, visible);
+    }
+
+    /**
+     * A method that will inflate the SecondaryToolbarButton if it is has not already been
+     * inflated. If it has been inflated already this method will do nothing.
+     */
+    private void maybeInflateSecondaryToolbarButton() {
+        ViewStub secondaryToolbarButtonStub =
+                (ViewStub) findViewById(R.id.secondary_toolbar_button_stub);
+        // If the secondaryToolbarButtonStub is null then the stub has been inflated so there is
+        // nothing to do.
+        if (secondaryToolbarButtonStub != null) {
+            secondaryToolbarButtonStub.inflate();
+            mSecondaryToolbarButton = (Button) findViewById(R.id.secondary_toolbar_button);
+            setSecondaryToolbarButtonVisible(false);
+        }
+
     }
 }
