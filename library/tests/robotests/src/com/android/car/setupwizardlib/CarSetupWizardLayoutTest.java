@@ -67,6 +67,7 @@ public class CarSetupWizardLayoutTest extends BaseRobolectricTest {
                 findViewById(R.id.primary_toolbar_button);
 
         // Have to make this call first to ensure secondaryToolbar button is created from stub.
+        mCarSetupWizardLayout.setSecondaryToolbarButtonVisible(true);
         mCarSetupWizardLayout.setSecondaryToolbarButtonVisible(false);
         mSecondaryToolbarButton = mCarSetupWizardLayout.
                 findViewById(R.id.secondary_toolbar_button);
