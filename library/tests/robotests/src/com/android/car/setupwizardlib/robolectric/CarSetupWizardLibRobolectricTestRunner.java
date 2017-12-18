@@ -52,8 +52,8 @@ public class CarSetupWizardLibRobolectricTestRunner extends RobolectricTestRunne
 
         // By adding any resources from libraries we need to the AndroidManifest, we can access
         // them from within the parallel universe's resource loader.
-        final AndroidManifest manifest = new AndroidManifest(Fs.fileFromPath(manifestPath),
-                Fs.fileFromPath(resDir), Fs.fileFromPath(assetsDir)) {
+        return new AndroidManifest(Fs.fileFromPath(manifestPath), Fs.fileFromPath(resDir),
+            Fs.fileFromPath(assetsDir), "com.android.car.setupwizardlib") {
             @Override
             public List<ResourcePath> getIncludedResourcePaths() {
                 List<ResourcePath> paths = super.getIncludedResourcePaths();
@@ -72,9 +72,5 @@ public class CarSetupWizardLibRobolectricTestRunner extends RobolectricTestRunne
                 return paths;
             }
         };
-
-        // Set the package name to the renamed one
-        manifest.setPackageName("com.android.car.setupwizardlib");
-        return manifest;
     }
 }
