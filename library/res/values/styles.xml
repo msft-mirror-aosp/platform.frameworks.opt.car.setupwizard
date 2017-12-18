@@ -16,10 +16,14 @@
 -->
 <resources>
     <!-- Style for the buttons used across the Car Setup Wizard. -->
-    <style name="CarSetupWizardButton" parent="CarButton"/>
+    <style name="CarSetupWizardButton" parent="CarButton">
+        <item name="android:textColor">@drawable/setup_wizard_button_text_color</item>
+    </style>
 
     <!-- Style for the buttons used in the Car Setup Wizard. -->
-    <style name="CarSetupWizardButton.Borderless" parent="CarButton.Borderless"/>
+    <style name="CarSetupWizardButton.Borderless" parent="CarButton.Borderless">
+        <item name="android:textColor">@drawable/setup_wizard_button_text_color</item>
+    </style>
 
     <!-- Style for the progress bars used in the Car Setup Wizard. -->
     <style name="CarSetupWizardProgressBar.Horizontal" parent="CarProgressBar.Horizontal">
