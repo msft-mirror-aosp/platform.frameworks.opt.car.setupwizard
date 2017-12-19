@@ -31,11 +31,8 @@ LOCAL_USE_AAPT2 := true
 # CardView library is needed for proper custom attribute namespacing
 LOCAL_STATIC_ANDROID_LIBRARIES += \
     android-support-car \
+    android-support-v7-appcompat \
     android-support-v7-cardview
-
-# Needed in order extend Theme.Material.Light.NoActionBar
-# TODO: Remove once CarSetupWizardTheme extends Car Support Library Theme
-LOCAL_STATIC_ANDROID_LIBRARIES += android-support-v7-appcompat
 
 LOCAL_PROGUARD_ENABLED := disabled
 
