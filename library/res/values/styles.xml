@@ -21,9 +21,7 @@
     </style>
 
     <!-- Style for the buttons used in the Car Setup Wizard. -->
-    <style name="CarSetupWizardButton.Borderless" parent="CarButton.Borderless">
-        <item name="android:textColor">@drawable/setup_wizard_button_text_color</item>
-    </style>
+    <style name="CarSetupWizardButton.Borderless" parent="CarButton.Borderless" />
 
     <!-- Style for the progress bars used in the Car Setup Wizard. -->
     <style name="CarSetupWizardProgressBar.Horizontal" parent="CarProgressBar.Horizontal">
