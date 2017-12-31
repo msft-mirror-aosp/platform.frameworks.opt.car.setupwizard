@@ -16,7 +16,7 @@
 -->
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
     <!-- The main theme for all activities within the Car Setup Wizard. -->
-    <style name="CarSetupWizardTheme" parent="android:Theme.Material.Light.NoActionBar">
+    <style name="CarSetupWizardTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="android:windowBackground">@color/windowBackground</item>
         <item name="android:colorAccent">@color/accentColor</item>
         <item name="android:colorPrimary">@color/car_highlight</item>
@@ -27,5 +27,8 @@
             @style/CarSetupWizardProgressBar.Horizontal
         </item>
         <item name="android:windowLightStatusBar">true</item>
+        <item name="android:colorControlActivated">?android:attr/colorPrimary</item>
+        <item name="android:colorControlHighlight">?android:attr/colorPrimary</item>
+        <item name="android:alertDialogTheme">@style/CarDialog</item>
     </style>
 </resources>
