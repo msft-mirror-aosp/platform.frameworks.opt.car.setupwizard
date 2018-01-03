@@ -102,15 +102,18 @@ public class CarSetupWizardLayoutTest extends BaseRobolectricTest {
     }
 
     /**
-     * Test that setBackButtonVisible does set the back button visibility
+     * Test that setBackButtonVisible does set the back button visibility and updates the touch
+     * delegate accordingly
      */
     @Test
     public void testSetBackButtonVisible() {
         mCarSetupWizardLayout.setBackButtonVisible(true);
         assertThat(mBackButton.getVisibility()).isEqualTo(View.VISIBLE);
+        assertThat(((View) mBackButton.getParent()).getTouchDelegate()).isNotNull();
 
         mCarSetupWizardLayout.setBackButtonVisible(false);
         assertThat(mBackButton.getVisibility()).isEqualTo(View.GONE);
+        assertThat(((View) mBackButton.getParent()).getTouchDelegate()).isNull();
     }
 
     /**

@@ -18,9 +18,11 @@ package com.android.car.setupwizardlib;
 import android.annotation.Nullable;
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.Rect;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
+import android.view.TouchDelegate;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewStub;
@@ -137,9 +139,7 @@ public class CarSetupWizardLayout extends LinearLayout {
 
         // Set the back button visibility based on the custom attribute.
         mBackButton = findViewById(R.id.back_button);
-        if (!showBackButton) {
-            setBackButtonVisible(false);
-        }
+        setBackButtonVisible(showBackButton);
 
         // Set the toolbar title visibility and text based on the custom attributes.
         mToolbarTitle = findViewById(R.id.toolbar_title);
@@ -198,11 +198,57 @@ public class CarSetupWizardLayout extends LinearLayout {
         mBackButton.setOnClickListener(listener);
     }
 
+    // Add or remove the back button touch delegate depending on whether it is visible.
+    private void updateBackButtonTouchDelegate(boolean visible) {
+        if (visible) {
+            // Post this action in the parent's message queue to make sure the parent
+            // lays out its children before getHitRect() is called
+            this.post(new Runnable() {
+                @Override
+                public void run() {
+                    Rect delegateArea = new Rect();
+
+                    mBackButton.getHitRect(delegateArea);
+
+                    /*
+                     * Update the delegate area based on the difference between the current size and
+                     * the touch target size
+                     */
+                    float touchTargetSize = getResources().getDimension(
+                            R.dimen.car_touch_target_size);
+                    float primaryIconSize = getResources().getDimension(
+                            R.dimen.car_primary_icon_size);
+
+                    int sizeDifference = (int) ((touchTargetSize - primaryIconSize) / 2);
+
+                    delegateArea.right += sizeDifference;
+                    delegateArea.bottom += sizeDifference;
+                    delegateArea.left -= sizeDifference;
+                    delegateArea.top -= sizeDifference;
+
+                    // Set the TouchDelegate on the parent view
+                    TouchDelegate touchDelegate = new TouchDelegate(delegateArea,
+                            mBackButton);
+
+                    if (View.class.isInstance(mBackButton.getParent())) {
+                        ((View) mBackButton.getParent()).setTouchDelegate(touchDelegate);
+                    }
+                }
+            });
+        } else {
+            // Set the TouchDelegate to null if the back button is not visible.
+            if (View.class.isInstance(mBackButton.getParent())) {
+                ((View) mBackButton.getParent()).setTouchDelegate(null);
+            }
+        }
+    }
+
     /**
      * Set the back button visibility to the given visibility.
      */
     public void setBackButtonVisible(boolean visible) {
         setViewVisible(mBackButton, visible);
+        updateBackButtonTouchDelegate(visible);
     }
 
     /**
