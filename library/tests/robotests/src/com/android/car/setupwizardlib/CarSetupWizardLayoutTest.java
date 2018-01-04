@@ -250,6 +250,17 @@ public class CarSetupWizardLayoutTest extends BaseRobolectricTest {
     }
 
     /**
+     * Test that setProgressBarProgress does set the progress bar progress
+     */
+    @Test
+    public void testSetProgressBarProgress() {
+        int progress = 80;
+        mCarSetupWizardLayout.setProgressBarProgress(progress);
+        assertThat(mProgressBar.isIndeterminate()).isFalse();
+        assertThat(mProgressBar.getProgress()).isEqualTo(progress);
+    }
+
+    /**
      * Test that setting primary button to flat replaces it with a flat button.
      */
     @Test

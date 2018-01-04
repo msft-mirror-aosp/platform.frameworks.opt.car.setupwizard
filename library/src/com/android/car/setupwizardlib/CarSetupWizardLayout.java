@@ -32,14 +32,13 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 /**
- * Custom layout for the Car Setup Wizard. Provides interfaces for setting basic functionality
- * such as the toolbar, toolbar buttons, and themes. Any modifications to elements built by
+ * Custom layout for the Car Setup Wizard. Provides accessors for modifying elements such as buttons
+ * and progress bars. Any modifications to elements built by
  * the CarSetupWizardLayout should be done through methods provided by this class unless that is
  * not possible so as to keep the state internally consistent.
  */
 public class CarSetupWizardLayout extends LinearLayout {
     private View mBackButton;
-
     private TextView mToolbarTitle;
 
     /* <p>The Primary Toolbar Button should always be used when there is only a single action that
@@ -50,14 +49,13 @@ public class CarSetupWizardLayout extends LinearLayout {
      * while the Secondary is used for the negative action.</p>
      */
     private Button mPrimaryToolbarButton;
+
     /*
-     * Flag to track the flat state.
+     * Flag to track the primary toolbar button flat state.
      */
     private boolean mPrimaryToolbarButtonFlat;
     private View.OnClickListener mPrimaryToolbarButtonOnClick;
     private Button mSecondaryToolbarButton;
-
-
     private ProgressBar mProgressBar;
 
     public CarSetupWizardLayout(Context context) {
@@ -106,6 +104,7 @@ public class CarSetupWizardLayout extends LinearLayout {
         boolean secondaryToolbarButtonEnabled;
 
         boolean showProgressBar;
+        boolean indeterminateProgressBar;
 
         try {
             showBackButton = attrArray.getBoolean(
@@ -130,6 +129,8 @@ public class CarSetupWizardLayout extends LinearLayout {
                     R.styleable.CarSetupWizardLayout_secondaryToolbarButtonEnabled, true);
             showProgressBar = attrArray.getBoolean(
                     R.styleable.CarSetupWizardLayout_showProgressBar, false);
+            indeterminateProgressBar = attrArray.getBoolean(
+                    R.styleable.CarSetupWizardLayout_indeterminateProgressBar, true);
         } finally {
             attrArray.recycle();
         }
@@ -178,6 +179,7 @@ public class CarSetupWizardLayout extends LinearLayout {
 
         mProgressBar = findViewById(R.id.progress_bar);
         setProgressBarVisible(showProgressBar);
+        setProgressBarIndeterminate(indeterminateProgressBar);
 
         // Set orientation programmatically since the inflated layout uses <merge>
         setOrientation(LinearLayout.VERTICAL);
@@ -252,6 +254,13 @@ public class CarSetupWizardLayout extends LinearLayout {
     }
 
     /**
+     * Getter for the back button
+     */
+    public View getBackButton() {
+        return mBackButton;
+    }
+
+    /**
      * Sets the header title visibility to given value.
      */
     public void setToolbarTitleVisible(boolean visible) {
@@ -263,6 +272,13 @@ public class CarSetupWizardLayout extends LinearLayout {
      */
     public void setToolbarTitleText(String text) {
         mToolbarTitle.setText(text);
+    }
+
+    /**
+     * Getter for the toolbar title
+     */
+    public TextView getToolbarTitle() {
+        return mToolbarTitle;
     }
 
     /**
@@ -330,6 +346,14 @@ public class CarSetupWizardLayout extends LinearLayout {
     }
 
     /**
+     * Getter for the primary toolbar button
+     */
+    public Button getPrimaryToolbarButton() {
+        return mPrimaryToolbarButton;
+    }
+
+
+    /**
      * Set whether the secondary continue button is enabled.
      */
     public void setSecondaryToolbarButtonEnabled(boolean enabled) {
@@ -367,6 +391,13 @@ public class CarSetupWizardLayout extends LinearLayout {
     }
 
     /**
+     * Getter for the secondary toolbar button
+     */
+    public Button getSecondaryToolbarButton() {
+        return mSecondaryToolbarButton;
+    }
+
+    /**
      * Set the progress bar visibility to the given visibility.
      */
     public void setProgressBarVisible(boolean visible) {
@@ -374,17 +405,38 @@ public class CarSetupWizardLayout extends LinearLayout {
     }
 
     /**
+     * Set the progress bar indeterminate/determinate state.
+     */
+    public void setProgressBarIndeterminate(boolean indeterminate) {
+        mProgressBar.setIndeterminate(indeterminate);
+    }
+
+    /**
+     * Set the progress bar's progress.
+     */
+    public void setProgressBarProgress(int progress) {
+        setProgressBarIndeterminate(false);
+        mProgressBar.setProgress(progress);
+    }
+
+    /**
+     * Getter for the progress bar
+     */
+    public ProgressBar getProgressBar() {
+        return mProgressBar;
+    }
+
+    /**
      * A method that will inflate the SecondaryToolbarButton if it is has not already been
      * inflated. If it has been inflated already this method will do nothing.
      */
     private void maybeInflateSecondaryToolbarButton() {
-        ViewStub secondaryToolbarButtonStub =
-                (ViewStub) findViewById(R.id.secondary_toolbar_button_stub);
+        ViewStub secondaryToolbarButtonStub = findViewById(R.id.secondary_toolbar_button_stub);
         // If the secondaryToolbarButtonStub is null then the stub has been inflated so there is
         // nothing to do.
         if (secondaryToolbarButtonStub != null) {
             secondaryToolbarButtonStub.inflate();
-            mSecondaryToolbarButton = (Button) findViewById(R.id.secondary_toolbar_button);
+            mSecondaryToolbarButton = findViewById(R.id.secondary_toolbar_button);
             setSecondaryToolbarButtonVisible(false);
         }
 

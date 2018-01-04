@@ -35,7 +35,9 @@
         <attr name="secondaryToolbarButtonText" format="string"/>
         <attr name="secondaryToolbarButtonEnabled" format="boolean"/>
 
-        <!--  Attributes related to the visibility of the progress bar -->
+        <!--  Attributes related to the visibility and indeterminate/determinate state
+              of the progress bar -->
         <attr name="showProgressBar" format="boolean"/>
+        <attr name="indeterminateProgressBar" format="boolean"/>
     </declare-styleable>
 </resources>
