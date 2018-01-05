@@ -31,6 +31,8 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import java.util.Locale;
+
 /**
  * Custom layout for the Car Setup Wizard. Provides accessors for modifying elements such as buttons
  * and progress bars. Any modifications to elements built by
@@ -205,36 +207,33 @@ public class CarSetupWizardLayout extends LinearLayout {
         if (visible) {
             // Post this action in the parent's message queue to make sure the parent
             // lays out its children before getHitRect() is called
-            this.post(new Runnable() {
-                @Override
-                public void run() {
-                    Rect delegateArea = new Rect();
+            this.post(() -> {
+                Rect delegateArea = new Rect();
 
-                    mBackButton.getHitRect(delegateArea);
+                mBackButton.getHitRect(delegateArea);
 
-                    /*
-                     * Update the delegate area based on the difference between the current size and
-                     * the touch target size
-                     */
-                    float touchTargetSize = getResources().getDimension(
-                            R.dimen.car_touch_target_size);
-                    float primaryIconSize = getResources().getDimension(
-                            R.dimen.car_primary_icon_size);
+                /*
+                 * Update the delegate area based on the difference between the current size and
+                 * the touch target size
+                 */
+                float touchTargetSize = getResources().getDimension(
+                        R.dimen.car_touch_target_size);
+                float primaryIconSize = getResources().getDimension(
+                        R.dimen.car_primary_icon_size);
 
-                    int sizeDifference = (int) ((touchTargetSize - primaryIconSize) / 2);
+                int sizeDifference = (int) ((touchTargetSize - primaryIconSize) / 2);
 
-                    delegateArea.right += sizeDifference;
-                    delegateArea.bottom += sizeDifference;
-                    delegateArea.left -= sizeDifference;
-                    delegateArea.top -= sizeDifference;
+                delegateArea.right += sizeDifference;
+                delegateArea.bottom += sizeDifference;
+                delegateArea.left -= sizeDifference;
+                delegateArea.top -= sizeDifference;
 
-                    // Set the TouchDelegate on the parent view
-                    TouchDelegate touchDelegate = new TouchDelegate(delegateArea,
-                            mBackButton);
+                // Set the TouchDelegate on the parent view
+                TouchDelegate touchDelegate = new TouchDelegate(delegateArea,
+                        mBackButton);
 
-                    if (View.class.isInstance(mBackButton.getParent())) {
-                        ((View) mBackButton.getParent()).setTouchDelegate(touchDelegate);
-                    }
+                if (View.class.isInstance(mBackButton.getParent())) {
+                    ((View) mBackButton.getParent()).setTouchDelegate(touchDelegate);
                 }
             });
         } else {
@@ -424,6 +423,26 @@ public class CarSetupWizardLayout extends LinearLayout {
      */
     public ProgressBar getProgressBar() {
         return mProgressBar;
+    }
+
+    /**
+     * Sets the locale to be used for rendering.
+     */
+    public void applyLocale(Locale locale) {
+        if (locale == null) {
+            return;
+        }
+        int direction = TextUtils.getLayoutDirectionFromLocale(locale);
+        setLayoutDirection(direction);
+
+        mToolbarTitle.setTextLocale(locale);
+        mToolbarTitle.setLayoutDirection(direction);
+
+        mPrimaryToolbarButton.setTextLocale(locale);
+        mPrimaryToolbarButton.setLayoutDirection(direction);
+
+        mSecondaryToolbarButton.setTextLocale(locale);
+        mSecondaryToolbarButton.setLayoutDirection(direction);
     }
 
     /**

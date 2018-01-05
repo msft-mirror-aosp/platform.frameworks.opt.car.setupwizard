@@ -34,12 +34,18 @@ import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
 import org.robolectric.RuntimeEnvironment;
 
+import java.util.Locale;
+
 /**
  * Tests for the CarSetupWizardLayout
  */
 @RunWith(CarSetupWizardLibRobolectricTestRunner.class)
 public class CarSetupWizardLayoutTest extends BaseRobolectricTest {
     private static final String TAG = "CarSetupWizardLayoutTest";
+
+    private static final Locale LOCALE_EN_US = new Locale("en", "US");
+    // Hebrew locale can be used to test RTL.
+    private static final Locale LOCALE_IW_IL = new Locale("iw", "IL");
 
     private boolean isClicked;
     private CarSetupWizardLayout mCarSetupWizardLayout;
@@ -247,6 +253,27 @@ public class CarSetupWizardLayoutTest extends BaseRobolectricTest {
 
         mCarSetupWizardLayout.setProgressBarVisible(false);
         assertThat(mProgressBar.getVisibility()).isEqualTo(View.GONE);
+    }
+
+    @Test
+    public void testApplyUpdatedLocale() {
+        mCarSetupWizardLayout.applyLocale(LOCALE_IW_IL);
+        assertThat(mToolbarTitleView.getLayoutDirection()).isEqualTo(View.LAYOUT_DIRECTION_RTL);
+        assertThat(mToolbarTitleView.getTextLocale()).isEqualTo(LOCALE_IW_IL);
+        assertThat(mPrimaryToolbarButton.getLayoutDirection()).isEqualTo(View.LAYOUT_DIRECTION_RTL);
+        assertThat(mPrimaryToolbarButton.getTextLocale()).isEqualTo(LOCALE_IW_IL);
+        assertThat(mSecondaryToolbarButton.getLayoutDirection())
+                .isEqualTo(View.LAYOUT_DIRECTION_RTL);
+        assertThat(mSecondaryToolbarButton.getTextLocale()).isEqualTo(LOCALE_IW_IL);
+
+        mCarSetupWizardLayout.applyLocale(LOCALE_EN_US);
+        assertThat(mToolbarTitleView.getLayoutDirection()).isEqualTo(View.LAYOUT_DIRECTION_LTR);
+        assertThat(mToolbarTitleView.getTextLocale()).isEqualTo(LOCALE_EN_US);
+        assertThat(mPrimaryToolbarButton.getLayoutDirection()).isEqualTo(View.LAYOUT_DIRECTION_LTR);
+        assertThat(mPrimaryToolbarButton.getTextLocale()).isEqualTo(LOCALE_EN_US);
+        assertThat(mSecondaryToolbarButton.getLayoutDirection())
+                .isEqualTo(View.LAYOUT_DIRECTION_LTR);
+        assertThat(mSecondaryToolbarButton.getTextLocale()).isEqualTo(LOCALE_EN_US);
     }
 
     /**
