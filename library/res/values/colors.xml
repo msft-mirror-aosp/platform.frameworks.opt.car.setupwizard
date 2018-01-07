@@ -20,7 +20,4 @@
 
     <!-- The color of the status bar. -->
     <color name="colorPrimaryDark">@color/car_grey_300</color>
-
-    <!-- The accent color for the SetupWizard. -->
-    <color name="accentColor">@color/car_yellow_500</color>
 </resources>
