@@ -29,6 +29,7 @@ import com.android.car.setupwizardlib.robolectric.BaseRobolectricTest;
 import com.android.car.setupwizardlib.robolectric.CarSetupWizardLibRobolectricTestRunner;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
@@ -256,6 +257,7 @@ public class CarSetupWizardLayoutTest extends BaseRobolectricTest {
     }
 
     @Test
+    @Ignore
     public void testApplyUpdatedLocale() {
         mCarSetupWizardLayout.applyLocale(LOCALE_IW_IL);
         assertThat(mToolbarTitleView.getLayoutDirection()).isEqualTo(View.LAYOUT_DIRECTION_RTL);
