@@ -27,12 +27,13 @@ LOCAL_MODULE_TAGS := optional
 
 LOCAL_USE_AAPT2 := true
 
-# Car Support Library
-# CardView library is needed for proper custom attribute namespacing
 LOCAL_STATIC_ANDROID_LIBRARIES += \
     android-support-car \
+    android-support-design \
+    android-support-v4 \
     android-support-v7-appcompat \
-    android-support-v7-cardview
+    android-support-v7-cardview \
+    android-support-v7-recyclerview
 
 LOCAL_PROGUARD_ENABLED := disabled
 
