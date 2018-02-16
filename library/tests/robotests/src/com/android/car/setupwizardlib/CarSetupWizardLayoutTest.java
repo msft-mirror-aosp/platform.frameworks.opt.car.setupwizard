@@ -297,12 +297,12 @@ public class CarSetupWizardLayoutTest extends BaseRobolectricTest {
         mCarSetupWizardLayout.setPrimaryToolbarButtonFlat(true);
         ViewGroup buttonGroup = mCarSetupWizardLayoutTestActivity
                 .findViewById(R.id.button_container);
-        assertThat(buttonGroup.getChildCount() == 2);
+        assertThat(buttonGroup.getChildCount()).isEqualTo(2);
         mPrimaryToolbarButton = mCarSetupWizardLayoutTestActivity
                 .findViewById(R.id.primary_toolbar_button);
-        assertThat(mPrimaryToolbarButton.getBackground()
-                .equals(mCarSetupWizardLayoutTestActivity
-                        .getDrawable(R.drawable.abc_btn_borderless_material)));
-        assertThat(buttonGroup.indexOfChild(mPrimaryToolbarButton) == 1);
+        assertThat(mPrimaryToolbarButton.getBackground())
+                .isEqualTo(mCarSetupWizardLayoutTestActivity
+                        .getDrawable(R.drawable.abc_btn_borderless_material));
+        assertThat(buttonGroup.indexOfChild(mPrimaryToolbarButton)).isEqualTo(1);
     }
 }
