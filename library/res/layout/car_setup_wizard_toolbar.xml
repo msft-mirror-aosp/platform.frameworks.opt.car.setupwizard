@@ -75,8 +75,10 @@
 
     <ProgressBar
         android:id="@+id/progress_bar"
-        style="@style/Widget.Car.ProgressBar.Horizontal"
+        style="?android:attr/progressBarStyleHorizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"/>
+        android:layout_alignParentBottom="true"
+        android:indeterminateTint="?android:attr/colorAccent"
+        android:indeterminateTintMode="src_in"/>
 </RelativeLayout>
