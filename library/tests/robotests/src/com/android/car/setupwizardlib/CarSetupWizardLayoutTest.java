@@ -257,24 +257,15 @@ public class CarSetupWizardLayoutTest extends BaseRobolectricTest {
     }
 
     @Test
-    @Ignore
     public void testApplyUpdatedLocale() {
         mCarSetupWizardLayout.applyLocale(LOCALE_IW_IL);
-        assertThat(mToolbarTitleView.getLayoutDirection()).isEqualTo(View.LAYOUT_DIRECTION_RTL);
         assertThat(mToolbarTitleView.getTextLocale()).isEqualTo(LOCALE_IW_IL);
-        assertThat(mPrimaryToolbarButton.getLayoutDirection()).isEqualTo(View.LAYOUT_DIRECTION_RTL);
         assertThat(mPrimaryToolbarButton.getTextLocale()).isEqualTo(LOCALE_IW_IL);
-        assertThat(mSecondaryToolbarButton.getLayoutDirection())
-                .isEqualTo(View.LAYOUT_DIRECTION_RTL);
         assertThat(mSecondaryToolbarButton.getTextLocale()).isEqualTo(LOCALE_IW_IL);
 
         mCarSetupWizardLayout.applyLocale(LOCALE_EN_US);
-        assertThat(mToolbarTitleView.getLayoutDirection()).isEqualTo(View.LAYOUT_DIRECTION_LTR);
         assertThat(mToolbarTitleView.getTextLocale()).isEqualTo(LOCALE_EN_US);
-        assertThat(mPrimaryToolbarButton.getLayoutDirection()).isEqualTo(View.LAYOUT_DIRECTION_LTR);
         assertThat(mPrimaryToolbarButton.getTextLocale()).isEqualTo(LOCALE_EN_US);
-        assertThat(mSecondaryToolbarButton.getLayoutDirection())
-                .isEqualTo(View.LAYOUT_DIRECTION_LTR);
         assertThat(mSecondaryToolbarButton.getTextLocale()).isEqualTo(LOCALE_EN_US);
     }
 
