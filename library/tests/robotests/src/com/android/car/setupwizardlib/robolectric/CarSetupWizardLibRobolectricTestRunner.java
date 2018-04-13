@@ -15,6 +15,8 @@
  */
 package com.android.car.setupwizardlib.robolectric;
 
+import androidx.annotation.NonNull;
+
 import org.junit.runners.model.InitializationError;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
@@ -22,6 +24,8 @@ import org.robolectric.manifest.AndroidManifest;
 import org.robolectric.res.Fs;
 import org.robolectric.res.ResourcePath;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.List;
 
 /**
@@ -30,12 +34,31 @@ import java.util.List;
  * We want to override this to add several spanning different projects.
  */
 public class CarSetupWizardLibRobolectricTestRunner extends RobolectricTestRunner {
+    private static final String AAR_VERSION = "1.0.0-alpha1";
+    private static final String SUPPORT_RESOURCE_PATH_TEMPLATE =
+            "jar:file:prebuilts/sdk/current/androidx/m2repository/androidx/"
+                    + "%1$s/%1$s/%2$s/%1$s-%2$s.aar!/res";
 
     /**
      * We don't actually want to change this behavior, so we just call super.
      */
     public CarSetupWizardLibRobolectricTestRunner(Class<?> testClass) throws InitializationError {
         super(testClass);
+    }
+
+    private static ResourcePath createResourcePath(@NonNull String filePath) {
+        try {
+            return new ResourcePath(null, Fs.fromURL(new URL(filePath)), null);
+        } catch (MalformedURLException e) {
+            throw new RuntimeException("CarSetupWizardRobolectricTestRunner failure", e);
+        }
+    }
+
+    /**
+     * Create the resource path for a support library component's JAR.
+     */
+    private static String createSupportResourcePathFromJar(@NonNull String componentId) {
+        return String.format(SUPPORT_RESOURCE_PATH_TEMPLATE, componentId, AAR_VERSION);
     }
 
     /**
@@ -45,30 +68,27 @@ public class CarSetupWizardLibRobolectricTestRunner extends RobolectricTestRunne
     @Override
     protected AndroidManifest getAppManifest(Config config) {
         // Using the manifest file's relative path, we can figure out the application directory.
-        final String appRoot = "frameworks/opt/car/setupwizard/library";
-        final String manifestPath = appRoot + "/AndroidManifest.xml";
-        final String resDir = appRoot + "/tests/robotests/res";
-        final String assetsDir = appRoot + config.assetDir();
+        String appRoot = "frameworks/opt/car/setupwizard/library";
+        String manifestPath = appRoot + "/AndroidManifest.xml";
+        String resDir = appRoot + "/res";
+        String assetsDir = appRoot + config.assetDir();
 
         // By adding any resources from libraries we need to the AndroidManifest, we can access
         // them from within the parallel universe's resource loader.
-        return new AndroidManifest(Fs.fileFromPath(manifestPath), Fs.fileFromPath(resDir),
-            Fs.fileFromPath(assetsDir), "com.android.car.setupwizardlib") {
+        return new AndroidManifest(Fs.fileFromPath(manifestPath),
+                Fs.fileFromPath(resDir), Fs.fileFromPath(assetsDir)) {
             @Override
             public List<ResourcePath> getIncludedResourcePaths() {
                 List<ResourcePath> paths = super.getIncludedResourcePaths();
-                paths.add(new ResourcePath(
-                        null,
-                        Fs.fileFromPath("./frameworks/opt/car/setupwizard/library/res"),
-                        null));
-                paths.add(new ResourcePath(
-                        null,
-                        Fs.fileFromPath("./frameworks/support/v7/appcompat/res"),
-                        null));
-                paths.add(new ResourcePath(
-                        null,
-                        Fs.fileFromPath("./frameworks/support/car/res"),
-                        null));
+
+                paths.add(createResourcePath("file:" + resDir));
+                paths.add(createResourcePath("file:" + appRoot + "/tests/robotests/res"));
+
+                // Support library resources. These need to point to the prebuilts of support
+                // library and not the source.
+                paths.add(createResourcePath(createSupportResourcePathFromJar("appcompat")));
+                paths.add(createResourcePath(createSupportResourcePathFromJar("car")));
+
                 return paths;
             }
         };
