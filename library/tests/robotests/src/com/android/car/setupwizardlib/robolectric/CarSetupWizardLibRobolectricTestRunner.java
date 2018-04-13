@@ -15,7 +15,7 @@
  */
 package com.android.car.setupwizardlib.robolectric;
 
-import android.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import org.junit.runners.model.InitializationError;
 import org.robolectric.RobolectricTestRunner;
