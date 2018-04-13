@@ -20,10 +20,11 @@ import static com.google.common.truth.Truth.assertThat;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+
+import androidx.fragment.app.Fragment;
 
 import com.android.car.setupwizardlib.robolectric.BaseRobolectricTest;
 import com.android.car.setupwizardlib.robolectric.CarSetupWizardLibRobolectricTestRunner;
