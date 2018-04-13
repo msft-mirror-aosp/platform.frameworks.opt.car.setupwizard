@@ -39,8 +39,7 @@ LOCAL_JAR_EXCLUDE_FILES := none
 
 LOCAL_JAVA_LIBRARIES := \
     junit \
-    platform-robolectric-3.6.1-prebuilt \
-    sdk_vcurrent
+    platform-robolectric-3.6.1-prebuilt
 
 LOCAL_INSTRUMENTATION_FOR := CarSetupWizardLib
 LOCAL_MODULE := CarSetupWizardLibRoboTests
