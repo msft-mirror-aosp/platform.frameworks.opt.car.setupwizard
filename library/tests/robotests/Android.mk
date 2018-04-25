@@ -24,22 +24,23 @@ include $(BUILD_PACKAGE)
 #############################################
 include $(CLEAR_VARS)
 
+LOCAL_MODULE := CarSetupWizardLibRoboTests
+
 LOCAL_SRC_FILES := $(call all-java-files-under, src)
 
-# Include the testing libraries (JUnit4 + Robolectric libs).
-LOCAL_STATIC_JAVA_LIBRARIES := \
-    truth-prebuilt \
-    mockito-robolectric-prebuilt
+LOCAL_RESOURCE_DIR := \
+    $(LOCAL_PATH)/res
 
-LOCAL_JAR_EXCLUDE_FILES := none
+LOCAL_JAVA_RESOURCE_DIRS := config
 
+# Include the testing libraries
 LOCAL_JAVA_LIBRARIES := \
-    junit \
-    platform-robolectric-3.6.1-prebuilt \
-    sdk_vcurrent
+    robolectric_android-all-stub \
+    Robolectric_all-target \
+    mockito-robolectric-prebuilt \
+    truth-prebuilt
 
 LOCAL_INSTRUMENTATION_FOR := CarSetupWizardLib
-LOCAL_MODULE := CarSetupWizardLibRoboTests
 
 LOCAL_MODULE_TAGS := optional
 
@@ -49,13 +50,14 @@ include $(BUILD_STATIC_JAVA_LIBRARY)
 # Car Setup Wizard Library runner target to run the previous target. #
 #############################################################
 include $(CLEAR_VARS)
-
 LOCAL_MODULE := RunCarSetupWizardLibRoboTests
 
-LOCAL_SDK_VERSION := current
-
-LOCAL_STATIC_JAVA_LIBRARIES := \
-    CarSetupWizardLibRoboTests
+LOCAL_JAVA_LIBRARIES := \
+    CarSetupWizardLibRoboTests \
+    robolectric_android-all-stub \
+    Robolectric_all-target \
+    mockito-robolectric-prebuilt \
+    truth-prebuilt
 
 LOCAL_TEST_PACKAGE := CarSetupWizardLib
 
@@ -64,4 +66,4 @@ LOCAL_ROBOTEST_FILES := $(filter-out %/BaseRobolectricTest.java,\
 
 LOCAL_INSTRUMENT_SOURCE_DIRS := $(dir $(LOCAL_PATH))../src
 
-include prebuilts/misc/common/robolectric/3.6.1/run_robotests.mk
+include external/robolectric-shadows/run_robotests.mk
