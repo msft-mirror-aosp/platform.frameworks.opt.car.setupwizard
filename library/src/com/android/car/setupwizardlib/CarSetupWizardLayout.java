@@ -31,6 +31,8 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import androidx.annotation.VisibleForTesting;
+
 import java.util.Locale;
 
 /**
@@ -141,11 +143,11 @@ public class CarSetupWizardLayout extends LinearLayout {
         inflater.inflate(R.layout.car_setup_wizard_layout, this);
 
         // Set the back button visibility based on the custom attribute.
-        mBackButton = findViewById(R.id.back_button);
+        setBackButton(findViewById(R.id.back_button));
         setBackButtonVisible(showBackButton);
 
         // Set the toolbar title visibility and text based on the custom attributes.
-        mToolbarTitle = findViewById(R.id.toolbar_title);
+        setToolbarTitle(findViewById(R.id.toolbar_title));
         if (showToolbarTitle) {
             setToolbarTitleText(toolbarTitleText);
         } else {
@@ -160,7 +162,7 @@ public class CarSetupWizardLayout extends LinearLayout {
             primaryToolbarButtonStub.setLayoutResource(R.layout.flat_button);
         }
         primaryToolbarButtonStub.inflate();
-        mPrimaryToolbarButton = findViewById(R.id.primary_toolbar_button);
+        setPrimaryToolbarButton(findViewById(R.id.primary_toolbar_button));
         if (showPrimaryToolbarButton) {
             setPrimaryToolbarButtonText(primaryToolbarButtonText);
             setPrimaryToolbarButtonEnabled(primaryToolbarButtonEnabled);
@@ -188,22 +190,16 @@ public class CarSetupWizardLayout extends LinearLayout {
     }
 
     /**
-     * Set a given button's visibility.
+     * Set a given view's visibility.
      */
-    private void setViewVisible(View view, boolean visible) {
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    void setViewVisible(View view, boolean visible) {
         view.setVisibility(visible ? View.VISIBLE : View.GONE);
     }
 
-    /**
-     * Set the back button onClickListener to given listener. Can be null if the listener should
-     * be overridden so no callback is made.
-     */
-    public void setBackButtonListener(@Nullable View.OnClickListener listener) {
-        mBackButton.setOnClickListener(listener);
-    }
-
     // Add or remove the back button touch delegate depending on whether it is visible.
-    private void updateBackButtonTouchDelegate(boolean visible) {
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    void updateBackButtonTouchDelegate(boolean visible) {
         if (visible) {
             // Post this action in the parent's message queue to make sure the parent
             // lays out its children before getHitRect() is called
@@ -245,6 +241,26 @@ public class CarSetupWizardLayout extends LinearLayout {
     }
 
     /**
+     * Gets the back button.
+     */
+    public View getBackButton() {
+        return mBackButton;
+    }
+
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    final void setBackButton(View backButton) {
+        mBackButton = backButton;
+    }
+
+    /**
+     * Set the back button onClickListener to given listener. Can be null if the listener should
+     * be overridden so no callback is made.
+     */
+    public void setBackButtonListener(@Nullable View.OnClickListener listener) {
+        mBackButton.setOnClickListener(listener);
+    }
+
+    /**
      * Set the back button visibility to the given visibility.
      */
     public void setBackButtonVisible(boolean visible) {
@@ -253,10 +269,15 @@ public class CarSetupWizardLayout extends LinearLayout {
     }
 
     /**
-     * Getter for the back button
+     * Gets the toolbar title.
      */
-    public View getBackButton() {
-        return mBackButton;
+    public TextView getToolbarTitle() {
+        return mToolbarTitle;
+    }
+
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    final void setToolbarTitle(TextView toolbarTitle) {
+        mToolbarTitle = toolbarTitle;
     }
 
     /**
@@ -274,10 +295,22 @@ public class CarSetupWizardLayout extends LinearLayout {
     }
 
     /**
-     * Getter for the toolbar title
+     * Gets the primary toolbar button.
      */
-    public TextView getToolbarTitle() {
-        return mToolbarTitle;
+    public Button getPrimaryToolbarButton() {
+        return mPrimaryToolbarButton;
+    }
+
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    final void setPrimaryToolbarButton(Button primaryToolbarButton) {
+        mPrimaryToolbarButton = primaryToolbarButton;
+    }
+
+    /**
+     * Set the primary continue button visibility to the given visibility.
+     */
+    public void setPrimaryToolbarButtonVisible(boolean visible) {
+        setViewVisible(mPrimaryToolbarButton, visible);
     }
 
     /**
@@ -285,6 +318,13 @@ public class CarSetupWizardLayout extends LinearLayout {
      */
     public void setPrimaryToolbarButtonEnabled(boolean enabled) {
         mPrimaryToolbarButton.setEnabled(enabled);
+    }
+
+    /**
+     * Set the primary continue button text to the given text.
+     */
+    public void setPrimaryToolbarButtonText(String text) {
+        mPrimaryToolbarButton.setText(text);
     }
 
     /**
@@ -299,17 +339,10 @@ public class CarSetupWizardLayout extends LinearLayout {
     }
 
     /**
-     * Set the primary continue button text to the given text.
+     * Getter for the flatness of the primary toolbar button.
      */
-    public void setPrimaryToolbarButtonText(String text) {
-        mPrimaryToolbarButton.setText(text);
-    }
-
-    /**
-     * Set the primary continue button visibility to the given visibility.
-     */
-    public void setPrimaryToolbarButtonVisible(boolean visible) {
-        setViewVisible(mPrimaryToolbarButton, visible);
+    public boolean getPrimaryToolbarButtonFlat() {
+        return mPrimaryToolbarButtonFlat;
     }
 
     /**
@@ -323,16 +356,7 @@ public class CarSetupWizardLayout extends LinearLayout {
         if (isFlat == mPrimaryToolbarButtonFlat) {
             return;
         }
-        int layoutId = isFlat ? R.layout.flat_button : R.layout.primary_button;
-        Button newPrimaryButton = (Button) inflate(mContext, layoutId, null);
-        newPrimaryButton.setId(mPrimaryToolbarButton.getId());
-        newPrimaryButton.setVisibility(mPrimaryToolbarButton.getVisibility());
-        newPrimaryButton.setEnabled(mPrimaryToolbarButton.isEnabled());
-        newPrimaryButton.setText(mPrimaryToolbarButton.getText());
-        if (mPrimaryToolbarButtonOnClick != null) {
-            newPrimaryButton.setOnClickListener(mPrimaryToolbarButtonOnClick);
-        }
-        newPrimaryButton.setLayoutParams(mPrimaryToolbarButton.getLayoutParams());
+        Button newPrimaryButton = createPrimaryToolbarButton(isFlat);
 
         ViewGroup parent = (ViewGroup) findViewById(R.id.button_container);
         int buttonIndex = parent.indexOfChild(mPrimaryToolbarButton);
@@ -340,41 +364,29 @@ public class CarSetupWizardLayout extends LinearLayout {
         parent.addView(newPrimaryButton, buttonIndex);
 
         // Update state of layout
-        mPrimaryToolbarButton = newPrimaryButton;
+        setPrimaryToolbarButton(newPrimaryButton);
         mPrimaryToolbarButtonFlat = isFlat;
     }
 
-    /**
-     * Getter for the primary toolbar button
-     */
-    public Button getPrimaryToolbarButton() {
-        return mPrimaryToolbarButton;
-    }
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    Button createPrimaryToolbarButton(boolean isFlat) {
+        int layoutId = isFlat ? R.layout.flat_button : R.layout.primary_button;
+        Button newPrimaryButton = (Button) inflate(getContext(), layoutId, null);
+        newPrimaryButton.setId(mPrimaryToolbarButton.getId());
+        newPrimaryButton.setVisibility(mPrimaryToolbarButton.getVisibility());
+        newPrimaryButton.setEnabled(mPrimaryToolbarButton.isEnabled());
+        newPrimaryButton.setText(mPrimaryToolbarButton.getText());
+        newPrimaryButton.setOnClickListener(mPrimaryToolbarButtonOnClick);
+        newPrimaryButton.setLayoutParams(mPrimaryToolbarButton.getLayoutParams());
 
-
-    /**
-     * Set whether the secondary continue button is enabled.
-     */
-    public void setSecondaryToolbarButtonEnabled(boolean enabled) {
-        maybeInflateSecondaryToolbarButton();
-        mSecondaryToolbarButton.setEnabled(enabled);
-    }
-
-    /**
-     * Set the secondary continue button onClickListener to the given listener. Can be null if the
-     * listener should be overridden so no callback is made.
-     */
-    public void setSecondaryToolbarButtonListener(@Nullable View.OnClickListener listener) {
-        maybeInflateSecondaryToolbarButton();
-        mSecondaryToolbarButton.setOnClickListener(listener);
+        return newPrimaryButton;
     }
 
     /**
-     * Set the secondary continue button text to the given text.
+     * Gets the secondary toolbar button.
      */
-    public void setSecondaryToolbarButtonText(String text) {
-        maybeInflateSecondaryToolbarButton();
-        mSecondaryToolbarButton.setText(text);
+    public Button getSecondaryToolbarButton() {
+        return mSecondaryToolbarButton;
     }
 
     /**
@@ -390,39 +402,73 @@ public class CarSetupWizardLayout extends LinearLayout {
     }
 
     /**
-     * Getter for the secondary toolbar button
+     * Sets whether the secondary continue button is enabled.
      */
-    public Button getSecondaryToolbarButton() {
-        return mSecondaryToolbarButton;
+    public void setSecondaryToolbarButtonEnabled(boolean enabled) {
+        maybeInflateSecondaryToolbarButton();
+        mSecondaryToolbarButton.setEnabled(enabled);
     }
 
     /**
-     * Set the progress bar visibility to the given visibility.
+     * Sets the secondary continue button text to the given text.
+     */
+    public void setSecondaryToolbarButtonText(String text) {
+        maybeInflateSecondaryToolbarButton();
+        mSecondaryToolbarButton.setText(text);
+    }
+
+    /**
+     * Sets the secondary continue button onClickListener to the given listener. Can be null if the
+     * listener should be overridden so no callback is made.
+     */
+    public void setSecondaryToolbarButtonListener(@Nullable View.OnClickListener listener) {
+        maybeInflateSecondaryToolbarButton();
+        mSecondaryToolbarButton.setOnClickListener(listener);
+    }
+
+    /**
+     * A method that will inflate the SecondaryToolbarButton if it is has not already been
+     * inflated. If it has been inflated already this method will do nothing.
+     */
+    private void maybeInflateSecondaryToolbarButton() {
+        ViewStub secondaryToolbarButtonStub = findViewById(R.id.secondary_toolbar_button_stub);
+        // If the secondaryToolbarButtonStub is null then the stub has been inflated so there is
+        // nothing to do.
+        if (secondaryToolbarButtonStub != null) {
+            secondaryToolbarButtonStub.inflate();
+            mSecondaryToolbarButton = findViewById(R.id.secondary_toolbar_button);
+            setSecondaryToolbarButtonVisible(false);
+        }
+
+    }
+
+    /**
+     * Gets the progress bar.
+     */
+    public ProgressBar getProgressBar() {
+        return mProgressBar;
+    }
+
+    /**
+     * Sets the progress bar visibility to the given visibility.
      */
     public void setProgressBarVisible(boolean visible) {
         setViewVisible(mProgressBar, visible);
     }
 
     /**
-     * Set the progress bar indeterminate/determinate state.
+     * Sets the progress bar indeterminate/determinate state.
      */
     public void setProgressBarIndeterminate(boolean indeterminate) {
         mProgressBar.setIndeterminate(indeterminate);
     }
 
     /**
-     * Set the progress bar's progress.
+     * Sets the progress bar's progress.
      */
     public void setProgressBarProgress(int progress) {
         setProgressBarIndeterminate(false);
         mProgressBar.setProgress(progress);
-    }
-
-    /**
-     * Getter for the progress bar
-     */
-    public ProgressBar getProgressBar() {
-        return mProgressBar;
     }
 
     /**
@@ -443,21 +489,5 @@ public class CarSetupWizardLayout extends LinearLayout {
 
         mSecondaryToolbarButton.setTextLocale(locale);
         mSecondaryToolbarButton.setLayoutDirection(direction);
-    }
-
-    /**
-     * A method that will inflate the SecondaryToolbarButton if it is has not already been
-     * inflated. If it has been inflated already this method will do nothing.
-     */
-    private void maybeInflateSecondaryToolbarButton() {
-        ViewStub secondaryToolbarButtonStub = findViewById(R.id.secondary_toolbar_button_stub);
-        // If the secondaryToolbarButtonStub is null then the stub has been inflated so there is
-        // nothing to do.
-        if (secondaryToolbarButtonStub != null) {
-            secondaryToolbarButtonStub.inflate();
-            mSecondaryToolbarButton = findViewById(R.id.secondary_toolbar_button);
-            setSecondaryToolbarButtonVisible(false);
-        }
-
     }
 }

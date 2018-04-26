@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Android Open Source Project
+ * Copyright (C) 2017 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,22 +18,19 @@ package com.android.car.setupwizardlib;
 
 import static com.google.common.truth.Truth.assertThat;
 
-import android.content.Context;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.android.car.setupwizardlib.robolectric.BaseRobolectricTest;
 import com.android.car.setupwizardlib.robolectric.CarSetupWizardLibRobolectricTestRunner;
+import com.android.car.setupwizardlib.robolectric.TestHelper;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.robolectric.Robolectric;
-import org.robolectric.RuntimeEnvironment;
 
 import java.util.Locale;
 
@@ -42,20 +39,12 @@ import java.util.Locale;
  */
 @RunWith(CarSetupWizardLibRobolectricTestRunner.class)
 public class CarSetupWizardLayoutTest extends BaseRobolectricTest {
-    private static final String TAG = "CarSetupWizardLayoutTest";
-
     private static final Locale LOCALE_EN_US = new Locale("en", "US");
     // Hebrew locale can be used to test RTL.
     private static final Locale LOCALE_IW_IL = new Locale("iw", "IL");
 
-    private boolean isClicked;
     private CarSetupWizardLayout mCarSetupWizardLayout;
     private CarSetupWizardLayoutTestActivity mCarSetupWizardLayoutTestActivity;
-    private View mBackButton;
-    private TextView mToolbarTitleView;
-    private Button mPrimaryToolbarButton;
-    private Button mSecondaryToolbarButton;
-    private ProgressBar mProgressBar;
 
     @Before
     public void setUp() {
@@ -67,233 +56,343 @@ public class CarSetupWizardLayoutTest extends BaseRobolectricTest {
         mCarSetupWizardLayout = mCarSetupWizardLayoutTestActivity.
                 findViewById(R.id.car_setup_wizard_layout);
 
-        mBackButton = mCarSetupWizardLayout.
-                findViewById(R.id.back_button);
-
-        mPrimaryToolbarButton = mCarSetupWizardLayout.
-                findViewById(R.id.primary_toolbar_button);
-
         // Have to make this call first to ensure secondaryToolbar button is created from stub.
         mCarSetupWizardLayout.setSecondaryToolbarButtonVisible(true);
         mCarSetupWizardLayout.setSecondaryToolbarButtonVisible(false);
-        mSecondaryToolbarButton = mCarSetupWizardLayout.
-                findViewById(R.id.secondary_toolbar_button);
-
-        mToolbarTitleView = mCarSetupWizardLayout.
-                findViewById(R.id.toolbar_title);
-
-        mProgressBar = mCarSetupWizardLayout.findViewById(R.id.progress_bar);
-
-        isClicked = false;
-    }
-
-    private String getTestString() {
-        Context context = RuntimeEnvironment.application;
-        return context.getString(R.string.test_text);
     }
 
     /**
-     * Test that setBackButtonListener does set the back button listener
+     * Test that {@link CarSetupWizardLayout#setBackButtonListener} does set the back button
+     * listener.
      */
     @Test
     public void testSetBackButtonListener() {
-        mCarSetupWizardLayout.setBackButtonListener(v -> {
-            isClicked = true;
-        });
+        View.OnClickListener spyListener = TestHelper.createSpyListener();
 
-        assertThat(isClicked).isFalse();
-
-        mBackButton.performClick();
-
-        assertThat(isClicked).isTrue();
+        mCarSetupWizardLayout.setBackButtonListener(spyListener);
+        mCarSetupWizardLayout.getBackButton().performClick();
+        Mockito.verify(spyListener).onClick(mCarSetupWizardLayout.getBackButton());
     }
 
     /**
-     * Test that setBackButtonVisible does set the back button visibility and updates the touch
-     * delegate accordingly
+     * Test that {@link CarSetupWizardLayout#setBackButtonVisible} does set the view visible/not
+     * visible and calls updateBackButtonTouchDelegate.
      */
     @Test
-    public void testSetBackButtonVisible() {
-        mCarSetupWizardLayout.setBackButtonVisible(true);
-        assertThat(mBackButton.getVisibility()).isEqualTo(View.VISIBLE);
-        assertThat(((View) mBackButton.getParent()).getTouchDelegate()).isNotNull();
+    public void testSetBackButtonVisibleTrue() {
+        CarSetupWizardLayout spyCarSetupWizardLayout = Mockito.spy(mCarSetupWizardLayout);
 
-        mCarSetupWizardLayout.setBackButtonVisible(false);
-        assertThat(mBackButton.getVisibility()).isEqualTo(View.GONE);
-        assertThat(((View) mBackButton.getParent()).getTouchDelegate()).isNull();
+        spyCarSetupWizardLayout.setBackButtonVisible(true);
+        View backButton = spyCarSetupWizardLayout.getBackButton();
+        TestHelper.assertViewVisible(backButton);
+        Mockito.verify(spyCarSetupWizardLayout).updateBackButtonTouchDelegate(true);
     }
 
     /**
-     * Tests that setToolbarTitleVisible sets the toolbar title visibility
+     * Test that {@link CarSetupWizardLayout#setBackButtonVisible} does set the view visible/not
+     * visible and calls updateBackButtonTouchDelegate.
      */
     @Test
-    public void testSetToolbarTitleVisible() {
+    public void testSetBackButtonVisibleFalse() {
+        CarSetupWizardLayout spyCarSetupWizardLayout = Mockito.spy(mCarSetupWizardLayout);
+
+        spyCarSetupWizardLayout.setBackButtonVisible(false);
+        View backButton = spyCarSetupWizardLayout.getBackButton();
+        TestHelper.assertViewNotVisible(backButton);
+        Mockito.verify(spyCarSetupWizardLayout).updateBackButtonTouchDelegate(false);
+    }
+
+    /**
+     * Test that {@link CarSetupWizardLayout#setToolbarTitleVisible} does set the view visible/not
+     * visible.
+     */
+    @Test
+    public void testSetToolbarTitleVisibleTrue() {
+        View toolbarTitle = mCarSetupWizardLayout.getToolbarTitle();
+
         mCarSetupWizardLayout.setToolbarTitleVisible(true);
-        assertThat(mToolbarTitleView.getVisibility()).isEqualTo(View.VISIBLE);
+        TestHelper.assertViewVisible(toolbarTitle);
+    }
+
+    /**
+     * Test that {@link CarSetupWizardLayout#setToolbarTitleVisible} does set the view visible/not
+     * visible.
+     */
+    @Test
+    public void testSetToolbarTitleVisibleFalse() {
+        View toolbarTitle = mCarSetupWizardLayout.getToolbarTitle();
 
         mCarSetupWizardLayout.setToolbarTitleVisible(false);
-        assertThat(mToolbarTitleView.getVisibility()).isEqualTo(View.GONE);
+        TestHelper.assertViewNotVisible(toolbarTitle);
     }
 
     /**
-     * Tests that setToolbarTitleText does set the toolbar title text
+     * Tests that {@link CarSetupWizardLayout#setToolbarTitleText(String)} does set the toolbar
+     * title text.
      */
     @Test
     public void testSetToolbarTitleText() {
-        mCarSetupWizardLayout.setToolbarTitleText(getTestString());
-        assertThat(mToolbarTitleView.getText()).isEqualTo(getTestString());
+        mCarSetupWizardLayout.setToolbarTitleText("test title");
+        TestHelper.assertTextEqual(mCarSetupWizardLayout.getToolbarTitle(), "test title");
     }
 
     /**
-     * Test that setPrimaryToolbarButtonEnabled does set whether the primary continue button is
-     * enabled
+     * Test that {@link CarSetupWizardLayout#setPrimaryToolbarButtonVisible} does set the view
+     * visible/not visible.
      */
     @Test
-    public void testSetPrimaryToolbarButtonEnabled() {
+    public void testSetPrimaryToolbarButtonVisibleTrue() {
+        View toolbarTitle = mCarSetupWizardLayout.getPrimaryToolbarButton();
+
+        mCarSetupWizardLayout.setPrimaryToolbarButtonVisible(true);
+        TestHelper.assertViewVisible(toolbarTitle);
+    }
+
+    /**
+     * Test that {@link CarSetupWizardLayout#setPrimaryToolbarButtonVisible} does set the view
+     * visible/not visible.
+     */
+    @Test
+    public void testSetPrimaryToolbarButtonVisibleFalse() {
+        View toolbarTitle = mCarSetupWizardLayout.getPrimaryToolbarButton();
+
+        mCarSetupWizardLayout.setPrimaryToolbarButtonVisible(false);
+        TestHelper.assertViewNotVisible(toolbarTitle);
+    }
+
+    /**
+     * Test that {@link CarSetupWizardLayout#setPrimaryToolbarButtonEnabled} does set the view
+     * enabled/not enabled.
+     */
+    @Test
+    public void testSetPrimaryToolbarButtonEnabledTrue() {
+        View toolbarTitle = mCarSetupWizardLayout.getPrimaryToolbarButton();
+
         mCarSetupWizardLayout.setPrimaryToolbarButtonEnabled(true);
-        assertThat(mPrimaryToolbarButton.isEnabled()).isEqualTo(true);
+        TestHelper.assertViewEnabled(toolbarTitle);
+    }
+
+    /**
+     * Test that {@link CarSetupWizardLayout#setPrimaryToolbarButtonEnabled} does set the view
+     * enabled/not enabled.
+     */
+    @Test
+    public void testSetPrimaryToolbarButtonEnabledFalse() {
+        View toolbarTitle = mCarSetupWizardLayout.getPrimaryToolbarButton();
 
         mCarSetupWizardLayout.setPrimaryToolbarButtonEnabled(false);
-        assertThat(mPrimaryToolbarButton.isEnabled()).isEqualTo(false);
+        TestHelper.assertViewNotEnabled(toolbarTitle);
     }
 
     /**
-     * Test that setPrimaryToolbarButtonListener does set the primary continue button listener
-     */
-    @Test
-    public void testSetPrimaryToolbarButtonListener() {
-        mCarSetupWizardLayout.setPrimaryToolbarButtonListener(v -> {
-            isClicked = true;
-        });
-
-        assertThat(isClicked).isFalse();
-
-        mPrimaryToolbarButton.performClick();
-
-        assertThat(isClicked).isTrue();
-    }
-
-    /**
-     * Test that setPrimaryToolbarButtonText does set the primary continue button text
+     * Tests that {@link CarSetupWizardLayout#setPrimaryToolbarButtonText(String)} does set the
+     * primary toolbar button text.
      */
     @Test
     public void testSetPrimaryToolbarButtonText() {
-        mCarSetupWizardLayout.setPrimaryToolbarButtonText(getTestString());
-        assertThat(mPrimaryToolbarButton.getText()).isEqualTo(getTestString());
+        mCarSetupWizardLayout.setPrimaryToolbarButtonText("test title");
+        TestHelper.assertTextEqual(mCarSetupWizardLayout.getPrimaryToolbarButton(), "test title");
     }
 
     /**
-     * Test that set does set the primary continue button visibility
+     * Test that {@link CarSetupWizardLayout#setPrimaryToolbarButtonListener} does set the primary
+     * toolbar button listener.
      */
     @Test
-    public void testSetPrimaryToolbarButtonVisible() {
-        mCarSetupWizardLayout.setPrimaryToolbarButtonVisible(true);
-        assertThat(mPrimaryToolbarButton.getVisibility()).isEqualTo(View.VISIBLE);
+    public void testSetPrimaryToolbarButtonListener() {
+        View.OnClickListener spyListener = TestHelper.createSpyListener();
 
-        mCarSetupWizardLayout.setPrimaryToolbarButtonVisible(false);
-        assertThat(mPrimaryToolbarButton.getVisibility()).isEqualTo(View.GONE);
+        mCarSetupWizardLayout.setPrimaryToolbarButtonListener(spyListener);
+        mCarSetupWizardLayout.getPrimaryToolbarButton().performClick();
+        Mockito.verify(spyListener).onClick(mCarSetupWizardLayout.getPrimaryToolbarButton());
     }
 
     /**
-     * Test that setSecondaryToolbarButtonEnabled does set whether the secondary continue button is
-     * enabled
+     * Test that {@link CarSetupWizardLayout#createPrimaryToolbarButton} creates a new button but
+     * holds over the correct attributes.
      */
     @Test
-    public void testSetSecondaryToolbarButtonEnabled() {
+    public void testCreatePrimaryButtonTrue() {
+        Button currPrimaryToolbarButton = mCarSetupWizardLayout.getPrimaryToolbarButton();
+        Button primaryToolbarButton = mCarSetupWizardLayout.createPrimaryToolbarButton(true);
+
+        assertThat(primaryToolbarButton.getVisibility()).isEqualTo(
+                currPrimaryToolbarButton.getVisibility());
+        assertThat(primaryToolbarButton.isEnabled()).isEqualTo(
+                currPrimaryToolbarButton.isEnabled());
+        assertThat(primaryToolbarButton.getText()).isEqualTo(currPrimaryToolbarButton.getText());
+        assertThat(primaryToolbarButton.getLayoutParams()).isEqualTo(
+                currPrimaryToolbarButton.getLayoutParams());
+    }
+
+    /**
+     * Test that {@link CarSetupWizardLayout#setSecondaryToolbarButtonVisible} does set the view
+     * visible/not visible.
+     */
+    @Test
+    public void testSetSecondaryToolbarButtonVisibleTrue() {
+        View toolbarTitle = mCarSetupWizardLayout.getSecondaryToolbarButton();
+
+        mCarSetupWizardLayout.setSecondaryToolbarButtonVisible(true);
+        TestHelper.assertViewVisible(toolbarTitle);
+    }
+
+    /**
+     * Test that {@link CarSetupWizardLayout#setSecondaryToolbarButtonVisible} does set the view
+     * visible/not visible.
+     */
+    @Test
+    public void testSetSecondaryToolbarButtonVisibleFalse() {
+        View toolbarTitle = mCarSetupWizardLayout.getSecondaryToolbarButton();
+
+        mCarSetupWizardLayout.setSecondaryToolbarButtonVisible(false);
+        TestHelper.assertViewNotVisible(toolbarTitle);
+    }
+
+    /**
+     * Test that {@link CarSetupWizardLayout#setSecondaryToolbarButtonEnabled} does set the view
+     * enabled/not enabled.
+     */
+    @Test
+    public void testSetSecondaryToolbarButtonEnabledTrue() {
+        View toolbarTitle = mCarSetupWizardLayout.getSecondaryToolbarButton();
+
         mCarSetupWizardLayout.setSecondaryToolbarButtonEnabled(true);
-        assertThat(mSecondaryToolbarButton.isEnabled()).isEqualTo(true);
+        TestHelper.assertViewEnabled(toolbarTitle);
+    }
+
+    /**
+     * Test that {@link CarSetupWizardLayout#setSecondaryToolbarButtonEnabled} does set the view
+     * enabled/not enabled.
+     */
+    @Test
+    public void testSetSecondaryToolbarButtonEnabledFalse() {
+        View toolbarTitle = mCarSetupWizardLayout.getSecondaryToolbarButton();
 
         mCarSetupWizardLayout.setSecondaryToolbarButtonEnabled(false);
-        assertThat(mSecondaryToolbarButton.isEnabled()).isEqualTo(false);
+        TestHelper.assertViewNotEnabled(toolbarTitle);
     }
 
     /**
-     * Test that setSecondaryToolbarButtonListener does set the secondary continue button listener
-     */
-    @Test
-    public void testSetSecondaryToolbarButtonListener() {
-        mCarSetupWizardLayout.setSecondaryToolbarButtonListener(v -> {
-            isClicked = true;
-        });
-
-        assertThat(isClicked).isFalse();
-
-        mSecondaryToolbarButton.performClick();
-
-        assertThat(isClicked).isTrue();
-    }
-
-    /**
-     * Test that setSecondaryToolbarButtonText does set the secondary continue button text
+     * Tests that {@link CarSetupWizardLayout#setSecondaryToolbarButtonText(String)} does set the
+     * secondary toolbar button text.
      */
     @Test
     public void testSetSecondaryToolbarButtonText() {
-        mCarSetupWizardLayout.setSecondaryToolbarButtonText(getTestString());
-        assertThat(mSecondaryToolbarButton.getText()).isEqualTo(getTestString());
+        mCarSetupWizardLayout.setSecondaryToolbarButtonText("test title");
+        TestHelper.assertTextEqual(mCarSetupWizardLayout.getSecondaryToolbarButton(), "test title");
     }
 
     /**
-     * Test that set does set the secondary continue button visibility
+     * Test that {@link CarSetupWizardLayout#setSecondaryToolbarButtonListener} does set the
+     * secondary toolbar button listener.
      */
     @Test
-    public void testSetSecondaryToolbarButtonVisible() {
-        mCarSetupWizardLayout.setSecondaryToolbarButtonVisible(true);
-        assertThat(mSecondaryToolbarButton.getVisibility()).isEqualTo(View.VISIBLE);
+    public void testSetSecondaryToolbarButtonListener() {
+        View.OnClickListener spyListener = TestHelper.createSpyListener();
 
-        mCarSetupWizardLayout.setSecondaryToolbarButtonVisible(false);
-        assertThat(mSecondaryToolbarButton.getVisibility()).isEqualTo(View.GONE);
+        mCarSetupWizardLayout.setSecondaryToolbarButtonListener(spyListener);
+        mCarSetupWizardLayout.getSecondaryToolbarButton().performClick();
+        Mockito.verify(spyListener).onClick(mCarSetupWizardLayout.getSecondaryToolbarButton());
     }
 
     /**
-     * Test that setProgressBarVisible does set the progress bar visibility
+     * Test that {@link CarSetupWizardLayout#setProgressBarVisible} does set the view
+     * visible/not visible.
      */
     @Test
-    public void testSetProgressBarVisible() {
+    public void testSetProgressBarVisibleTrue() {
+        View toolbarTitle = mCarSetupWizardLayout.getProgressBar();
+
         mCarSetupWizardLayout.setProgressBarVisible(true);
-        assertThat(mProgressBar.getVisibility()).isEqualTo(View.VISIBLE);
+        TestHelper.assertViewVisible(toolbarTitle);
+    }
+
+    /**
+     * Test that {@link CarSetupWizardLayout#setProgressBarVisible} does set the view
+     * visible/not visible.
+     */
+    @Test
+    public void testSetProgressBarVisibleFalse() {
+        View toolbarTitle = mCarSetupWizardLayout.getProgressBar();
 
         mCarSetupWizardLayout.setProgressBarVisible(false);
-        assertThat(mProgressBar.getVisibility()).isEqualTo(View.GONE);
+        TestHelper.assertViewNotVisible(toolbarTitle);
+    }
+
+    /**
+     * Test that {@link CarSetupWizardLayout#setProgressBarIndeterminate(boolean)}
+     * does set the progress bar intermediate/not indeterminate.
+     */
+    @Test
+    public void testSetProgressBarIndeterminateTrue() {
+        mCarSetupWizardLayout.setProgressBarIndeterminate(true);
+        assertThat(mCarSetupWizardLayout.getProgressBar().isIndeterminate()).isTrue();
+    }
+
+    /**
+     * Test that {@link CarSetupWizardLayout#setProgressBarIndeterminate(boolean)}
+     * does set the progress bar intermediate/not indeterminate.
+     */
+    @Test
+    public void testSetProgressBarIndeterminateFalse() {
+        mCarSetupWizardLayout.setProgressBarIndeterminate(false);
+        assertThat(mCarSetupWizardLayout.getProgressBar().isIndeterminate()).isFalse();
+    }
+
+    /**
+     * Test that {@link CarSetupWizardLayout#setProgressBarProgress} does set the progress.
+     */
+    @Test
+    public void testSetProgressBarProgress() {
+        mCarSetupWizardLayout.setProgressBarProgress(80);
+        assertThat(mCarSetupWizardLayout.getProgressBar().getProgress()).isEqualTo(80);
     }
 
     @Test
     public void testApplyUpdatedLocale() {
         mCarSetupWizardLayout.applyLocale(LOCALE_IW_IL);
-        assertThat(mToolbarTitleView.getTextLocale()).isEqualTo(LOCALE_IW_IL);
-        assertThat(mPrimaryToolbarButton.getTextLocale()).isEqualTo(LOCALE_IW_IL);
-        assertThat(mSecondaryToolbarButton.getTextLocale()).isEqualTo(LOCALE_IW_IL);
+        TextView toolbarTitle = mCarSetupWizardLayout.getToolbarTitle();
+        Button primaryToolbarButton = mCarSetupWizardLayout.getPrimaryToolbarButton();
+        Button secondaryToolbarButton = mCarSetupWizardLayout.getSecondaryToolbarButton();
+
+        assertThat(toolbarTitle.getTextLocale()).isEqualTo(LOCALE_IW_IL);
+        assertThat(primaryToolbarButton.getTextLocale()).isEqualTo(LOCALE_IW_IL);
+        assertThat(secondaryToolbarButton.getTextLocale()).isEqualTo(LOCALE_IW_IL);
 
         mCarSetupWizardLayout.applyLocale(LOCALE_EN_US);
-        assertThat(mToolbarTitleView.getTextLocale()).isEqualTo(LOCALE_EN_US);
-        assertThat(mPrimaryToolbarButton.getTextLocale()).isEqualTo(LOCALE_EN_US);
-        assertThat(mSecondaryToolbarButton.getTextLocale()).isEqualTo(LOCALE_EN_US);
+        assertThat(toolbarTitle.getTextLocale()).isEqualTo(LOCALE_EN_US);
+        assertThat(primaryToolbarButton.getTextLocale()).isEqualTo(LOCALE_EN_US);
+        assertThat(secondaryToolbarButton.getTextLocale()).isEqualTo(LOCALE_EN_US);
     }
 
-    /**
-     * Test that setProgressBarProgress does set the progress bar progress
-     */
     @Test
-    public void testSetProgressBarProgress() {
-        int progress = 80;
-        mCarSetupWizardLayout.setProgressBarProgress(progress);
-        assertThat(mProgressBar.isIndeterminate()).isFalse();
-        assertThat(mProgressBar.getProgress()).isEqualTo(progress);
+    public void testGetBackButton() {
+        assertThat(mCarSetupWizardLayout.getPrimaryToolbarButton()).isEqualTo(
+                mCarSetupWizardLayout.findViewById(R.id.primary_toolbar_button));
     }
 
-    /**
-     * Test that setting primary button to flat replaces it with a flat button.
-     */
     @Test
-    public void testSetPrimaryToolbarButtonFlat() {
-        mCarSetupWizardLayout.setPrimaryToolbarButtonFlat(true);
-        ViewGroup buttonGroup = mCarSetupWizardLayoutTestActivity
-                .findViewById(R.id.button_container);
-        assertThat(buttonGroup.getChildCount()).isEqualTo(2);
-        mPrimaryToolbarButton = mCarSetupWizardLayoutTestActivity
-                .findViewById(R.id.primary_toolbar_button);
-        assertThat(mPrimaryToolbarButton.getBackground())
-                .isEqualTo(mCarSetupWizardLayoutTestActivity
-                        .getDrawable(R.drawable.abc_btn_borderless_material));
-        assertThat(buttonGroup.indexOfChild(mPrimaryToolbarButton)).isEqualTo(1);
+    public void testGetToolBarTitle() {
+        assertThat(mCarSetupWizardLayout.getToolbarTitle()).isEqualTo(
+                mCarSetupWizardLayout.findViewById(R.id.toolbar_title));
+    }
+
+    @Test
+    public void testGetPrimaryToolBarButton() {
+        assertThat(mCarSetupWizardLayout.getPrimaryToolbarButton()).isEqualTo(
+                mCarSetupWizardLayout.findViewById(R.id.primary_toolbar_button));
+    }
+
+    @Test
+    public void testGetSecondaryToolBarButton() {
+        assertThat(mCarSetupWizardLayout.getSecondaryToolbarButton()).isEqualTo(
+                mCarSetupWizardLayout.findViewById(R.id.secondary_toolbar_button));
+    }
+
+    @Test
+    public void testGetProgressBar() {
+        assertThat(mCarSetupWizardLayout.getProgressBar()).isEqualTo(
+                mCarSetupWizardLayout.findViewById(R.id.progress_bar));
     }
 }
