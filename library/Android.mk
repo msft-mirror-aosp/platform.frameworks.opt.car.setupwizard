@@ -37,7 +37,10 @@ LOCAL_PROGUARD_ENABLED := disabled
 
 include $(BUILD_STATIC_JAVA_LIBRARY)
 
-# Use the following include to make our test apk.
-ifeq (,$(ONE_SHOT_MAKEFILE))
-    include $(call all-makefiles-under,$(LOCAL_PATH))
-endif
+#disable build in PDK, robotests won't build
+ifneq ($(TARGET_BUILD_PDK),true)
+    # Use the following include to make our test apk.
+    ifeq (,$(ONE_SHOT_MAKEFILE))
+        include $(call all-makefiles-under,$(LOCAL_PATH))
+    endif
+endif #TARGET_BUILD_PDK
