@@ -19,12 +19,11 @@ package com.android.car.setupwizardlib;
 import android.annotation.CallSuper;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.LayoutRes;
+import android.support.annotation.VisibleForTesting;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.view.View;
-
-import androidx.annotation.LayoutRes;
-import androidx.annotation.VisibleForTesting;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
 
 import com.android.car.setupwizardlib.util.CarWizardManagerHelper;
 
@@ -89,8 +88,16 @@ public class BaseActivity extends FragmentActivity {
                 finish();
             }
         });
-        setPrimaryToolbarButtonOnClickListener(v -> defaultOnPrimaryToolbarButtonClicked());
-        setSecondaryToolbarButtonOnClickListener(v -> defaultOnSecondaryToolbarButtonClicked());
+
+        /* If this activity has a saved instance and a content fragment, call onContentFragmentSet()
+         * so the appropriate views/events are updated.
+         */
+        if (savedInstanceState != null && getContentFragment() != null) {
+            onContentFragmentSet(getContentFragment());
+        }
+
+        resetPrimaryToolbarButtonOnCLickListener();
+        resetSecondaryToolbarButtonOnCLickListener();
     }
 
     @Override
@@ -116,7 +123,8 @@ public class BaseActivity extends FragmentActivity {
     /**
      * Sets the content fragment and adds it to the fragment backstack.
      */
-    protected final void setContentFragmentWithBackstack(Fragment fragment) {
+    @CallSuper
+    protected void setContentFragmentWithBackstack(Fragment fragment) {
         if (mAllowFragmentCommits) {
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.car_setup_wizard_layout, fragment, CONTENT_FRAGMENT_TAG)
@@ -130,16 +138,23 @@ public class BaseActivity extends FragmentActivity {
     /**
      * Returns the fragment that is currently being displayed as the content view.
      */
-    protected final Fragment getContentFragment() {
+    @CallSuper
+    protected Fragment getContentFragment() {
         return getSupportFragmentManager().findFragmentByTag(CONTENT_FRAGMENT_TAG);
     }
 
     /**
      * Sets the fragment that will be shown as the main content of this Activity.
      */
-    protected final void setContentFragment(Fragment fragment) {
+    @CallSuper
+    protected void setContentFragment(Fragment fragment) {
         if (mAllowFragmentCommits) {
             getSupportFragmentManager().beginTransaction()
+                    .setCustomAnimations(
+                            android.R.animator.fade_in,
+                            android.R.animator.fade_out,
+                            android.R.animator.fade_in,
+                            android.R.animator.fade_out)
                     .replace(R.id.car_setup_wizard_layout, fragment, CONTENT_FRAGMENT_TAG)
                     .commitNow();
             onContentFragmentSet(getContentFragment());
@@ -152,7 +167,8 @@ public class BaseActivity extends FragmentActivity {
      *
      * @return {@code true} if a fragment was popped.
      */
-    protected final boolean popBackStackImmediate() {
+    @CallSuper
+    protected boolean popBackStackImmediate() {
         if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
             getSupportFragmentManager().popBackStackImmediate();
             onContentFragmentSet(getContentFragment());
@@ -174,7 +190,8 @@ public class BaseActivity extends FragmentActivity {
      * Sets the layout view that will be shown as the main content of this Activity. Should be used
      * when the activity does not hold a fragment.
      */
-    protected final View setContentLayout(@LayoutRes int id) {
+    @CallSuper
+    protected View setContentLayout(@LayoutRes int id) {
         return getLayoutInflater().inflate(id, mCarSetupWizardLayout);
     }
 
@@ -199,14 +216,14 @@ public class BaseActivity extends FragmentActivity {
     /**
      * Moves to the next Activity in the SetupWizard flow.
      */
-    protected final void nextAction(int resultCode) {
+    protected void nextAction(int resultCode) {
         nextAction(resultCode, null);
     }
 
     /**
      * Moves to the next Activity in the SetupWizard flow, and save the intent data.
      */
-    protected final void nextAction(int resultCode, Intent data) {
+    protected void nextAction(int resultCode, Intent data) {
         if (resultCode == RESULT_CANCELED) {
             throw new IllegalArgumentException("Cannot call nextAction with RESULT_CANCELED");
         }
@@ -221,7 +238,7 @@ public class BaseActivity extends FragmentActivity {
      * Method for finishing an action. The default behavior is to close out the screen and
      * go back to the previous one.
      */
-    protected final void finishAction() {
+    protected void finishAction() {
         finishAction(RESULT_CANCELED);
     }
 
@@ -229,14 +246,14 @@ public class BaseActivity extends FragmentActivity {
      * Method for finishing an action with a non-default result code. This is a convenience
      * method to replace nextAction(resultCode); finish();
      */
-    protected final void finishAction(int resultCode) {
+    protected void finishAction(int resultCode) {
         finishAction(resultCode, null);
     }
 
     /**
      * Convenience method for nextAction(resultCode, data); finish();
      */
-    protected final void finishAction(int resultCode, Intent data) {
+    protected void finishAction(int resultCode, Intent data) {
         if (resultCode != RESULT_CANCELED) {
             nextAction(resultCode, data);
         }
@@ -244,33 +261,33 @@ public class BaseActivity extends FragmentActivity {
     }
 
     /**
+     * Method to retrieve resultCode saved via {@link #setResultCode(int, Intent)}
+     */
+    protected int getResultCode() {
+        return mResultCode;
+    }
+
+    /**
      * Use instead of {@link #setResult(int, Intent)} so that the resultCode
      * and data can be referenced later
      */
-    protected final void setResultCode(int resultCode, Intent data) {
+    protected void setResultCode(int resultCode, Intent data) {
         mResultCode = resultCode;
         mResultData = data;
         setResult(resultCode, data);
     }
 
     /**
-     * Method to retrieve resultCode saved via {@link #setResultCode(int, Intent)}
-     */
-    protected final int getResultCode() {
-        return mResultCode;
-    }
-
-    /**
      * Use instead of {@link #setResult(int)} so that the resultCode can be referenced later
      */
-    protected final void setResultCode(int resultCode) {
+    protected void setResultCode(int resultCode) {
         setResultCode(resultCode, getResultData());
     }
 
     /**
      * Method to retrieve intent data saved via {@link #setResultCode(int, Intent)}
      */
-    protected final Intent getResultData() {
+    protected Intent getResultData() {
         return mResultData;
     }
 
@@ -281,28 +298,28 @@ public class BaseActivity extends FragmentActivity {
      * Sets whether the back button is visible. If this value is {@code true}, clicking the
      * button will take the user back to the previous screen in the setup flow.
      */
-    protected final void setBackButtonVisible(boolean visible) {
+    protected void setBackButtonVisible(boolean visible) {
         mCarSetupWizardLayout.setBackButtonVisible(visible);
     }
 
     /**
      * Sets whether the toolbar title is visible.
      */
-    protected final void setToolbarTitleVisible(boolean visible) {
+    protected void setToolbarTitleVisible(boolean visible) {
         mCarSetupWizardLayout.setToolbarTitleVisible(visible);
     }
 
     /**
      * Sets the text for the toolbar title.
      */
-    protected final void setToolbarTitleText(String text) {
+    protected void setToolbarTitleText(String text) {
         mCarSetupWizardLayout.setToolbarTitleText(text);
     }
 
     /**
      * Sets whether the primary continue button is visible.
      */
-    protected final void setPrimaryToolbarButtonVisible(boolean visible) {
+    protected void setPrimaryToolbarButtonVisible(boolean visible) {
         mCarSetupWizardLayout.setPrimaryToolbarButtonVisible(visible);
     }
 
@@ -310,48 +327,47 @@ public class BaseActivity extends FragmentActivity {
      * Sets whether the primary continue button is enabled. If this value is {@code true},
      * clicking the button will take the user to the next screen in the setup flow.
      */
-    protected final void setPrimaryToolbarButtonEnabled(boolean enabled) {
+    protected void setPrimaryToolbarButtonEnabled(boolean enabled) {
         mCarSetupWizardLayout.setPrimaryToolbarButtonEnabled(enabled);
     }
 
     /**
      * Sets the text of the primary continue button.
      */
-    protected final void setPrimaryToolbarButtonText(String text) {
+    protected void setPrimaryToolbarButtonText(String text) {
         mCarSetupWizardLayout.setPrimaryToolbarButtonText(text);
     }
 
     /**
      * Sets whether the primary button is displayed as a flat or raised button.
      */
-    protected final void setPrimaryToolbarButtonFlat(boolean flat) {
+    protected void setPrimaryToolbarButtonFlat(boolean flat) {
         mCarSetupWizardLayout.setPrimaryToolbarButtonFlat(flat);
     }
 
     /**
      * Sets the primary button onClick behavior to a custom method.
      *
-     * <p>NOTE: This will overwrite defaultOnPrimaryToolbarButtonClicked
+     * <p>NOTE: This will overwrite the primary tool bar button's default action to call
+     * {@link #nextAction} with RESULT_OK.
      */
-    protected final void setPrimaryToolbarButtonOnClickListener(View.OnClickListener listener) {
+    protected void setPrimaryToolbarButtonOnClickListener(View.OnClickListener listener) {
         mCarSetupWizardLayout.setPrimaryToolbarButtonListener(listener);
     }
 
     /**
-     * Method that will be called when the primary continue button is clicked. This method will be
-     * called before this BaseActivity executes code to move onto the next screen.
-     *
-     * <p>Default behavior is call nexAction(RESULT_OK)
+     * Reset's the primary toolbar button's on click listener to call {@link #nextAction} with
+     * RESULT_OK
      */
-    protected final void defaultOnPrimaryToolbarButtonClicked() {
-        nextAction(RESULT_OK);
+    protected void resetPrimaryToolbarButtonOnCLickListener() {
+        setPrimaryToolbarButtonOnClickListener(v -> nextAction(RESULT_OK));
     }
 
 
     /**
      * Sets whether the secondary continue button is visible.
      */
-    protected final void setSecondaryToolbarButtonVisible(boolean visible) {
+    protected void setSecondaryToolbarButtonVisible(boolean visible) {
         mCarSetupWizardLayout.setSecondaryToolbarButtonVisible(visible);
     }
 
@@ -359,50 +375,48 @@ public class BaseActivity extends FragmentActivity {
      * Sets whether the secondary continue button is enabled. If this value is {@code true},
      * clicking the button will take the user to the next screen in the setup flow.
      */
-    protected final void setSecondaryToolbarButtonEnabled(boolean enabled) {
+    protected void setSecondaryToolbarButtonEnabled(boolean enabled) {
         mCarSetupWizardLayout.setSecondaryToolbarButtonEnabled(enabled);
     }
 
     /**
      * Sets the text of the secondary continue button.
      */
-    protected final void setSecondaryToolbarButtonText(String text) {
+    protected void setSecondaryToolbarButtonText(String text) {
         mCarSetupWizardLayout.setSecondaryToolbarButtonText(text);
     }
 
     /**
      * Sets the secondary button onClick behavior to a custom method.
      *
-     * <p>NOTE: This will overwrite defaultOnSecondaryToolbarButtonClicked
+     * <p>NOTE: This will overwrite the secondary tool bar button's default action to call
+     * {@link #nextAction} with RESULT_OK.
      */
-    protected final void setSecondaryToolbarButtonOnClickListener(View.OnClickListener listener) {
+    protected void setSecondaryToolbarButtonOnClickListener(View.OnClickListener listener) {
         mCarSetupWizardLayout.setSecondaryToolbarButtonListener(listener);
     }
 
     /**
-     * Method that will be called when the secondary continue button is clicked. This method will be
-     * called before this BaseActivity executes code to move onto the next screen.
-     *
-     * <p>Default behavior is call nexAction(RESULT_SKIP)
+     * Reset's the secondary toolbar button's on click listener to call {@link #nextAction} with
+     * RESULT_OK
      */
-    protected final void defaultOnSecondaryToolbarButtonClicked() {
-        nextAction(RESULT_OK);
+    protected void resetSecondaryToolbarButtonOnCLickListener() {
+        setSecondaryToolbarButtonOnClickListener(v -> nextAction(RESULT_OK));
     }
 
     /**
      * Sets whether the progress bar is visible.
      */
-    protected final void setProgressBarVisible(boolean visible) {
+    protected void setProgressBarVisible(boolean visible) {
         mCarSetupWizardLayout.setProgressBarVisible(visible);
     }
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    final boolean getAllowFragmentCommits() {
+    boolean getAllowFragmentCommits() {
         return mAllowFragmentCommits;
     }
 
-    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    final CarSetupWizardLayout getCarSetupWizardLayout() {
+    protected CarSetupWizardLayout getCarSetupWizardLayout() {
         return mCarSetupWizardLayout;
     }
 }
