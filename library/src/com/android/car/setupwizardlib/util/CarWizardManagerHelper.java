@@ -24,10 +24,10 @@ import android.provider.Settings;
  * <p>Derived from {@code com.android.setupwizardlib/WizardManagerHelper.java}
  */
 public final class CarWizardManagerHelper {
-    static final String EXTRA_WIZARD_BUNDLE = "wizardBundle";
-    static final String EXTRA_IS_FIRST_RUN = "firstRun";
-    static final String EXTRA_IS_DEALER = "dealer";
-    static final String EXTRA_IS_DEFERRED_SETUP = "deferredSetup";
+    public static final String EXTRA_WIZARD_BUNDLE = "wizardBundle";
+    public static final String EXTRA_IS_FIRST_RUN = "firstRun";
+    public static final String EXTRA_IS_DEALER = "dealer";
+    public static final String EXTRA_IS_DEFERRED_SETUP = "deferredSetup";
     private static final String ACTION_NEXT = "com.android.wizard.NEXT";
     private static final String EXTRA_RESULT_CODE = "com.android.setupwizard.ResultCode";
 

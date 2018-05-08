@@ -18,6 +18,7 @@ package com.android.car.setupwizardlib;
 
 import static com.google.common.truth.Truth.assertThat;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -94,7 +95,7 @@ public class BaseActivityTest extends BaseRobolectricTest {
                 R.id.secondary_toolbar_button);
         secondaryToolBarButton.performClick();
 
-        Mockito.verify(spyBaseActivity).defaultOnSecondaryToolbarButtonClicked();
+        Mockito.verify(spyBaseActivity).nextAction(Activity.RESULT_OK);
     }
 
 
@@ -110,7 +111,7 @@ public class BaseActivityTest extends BaseRobolectricTest {
                 R.id.primary_toolbar_button);
         primaryToolBarButton.performClick();
 
-        Mockito.verify(spyBaseActivity).defaultOnPrimaryToolbarButtonClicked();
+        Mockito.verify(spyBaseActivity).nextAction(Activity.RESULT_OK);
     }
 
     private BaseActivity getStartedBaseActivity() {
