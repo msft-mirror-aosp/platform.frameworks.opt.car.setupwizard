@@ -31,6 +31,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.robolectric.Robolectric;
+import org.robolectric.RuntimeEnvironment;
 
 import java.util.Locale;
 
@@ -39,6 +40,7 @@ import java.util.Locale;
  */
 @RunWith(CarSetupWizardLibRobolectricTestRunner.class)
 public class CarSetupWizardLayoutTest extends BaseRobolectricTest {
+    private static final float COMPARISON_TOLERANCE = .01f;
     private static final Locale LOCALE_EN_US = new Locale("en", "US");
     // Hebrew locale can be used to test RTL.
     private static final Locale LOCALE_IW_IL = new Locale("iw", "IL");
@@ -394,5 +396,17 @@ public class CarSetupWizardLayoutTest extends BaseRobolectricTest {
     public void testGetProgressBar() {
         assertThat(mCarSetupWizardLayout.getProgressBar()).isEqualTo(
                 mCarSetupWizardLayout.findViewById(R.id.progress_bar));
+    }
+
+    @Test
+    public void testTitleBarElevationChange() {
+        mCarSetupWizardLayout.addElevationToTitleBar(/*animate= */ false);
+        View titleBar = mCarSetupWizardLayout.findViewById(R.id.application_bar);
+        assertThat(titleBar.getElevation()).isWithin(COMPARISON_TOLERANCE).of(
+                RuntimeEnvironment.application.getResources().getDimension(
+                        R.dimen.title_bar_drop_shadow_elevation));
+
+        mCarSetupWizardLayout.removeElevationFromTitleBar(/*animate= */ false);
+        assertThat(titleBar.getElevation()).isWithin(COMPARISON_TOLERANCE).of(0f);
     }
 }
