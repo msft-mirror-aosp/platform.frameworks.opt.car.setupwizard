@@ -35,6 +35,8 @@ LOCAL_STATIC_ANDROID_LIBRARIES += \
 
 LOCAL_PROGUARD_ENABLED := disabled
 
+LOCAL_MIN_SDK_VERSION := 26
+
 include $(BUILD_STATIC_JAVA_LIBRARY)
 
 #disable build in PDK, robotests won't build
