@@ -15,13 +15,9 @@
     limitations under the License.
 -->
 <resources>
-    <!-- The default color for all activities in the SetupWizard. -->
-    <color name="windowBackground">@color/car_dark_blue_grey_700</color>
-
     <!-- The color of the status bar. -->
-    <color name="colorPrimaryDark">@color/car_dark_blue_grey_800</color>
+    <color name="colorPrimaryDark">@android:color/black</color>
 
     <!-- The accent color for the SetupWizard. -->
     <color name="accentColor">@color/car_yellow_800</color>
-    <color name="blue_600">@color/blue_600_light</color>
 </resources>
