@@ -22,6 +22,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import androidx.annotation.StyleRes;
+
 import com.android.car.setupwizardlib.robolectric.BaseRobolectricTest;
 import com.android.car.setupwizardlib.robolectric.CarSetupWizardLibRobolectricTestRunner;
 import com.android.car.setupwizardlib.robolectric.TestHelper;
@@ -32,6 +34,8 @@ import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.robolectric.Robolectric;
 import org.robolectric.RuntimeEnvironment;
+import org.robolectric.Shadows;
+import org.robolectric.shadows.ShadowTextView;
 
 import java.util.Locale;
 
@@ -136,6 +140,17 @@ public class CarSetupWizardLayoutTest extends BaseRobolectricTest {
     public void testSetToolbarTitleText() {
         mCarSetupWizardLayout.setToolbarTitleText("test title");
         TestHelper.assertTextEqual(mCarSetupWizardLayout.getToolbarTitle(), "test title");
+    }
+
+    /**
+     * Test that a call to setToolbarTitleStyle sets the text appearance on the toolbar title.
+     */
+    @Test
+    public void testSetToolbarStyle() {
+        @StyleRes int newStyle = R.style.TextAppearance_Car_Body2;
+        mCarSetupWizardLayout.setToolbarTitleStyle(newStyle);
+        ShadowTextView shadowTextView = Shadows.shadowOf(mCarSetupWizardLayout.getToolbarTitle());
+        assertThat(shadowTextView.getTextAppearanceId()).isEqualTo(newStyle);
     }
 
     /**

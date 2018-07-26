@@ -32,6 +32,7 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import androidx.annotation.StyleRes;
 import androidx.annotation.VisibleForTesting;
 
 import java.util.Locale;
@@ -309,6 +310,13 @@ public class CarSetupWizardLayout extends LinearLayout {
      */
     public void setToolbarTitleText(String text) {
         mToolbarTitle.setText(text);
+    }
+
+    /**
+     * Sets the style for the toolbar title.
+     */
+    public void setToolbarTitleStyle(@StyleRes int style) {
+        mToolbarTitle.setTextAppearance(style);
     }
 
     /**
