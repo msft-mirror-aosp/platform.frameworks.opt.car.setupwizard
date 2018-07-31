@@ -51,7 +51,7 @@ public class BaseActivity extends FragmentActivity {
      * Manager without requesting a result, the framework will choose not to issue a call to
      * onActivityResult with RESULT_CANCELED when navigating backward.
      */
-    private static final int REQUEST_CODE_NEXT = 10000;
+    protected static final int REQUEST_CODE_NEXT = 10000;
 
     /**
      * To implement a specific request code, see the following:
