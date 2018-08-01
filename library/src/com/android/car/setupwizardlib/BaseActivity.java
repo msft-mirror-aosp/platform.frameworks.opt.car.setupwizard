@@ -91,15 +91,15 @@ public class BaseActivity extends FragmentActivity {
             }
         });
 
+        resetPrimaryToolbarButtonOnClickListener();
+        resetSecondaryToolbarButtonOnClickListener();
+
         /* If this activity has a saved instance and a content fragment, call onContentFragmentSet()
          * so the appropriate views/events are updated.
          */
         if (savedInstanceState != null && getContentFragment() != null) {
             onContentFragmentSet(getContentFragment());
         }
-
-        resetPrimaryToolbarButtonOnCLickListener();
-        resetSecondaryToolbarButtonOnCLickListener();
     }
 
     @Override
@@ -368,7 +368,7 @@ public class BaseActivity extends FragmentActivity {
      * Reset's the primary toolbar button's on click listener to call {@link #nextAction} with
      * RESULT_OK
      */
-    protected void resetPrimaryToolbarButtonOnCLickListener() {
+    protected void resetPrimaryToolbarButtonOnClickListener() {
         setPrimaryToolbarButtonOnClickListener(v -> nextAction(RESULT_OK));
     }
 
@@ -409,7 +409,7 @@ public class BaseActivity extends FragmentActivity {
      * Reset's the secondary toolbar button's on click listener to call {@link #nextAction} with
      * RESULT_OK
      */
-    protected void resetSecondaryToolbarButtonOnCLickListener() {
+    protected void resetSecondaryToolbarButtonOnClickListener() {
         setSecondaryToolbarButtonOnClickListener(v -> nextAction(RESULT_OK));
     }
 
