@@ -22,6 +22,7 @@ import android.os.Bundle;
 import android.view.View;
 
 import androidx.annotation.LayoutRes;
+import androidx.annotation.StyleRes;
 import androidx.annotation.VisibleForTesting;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
@@ -315,6 +316,13 @@ public class BaseActivity extends FragmentActivity {
      */
     protected void setToolbarTitleText(String text) {
         mCarSetupWizardLayout.setToolbarTitleText(text);
+    }
+
+    /**
+     * Sets the text appearance for the toolbar title.
+     */
+    protected void setToolbarTitleStyle(@StyleRes int style) {
+        mCarSetupWizardLayout.setToolbarTitleStyle(style);
     }
 
     /**
