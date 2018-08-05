@@ -114,6 +114,28 @@ public class CarWizardManagerHelperTest extends BaseRobolectricTest {
     }
 
     /**
+     * Test that {@link CarWizardManagerHelper#isDeferredIntent} works.
+     */
+    @Test
+    public void testIsDeferredIntent_doesNotHaveExtra_shouldBeFalse() {
+        Intent intent = new Intent();
+        intent.putExtra(CarWizardManagerHelper.EXTRA_IS_DEFERRED_SETUP, false);
+
+        assertThat(CarWizardManagerHelper.isDeferredIntent(intent)).isFalse();
+    }
+
+    /**
+     * Test that {@link CarWizardManagerHelper#isDeferredIntent} works.
+     */
+    @Test
+    public void testIsDeferredIntent_doesHaveExtra_shouldBeTrue() {
+        Intent intent = new Intent();
+        intent.putExtra(CarWizardManagerHelper.EXTRA_IS_DEFERRED_SETUP, true);
+
+        assertThat(CarWizardManagerHelper.isDeferredIntent(intent)).isTrue();
+    }
+
+    /**
      * Test that {@link CarWizardManagerHelper#isDealerIntent} works.
      */
     @Test
