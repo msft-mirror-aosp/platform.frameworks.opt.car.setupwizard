@@ -23,4 +23,5 @@
 
     <!-- The accent color for the SetupWizard. -->
     <color name="accentColor">@color/car_yellow_800</color>
+    <color name="blue_600">@color/blue_600_light</color>
 </resources>

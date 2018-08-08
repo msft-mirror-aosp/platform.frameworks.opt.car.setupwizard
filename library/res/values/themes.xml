@@ -21,5 +21,13 @@
         <item name="android:colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="android:windowLightStatusBar">true</item>
         <item name="android:colorControlHighlight">?android:attr/colorAccent</item>
+        <item name="android:colorControlNormal">?android:attr/colorAccent</item>
+        <item name="android:colorControlActivated">?android:attr/colorAccent</item>
+        <item name="android:buttonStyle">@style/Widget.Car.SetupWizard.Button</item>
+        <item name="android:borderlessButtonStyle">@style/Widget.Car.SetupWizard.Button.Borderless.Colored</item>
+    </style>
+
+    <style name="Theme.Car.SetupWizard.NoActionBar.Accent" parent="Theme.Car.SetupWizard.NoActionBar">
+        <item name="android:colorAccent">@color/blue_600</item>
     </style>
 </resources>
