@@ -16,10 +16,8 @@
 -->
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
     <!-- The main theme for all activities within the Car Setup Wizard. -->
-    <style name="Theme.Car.SetupWizard.NoActionBar" parent="Theme.Car.Light.NoActionBar">
+    <style name="Theme.Car.SetupWizard.NoActionBar" parent="Theme.Car.Dark.NoActionBar">
         <item name="android:windowBackground">@color/windowBackground</item>
-        <item name="android:colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="android:windowLightStatusBar">true</item>
         <item name="android:colorButtonNormal">?android:attr/colorAccent</item>
         <item name="android:colorControlHighlight">?android:attr/colorAccent</item>
         <item name="android:colorControlNormal">?android:attr/colorAccent</item>
