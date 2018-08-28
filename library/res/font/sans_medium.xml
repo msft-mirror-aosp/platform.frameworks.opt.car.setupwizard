@@ -16,11 +16,11 @@
 -->
 <font-family xmlns:android="http://schemas.android.com/apk/res/android">
     <font
-        android:font="@font/Sans-Medium"
+        android:font="@font/sans_medium_regular"
         android:fontStyle="normal"
         android:fontWeight="500"/>
     <font
-        android:font="@font/Sans-MediumItalic"
+        android:font="@font/sans_medium_italic"
         android:fontStyle="italic"
         android:fontWeight="500"/>
 </font-family>
