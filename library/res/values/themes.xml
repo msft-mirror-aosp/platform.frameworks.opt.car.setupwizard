@@ -27,6 +27,6 @@
     </style>
 
     <style name="Theme.Car.SetupWizard.NoActionBar.Accent" parent="Theme.Car.SetupWizard.NoActionBar">
-        <item name="android:colorAccent">@color/blue_600</item>
+        <item name="android:colorAccent">@color/color_accent_suw</item>
     </style>
 </resources>
