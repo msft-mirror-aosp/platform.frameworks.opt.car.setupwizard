@@ -26,6 +26,10 @@ import org.mockito.Mockito;
  * Helper for commonly used assertions and mocks/spies.
  */
 public final class TestHelper {
+
+    private TestHelper() {
+    }
+
     // View testing helpers.
     public static void assertViewVisible(View view) {
         assertThat(view.getVisibility()).isEqualTo(View.VISIBLE);

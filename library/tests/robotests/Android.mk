@@ -1,8 +1,8 @@
 LOCAL_PATH := $(call my-dir)
 
-############################################################
-# CarSetupWizardLib app just for Robolectric test target.  #
-############################################################
+###############################################################
+# CarSetupWizardLib app just for Robolectric test target.     #
+###############################################################
 include $(CLEAR_VARS)
 
 LOCAL_RESOURCE_DIR := $(LOCAL_PATH)/res
@@ -15,25 +15,24 @@ LOCAL_USE_AAPT2 := true
 
 LOCAL_PRIVILEGED_MODULE := true
 
-include frameworks/opt/car/setupwizard/library/common.mk
+LOCAL_STATIC_ANDROID_LIBRARIES += car-setup-wizard-lib
 
 include $(BUILD_PACKAGE)
 
-#############################################
-# Car Setup Wizard Library Robolectric test target. #
-#############################################
+###############################################################
+# CarSetupWizardLib Robolectric test target.                  #
+###############################################################
 include $(CLEAR_VARS)
 
 LOCAL_MODULE := CarSetupWizardLibRoboTests
+LOCAL_MODULE_CLASS := JAVA_LIBRARIES
 
 LOCAL_SRC_FILES := $(call all-java-files-under, src)
 
-LOCAL_RESOURCE_DIR := \
-    $(LOCAL_PATH)/res
+LOCAL_RESOURCE_DIR := $(LOCAL_PATH)/res
 
 LOCAL_JAVA_RESOURCE_DIRS := config
 
-# Include the testing libraries
 LOCAL_JAVA_LIBRARIES := \
     android.car \
     robolectric_android-all-stub \
@@ -45,11 +44,14 @@ LOCAL_INSTRUMENTATION_FOR := CarSetupWizardLib
 
 LOCAL_MODULE_TAGS := optional
 
+# Generate test_config.properties
+include external/robolectric-shadows/gen_test_config.mk
+
 include $(BUILD_STATIC_JAVA_LIBRARY)
 
-#############################################################
-# Car Setup Wizard Library runner target to run the previous target. #
-#############################################################
+###############################################################
+# CarSetupWizardLib runner target to run the previous target. #
+###############################################################
 include $(CLEAR_VARS)
 LOCAL_MODULE := RunCarSetupWizardLibRoboTests
 

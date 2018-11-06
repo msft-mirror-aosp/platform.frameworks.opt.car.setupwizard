@@ -28,7 +28,6 @@ import androidx.annotation.StyleRes;
 import androidx.fragment.app.Fragment;
 
 import com.android.car.setupwizardlib.robolectric.BaseRobolectricTest;
-import com.android.car.setupwizardlib.robolectric.CarSetupWizardLibRobolectricTestRunner;
 import com.android.car.setupwizardlib.robolectric.TestHelper;
 
 import org.junit.Before;
@@ -36,16 +35,17 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.robolectric.Robolectric;
+import org.robolectric.RobolectricTestRunner;
 import org.robolectric.Shadows;
 import org.robolectric.shadows.ShadowTextView;
 
 /**
  * Unit tests for the {@link BaseActivity}.
  */
-@RunWith(CarSetupWizardLibRobolectricTestRunner.class)
+@RunWith(RobolectricTestRunner.class)
 public class BaseActivityTest extends BaseRobolectricTest {
-    BaseActivity mBaseActivity;
-    CarSetupWizardLayout mCarSetupWizardLayout;
+    private BaseActivity mBaseActivity;
+    private CarSetupWizardLayout mCarSetupWizardLayout;
 
     @Before
     public void setupBaseActivityAndLayout() {
@@ -79,8 +79,7 @@ public class BaseActivityTest extends BaseRobolectricTest {
     public void testBackButtonListenerIsDefault() {
         BaseActivity spyBaseActivity = createSpyBaseActivity();
 
-        ImageView backButton = (ImageView) spyBaseActivity.findViewById(
-                R.id.back_button);
+        ImageView backButton = (ImageView) spyBaseActivity.findViewById(R.id.back_button);
         backButton.performClick();
 
         Mockito.verify(spyBaseActivity).handleBackButton();
@@ -100,7 +99,6 @@ public class BaseActivityTest extends BaseRobolectricTest {
 
         Mockito.verify(spyBaseActivity).nextAction(Activity.RESULT_OK);
     }
-
 
     /**
      * Test that the BaseActivity sets the primary toolbar button listener to the default when

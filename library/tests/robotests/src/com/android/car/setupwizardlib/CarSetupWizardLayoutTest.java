@@ -18,6 +18,7 @@ package com.android.car.setupwizardlib;
 
 import static com.google.common.truth.Truth.assertThat;
 
+import android.content.res.Resources;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -25,15 +26,14 @@ import android.widget.TextView;
 import androidx.annotation.StyleRes;
 
 import com.android.car.setupwizardlib.robolectric.BaseRobolectricTest;
-import com.android.car.setupwizardlib.robolectric.CarSetupWizardLibRobolectricTestRunner;
 import com.android.car.setupwizardlib.robolectric.TestHelper;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.robolectric.Robolectric;
+import org.robolectric.RobolectricTestRunner;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.Shadows;
 import org.robolectric.shadows.ShadowTextView;
@@ -43,9 +43,8 @@ import java.util.Locale;
 /**
  * Tests for the CarSetupWizardLayout
  */
-@RunWith(CarSetupWizardLibRobolectricTestRunner.class)
+@RunWith(RobolectricTestRunner.class)
 public class CarSetupWizardLayoutTest extends BaseRobolectricTest {
-    private static final float COMPARISON_TOLERANCE = .01f;
     private static final Locale LOCALE_EN_US = new Locale("en", "US");
     // Hebrew locale can be used to test RTL.
     private static final Locale LOCALE_IW_IL = new Locale("iw", "IL");
@@ -415,15 +414,14 @@ public class CarSetupWizardLayoutTest extends BaseRobolectricTest {
     }
 
     @Test
-    @Ignore  // Start failing on build #5086991
     public void testTitleBarElevationChange() {
         mCarSetupWizardLayout.addElevationToTitleBar(/*animate= */ false);
         View titleBar = mCarSetupWizardLayout.findViewById(R.id.application_bar);
-        assertThat(titleBar.getElevation()).isWithin(COMPARISON_TOLERANCE).of(
-                RuntimeEnvironment.application.getResources().getDimension(
-                        R.dimen.title_bar_drop_shadow_elevation));
+        final Resources resources = RuntimeEnvironment.application.getResources();
+        float expected = resources.getDimension(R.dimen.title_bar_drop_shadow_elevation);
+        assertThat(titleBar.getElevation()).isEqualTo(expected);
 
         mCarSetupWizardLayout.removeElevationFromTitleBar(/*animate= */ false);
-        assertThat(titleBar.getElevation()).isWithin(COMPARISON_TOLERANCE).of(0f);
+        assertThat(titleBar.getElevation()).isEqualTo(0f);
     }
 }
