@@ -23,16 +23,16 @@ import android.os.Bundle;
 import android.provider.Settings;
 
 import com.android.car.setupwizardlib.robolectric.BaseRobolectricTest;
-import com.android.car.setupwizardlib.robolectric.CarSetupWizardLibRobolectricTestRunner;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.robolectric.RobolectricTestRunner;
 import org.robolectric.RuntimeEnvironment;
 
 /**
  * Tests for the {@link CarWizardManagerHelper}.
  */
-@RunWith(CarSetupWizardLibRobolectricTestRunner.class)
+@RunWith(RobolectricTestRunner.class)
 public class CarWizardManagerHelperTest extends BaseRobolectricTest {
     private static final String EXTRA_RESULT_CODE = "com.android.setupwizard.ResultCode";
 

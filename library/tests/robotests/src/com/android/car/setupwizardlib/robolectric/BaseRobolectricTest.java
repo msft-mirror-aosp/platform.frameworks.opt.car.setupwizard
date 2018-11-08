@@ -19,15 +19,13 @@ package com.android.car.setupwizardlib.robolectric;
 import org.junit.Rule;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
-import org.robolectric.annotation.Config;
 
 /**
  * Base test for CarSetupWizardLib Robolectric tests that sets the manifest and sdk config
  * parameters
  */
-@Config(manifest = TestConfig.MANIFEST_PATH, sdk = TestConfig.SDK_VERSION)
 public abstract class BaseRobolectricTest {
-    //This rule automatically initializes any mocks created using the @Mock annotation
+    // This rule automatically initializes any mocks created using the @Mock annotation
     @Rule
     public MockitoRule mMockitoRule = MockitoJUnit.rule();
 }
