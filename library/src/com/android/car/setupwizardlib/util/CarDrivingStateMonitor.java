@@ -22,15 +22,14 @@ import android.car.drivingstate.CarUxRestrictions;
 import android.car.drivingstate.CarUxRestrictionsManager;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.util.Log;
 
 import androidx.annotation.VisibleForTesting;
-
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * Monitor that listens for changes in the driving state so that it can trigger an exit of the
@@ -40,6 +39,9 @@ import java.util.Set;
 public class CarDrivingStateMonitor implements
         CarUxRestrictionsManager.OnUxRestrictionsChangedListener {
 
+    public static final String EXIT_BROADCAST_ACTION =
+            "com.android.car.setupwizardlib.driving_exit";
+
     private static final String TAG = "CarDrivingStateMonitor";
     private static final long DISCONNECT_DELAY_MS = 700;
 
@@ -47,13 +49,16 @@ public class CarDrivingStateMonitor implements
 
     private Car mCar;
     private CarUxRestrictionsManager mRestrictionsManager;
-    private Set<DrivingStateChangeListener> mDrivingStateChangeListeners = new HashSet<>();
     // Need to track the number of times the monitor is started so a single stopMonitor call does
     // not override them all.
     private int mMonitorStartedCount;
+    // Flag that allows the monitor to be started for a ux restrictions check but not kept running.
+    // This is particularly useful when a DrivingExit is triggered by an app external to the base
+    // setup wizard package and we need to verify that it is a valid driving exit.
+    private boolean mStopMonitorAfterUxCheck;
     private final Context mContext;
     @VisibleForTesting
-    final Handler mHandler = new Handler();
+    final Handler mHandler = new Handler(Looper.getMainLooper());
     @VisibleForTesting
     final Runnable mDisconnectRunnable = this::disconnectCarMonitor;
 
@@ -75,8 +80,14 @@ public class CarDrivingStateMonitor implements
      * Starts the monitor listening to driving state changes.
      */
     public void startMonitor() {
-        mHandler.removeCallbacks(mDisconnectRunnable);
+        if (isVerboseLoggable()) {
+            Log.v(TAG, "Starting monitor");
+        }
         mMonitorStartedCount++;
+        if (mMonitorStartedCount == 0) {
+            return;
+        }
+        mHandler.removeCallbacks(mDisconnectRunnable);
         if (mCar != null) {
             if (mCar.isConnected()) {
                 try {
@@ -104,8 +115,12 @@ public class CarDrivingStateMonitor implements
                         Log.e(TAG, "Unable to get CarUxRestrictionsManager");
                         return;
                     }
-                    mRestrictionsManager.registerListener(CarDrivingStateMonitor.this);
                     onUxRestrictionsChanged(mRestrictionsManager.getCurrentCarUxRestrictions());
+                    mRestrictionsManager.registerListener(CarDrivingStateMonitor.this);
+                    if (mStopMonitorAfterUxCheck) {
+                        mStopMonitorAfterUxCheck = false;
+                        stopMonitor();
+                    }
                 } catch (CarNotConnectedException e) {
                     Log.e(TAG, "Car not connected", e);
                 }
@@ -138,18 +153,24 @@ public class CarDrivingStateMonitor implements
      * 2 started calls requires two stop calls to stop.
      */
     public void stopMonitor() {
-        if (Log.isLoggable(TAG, Log.VERBOSE)) {
-            Log.v(TAG, "Scheduling driving monitor timeout");
+        if (isVerboseLoggable()) {
+            Log.v(TAG, "stopMonitor");
         }
         mHandler.removeCallbacks(mDisconnectRunnable);
         mMonitorStartedCount--;
         if (mMonitorStartedCount == 0) {
+            if (isVerboseLoggable()) {
+                Log.v(TAG, "Scheduling driving monitor timeout");
+            }
             mHandler.postDelayed(mDisconnectRunnable, DISCONNECT_DELAY_MS);
+        }
+        if (mMonitorStartedCount < 0) {
+            mMonitorStartedCount = 0;
         }
     }
 
     private void disconnectCarMonitor() {
-        if (Log.isLoggable(TAG, Log.VERBOSE)) {
+        if (isVerboseLoggable()) {
             Log.v(TAG, "Timeout finished, disconnecting Car Monitor");
         }
         if (mMonitorStartedCount > 0) {
@@ -174,43 +195,70 @@ public class CarDrivingStateMonitor implements
             // Connection failure - already disconnected or disconnecting.
             Log.e(TAG, "Failure disconnecting from Car object", e);
         }
-
     }
 
-    private boolean isSetupRestricted(CarUxRestrictions restrictionInfo) {
+    /**
+     * Returns {@code true} if the current driving state restricts setup from being completed.
+     */
+    public boolean checkIsSetupRestricted() {
+        if (mMonitorStartedCount <= 0 && (mCar == null || !mCar.isConnected())) {
+            if (isVerboseLoggable()) {
+                Log.v(TAG, "Starting monitor to perform restriction check, returning false for "
+                        + "restrictions in the meantime");
+            }
+            mStopMonitorAfterUxCheck = true;
+            startMonitor();
+            return false;
+        }
+        if (mRestrictionsManager == null) {
+            if (isVerboseLoggable()) {
+                Log.v(TAG, "Restrictions manager null in checkIsSetupRestricted, returning false");
+            }
+            return false;
+        }
+        try {
+            return checkIsSetupRestricted(mRestrictionsManager.getCurrentCarUxRestrictions());
+        } catch (CarNotConnectedException e) {
+            Log.e(TAG, "CarNotConnected in checkIsSetupRestricted, returning false", e);
+        }
+        return false;
+    }
+
+    private boolean checkIsSetupRestricted(CarUxRestrictions restrictionInfo) {
         return (restrictionInfo.getActiveRestrictions()
                 & CarUxRestrictions.UX_RESTRICTIONS_NO_SETUP) != 0;
-    }
-
-    /**
-     * Adds the given listener to be notified if there is a driving exit triggered.
-     */
-    public void addDrivingExitListener(DrivingStateChangeListener drivingExitListener) {
-        mDrivingStateChangeListeners.add(drivingExitListener);
-    }
-
-    /**
-     * Removes this listener for driving exits.
-     */
-    public void removeDrivingExitListener(DrivingStateChangeListener drivingExitListener) {
-        mDrivingStateChangeListeners.remove(drivingExitListener);
     }
 
     @Override
     public void onUxRestrictionsChanged(CarUxRestrictions restrictionInfo) {
         // Check if setup restriction is active.
-        if (Log.isLoggable(TAG, Log.VERBOSE)) {
+        if (isVerboseLoggable()) {
             Log.v(TAG, "onUxRestrictionsChanged");
         }
-        if (isSetupRestricted(restrictionInfo)) {
-            if (Log.isLoggable(TAG, Log.VERBOSE)) {
-                Log.v(TAG, "Triggering driving exit on listeners");
-            }
-            for (DrivingStateChangeListener drivingStateChangeListener :
-                    mDrivingStateChangeListeners) {
-                drivingStateChangeListener.onDrivingExitTriggered();
+
+        // Get the current CarUxRestrictions rather than trusting the ones passed in.
+        // This prevents in part interference from other applications triggering a setup wizard
+        // exit unnecessarily, though the broadcast is also checked on the receiver side.
+        if (mRestrictionsManager != null) {
+            try {
+                restrictionInfo = mRestrictionsManager.getCurrentCarUxRestrictions();
+            } catch (CarNotConnectedException e) {
+                Log.e(TAG, "Car not connected in onUxRestrictionsChanged, doing nothing.", e);
             }
         }
+
+        if (checkIsSetupRestricted(restrictionInfo)) {
+            if (isVerboseLoggable()) {
+                Log.v(TAG, "Triggering driving exit broadcast");
+            }
+            Intent broadcastIntent = new Intent();
+            broadcastIntent.setAction(EXIT_BROADCAST_ACTION);
+            mContext.sendBroadcast(broadcastIntent);
+        }
+    }
+
+    private boolean isVerboseLoggable() {
+        return Log.isLoggable(TAG, Log.VERBOSE);
     }
 
     /**
@@ -219,17 +267,5 @@ public class CarDrivingStateMonitor implements
     @VisibleForTesting
     public static void reset() {
         sCarDrivingStateMonitor = null;
-    }
-
-    /**
-     * Interface to be implemented by components that handle the exit logic for setup wizard.
-     */
-    public interface DrivingStateChangeListener {
-
-        /**
-         * Method that will be called by {@link CarDrivingStateMonitor} when the driving state
-         * changes to {@link CarUxRestrictions.UX_RESTRICTIONS_NO_SETUP}.
-         */
-        void onDrivingExitTriggered();
     }
 }
