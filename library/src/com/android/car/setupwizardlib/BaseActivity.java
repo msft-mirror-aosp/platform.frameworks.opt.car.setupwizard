@@ -233,7 +233,7 @@ public class BaseActivity extends FragmentActivity {
         setResultCode(resultCode, data);
         Intent nextIntent =
                 CarWizardManagerHelper.getNextIntent(getIntent(), mResultCode, mResultData);
-        startActivityForResult(nextIntent, REQUEST_CODE_NEXT);
+        startActivity(nextIntent);
     }
 
     /**
