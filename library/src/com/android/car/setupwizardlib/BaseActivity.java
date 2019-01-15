@@ -19,11 +19,12 @@ package com.android.car.setupwizardlib;
 import android.annotation.CallSuper;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.LayoutRes;
-import android.support.annotation.VisibleForTesting;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.view.View;
+
+import androidx.annotation.LayoutRes;
+import androidx.annotation.VisibleForTesting;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 
 import com.android.car.setupwizardlib.util.CarWizardManagerHelper;
 

@@ -22,16 +22,13 @@ LOCAL_SRC_FILES := $(call all-java-files-under, src)
 
 LOCAL_RESOURCE_DIR := $(LOCAL_PATH)/res
 
-# Work around limitations of AAR prebuilts
-LOCAL_RESOURCE_DIR += prebuilts/sdk/current/car/car/res
-
 LOCAL_MODULE := car-setup-wizard-lib
 LOCAL_MODULE_TAGS := optional
 
 LOCAL_USE_AAPT2 := true
 
 LOCAL_STATIC_ANDROID_LIBRARIES += \
-    android-support-car
+    androidx.car_car
 
 LOCAL_PROGUARD_ENABLED := disabled
 
