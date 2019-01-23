@@ -27,7 +27,6 @@ import androidx.annotation.VisibleForTesting;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 
-import com.android.car.setupwizardlib.util.CarDrivingStateMonitor;
 import com.android.car.setupwizardlib.util.CarWizardManagerHelper;
 
 
@@ -110,17 +109,6 @@ public class BaseActivity extends FragmentActivity {
         // Fragment commits are not allowed once the Activity's state has been saved. Once
         // onStart() has been called, the FragmentManager should now allow commits.
         mAllowFragmentCommits = true;
-        // Need to check for UX restrictions to setup wizard running and exit if they are enabled.
-        CarDrivingStateMonitor.get(this).startMonitor();
-    }
-
-    @Override
-    @CallSuper
-    protected void onStop() {
-        super.onStop();
-        // Trigger a stop to the CarDrivingStateMonitor. If the monitor is restarted soon by a
-        // subsequent activity then this will do nothing so as not to thrash the monitor.
-        CarDrivingStateMonitor.get(this).stopMonitor();
     }
 
     @Override

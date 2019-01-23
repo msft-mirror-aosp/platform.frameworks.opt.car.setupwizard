@@ -18,14 +18,7 @@ package com.android.car.setupwizardlib;
 
 import static com.google.common.truth.Truth.assertThat;
 
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.verify;
-
 import android.app.Activity;
-import android.car.Car;
-import android.car.CarNotConnectedException;
-import android.car.drivingstate.CarUxRestrictions;
-import android.car.drivingstate.CarUxRestrictionsManager;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -36,50 +29,28 @@ import androidx.fragment.app.Fragment;
 
 import com.android.car.setupwizardlib.robolectric.BaseRobolectricTest;
 import com.android.car.setupwizardlib.robolectric.TestHelper;
-import com.android.car.setupwizardlib.shadows.ShadowCar;
-import com.android.car.setupwizardlib.util.CarDrivingStateMonitor;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.Shadows;
-import org.robolectric.android.controller.ActivityController;
-import org.robolectric.annotation.Config;
 import org.robolectric.shadows.ShadowTextView;
 
 /**
  * Unit tests for the {@link BaseActivity}.
  */
 @RunWith(RobolectricTestRunner.class)
-@Config(shadows = ShadowCar.class)
 public class BaseActivityTest extends BaseRobolectricTest {
     private BaseActivity mBaseActivity;
     private CarSetupWizardLayout mCarSetupWizardLayout;
-    private ActivityController<BaseActivity> mActivityController;
-    @Mock
-    private CarUxRestrictionsManager mMockRestrictionsManager;
-    @Mock
-    private CarUxRestrictions mMockRestrictions;
 
     @Before
-    public void setupBaseActivityAndLayout() throws CarNotConnectedException {
-        mActivityController = Robolectric.buildActivity(BaseActivity.class).create();
-        mBaseActivity = mActivityController.get();
+    public void setupBaseActivityAndLayout() {
+        mBaseActivity = (BaseActivity) Robolectric.buildActivity(BaseActivity.class).create().get();
         mCarSetupWizardLayout = mBaseActivity.getCarSetupWizardLayout();
-        ShadowCar.setCarManager(Car.CAR_UX_RESTRICTION_SERVICE, mMockRestrictionsManager);
-        doReturn(mMockRestrictions).when(mMockRestrictionsManager).getCurrentCarUxRestrictions();
-        doReturn(CarUxRestrictions.UX_RESTRICTIONS_BASELINE).when(mMockRestrictions)
-                .getActiveRestrictions();
-    }
-
-    @After
-    public void resetCarState() {
-        CarDrivingStateMonitor.reset();
     }
 
     /**
@@ -111,7 +82,7 @@ public class BaseActivityTest extends BaseRobolectricTest {
         ImageView backButton = (ImageView) spyBaseActivity.findViewById(R.id.back_button);
         backButton.performClick();
 
-        verify(spyBaseActivity).handleBackButton();
+        Mockito.verify(spyBaseActivity).handleBackButton();
     }
 
     /**
@@ -126,7 +97,7 @@ public class BaseActivityTest extends BaseRobolectricTest {
                 R.id.secondary_toolbar_button);
         secondaryToolBarButton.performClick();
 
-        verify(spyBaseActivity).nextAction(Activity.RESULT_OK);
+        Mockito.verify(spyBaseActivity).nextAction(Activity.RESULT_OK);
     }
 
     /**
@@ -141,7 +112,7 @@ public class BaseActivityTest extends BaseRobolectricTest {
                 R.id.primary_toolbar_button);
         primaryToolBarButton.performClick();
 
-        verify(spyBaseActivity).nextAction(Activity.RESULT_OK);
+        Mockito.verify(spyBaseActivity).nextAction(Activity.RESULT_OK);
     }
 
     private BaseActivity getStartedBaseActivity() {
@@ -186,7 +157,7 @@ public class BaseActivityTest extends BaseRobolectricTest {
         assertThat(spyBaseActivity.getSupportFragmentManager().getBackStackEntryCount()).isEqualTo(
                 0);
         // Verify that onContentFragmentSet is called with the test fragment
-        verify(spyBaseActivity).onContentFragmentSet(fragment);
+        Mockito.verify(spyBaseActivity).onContentFragmentSet(fragment);
     }
 
     /**
@@ -204,7 +175,7 @@ public class BaseActivityTest extends BaseRobolectricTest {
         assertThat(spyBaseActivity.getSupportFragmentManager().getBackStackEntryCount()).isEqualTo(
                 0);
         // Verify that onContentFragmentSet is not called
-        verify(spyBaseActivity, Mockito.times(0)).onContentFragmentSet(fragment);
+        Mockito.verify(spyBaseActivity, Mockito.times(0)).onContentFragmentSet(fragment);
     }
 
     /**
@@ -223,7 +194,7 @@ public class BaseActivityTest extends BaseRobolectricTest {
         assertThat(spyBaseActivity.getSupportFragmentManager().getBackStackEntryCount()).isEqualTo(
                 1);
         // Verify that onContentFragmentSet is called with the test fragment
-        verify(spyBaseActivity).onContentFragmentSet(fragment);
+        Mockito.verify(spyBaseActivity).onContentFragmentSet(fragment);
     }
 
     /**
@@ -241,7 +212,7 @@ public class BaseActivityTest extends BaseRobolectricTest {
         assertThat(spyBaseActivity.getSupportFragmentManager().getBackStackEntryCount()).isEqualTo(
                 0);
         // Verify that onContentFragmentSet is not called
-        verify(spyBaseActivity, Mockito.times(0)).onContentFragmentSet(fragment);
+        Mockito.verify(spyBaseActivity, Mockito.times(0)).onContentFragmentSet(fragment);
     }
 
     /**
@@ -299,7 +270,7 @@ public class BaseActivityTest extends BaseRobolectricTest {
         BaseActivity spyBaseActivity = Mockito.spy(mBaseActivity);
         spyBaseActivity.finishAction();
 
-        verify(spyBaseActivity).finish();
+        Mockito.verify(spyBaseActivity).finish();
     }
 
     /**
@@ -311,8 +282,8 @@ public class BaseActivityTest extends BaseRobolectricTest {
         BaseActivity spyBaseActivity = Mockito.spy(mBaseActivity);
         spyBaseActivity.finishAction(BaseActivity.RESULT_OK);
 
-        verify(spyBaseActivity).nextAction(BaseActivity.RESULT_OK, null);
-        verify(spyBaseActivity).finish();
+        Mockito.verify(spyBaseActivity).nextAction(BaseActivity.RESULT_OK, null);
+        Mockito.verify(spyBaseActivity).finish();
     }
 
     /**
@@ -453,7 +424,7 @@ public class BaseActivityTest extends BaseRobolectricTest {
 
         mBaseActivity.setPrimaryToolbarButtonOnClickListener(spyListener);
         mBaseActivity.getCarSetupWizardLayout().getPrimaryToolbarButton().performClick();
-        verify(spyListener).onClick(Mockito.any());
+        Mockito.verify(spyListener).onClick(Mockito.any());
     }
 
     /**
@@ -517,7 +488,7 @@ public class BaseActivityTest extends BaseRobolectricTest {
 
         mBaseActivity.setSecondaryToolbarButtonOnClickListener(spyListener);
         mBaseActivity.getCarSetupWizardLayout().getSecondaryToolbarButton().performClick();
-        verify(spyListener).onClick(Mockito.any());
+        Mockito.verify(spyListener).onClick(Mockito.any());
     }
 
     /**
@@ -538,17 +509,5 @@ public class BaseActivityTest extends BaseRobolectricTest {
     public void testSetProgressBarVisibleFalse() {
         mBaseActivity.setProgressBarVisible(false);
         TestHelper.assertViewNotVisible(mCarSetupWizardLayout.getProgressBar());
-    }
-
-    @Test
-    public void testBaseActivityOnStart_startsDrivingMonitor() {
-        mActivityController.start();
-        assertThat(ShadowCar.hasConnected()).isTrue();
-    }
-
-    @Test
-    public void testBaseActivityOnStop_stopsDrivingMonitor() {
-        mActivityController.start().stop();
-        assertThat(ShadowCar.hasDisconnected()).isFalse();
     }
 }
