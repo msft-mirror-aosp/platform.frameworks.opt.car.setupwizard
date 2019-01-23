@@ -17,7 +17,6 @@ android_library {
     name: "car-setup-wizard-lib",
     srcs: ["src/**/*.java"],
     resource_dirs: ["res"],
-    libs: ["android.car"],
     static_libs: ["androidx.car_car"],
     optimize: {
         enabled: false,
