@@ -15,6 +15,8 @@ LOCAL_USE_AAPT2 := true
 
 LOCAL_PRIVILEGED_MODULE := true
 
+LOCAL_JAVA_LIBRARIES := android.car
+
 LOCAL_STATIC_ANDROID_LIBRARIES += car-setup-wizard-lib
 
 include $(BUILD_PACKAGE)
