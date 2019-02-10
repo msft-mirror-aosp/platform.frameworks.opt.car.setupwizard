@@ -39,7 +39,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.robolectric.RobolectricTestRunner;
+import org.robolectric.Shadows;
 import org.robolectric.annotation.Config;
+import org.robolectric.shadows.ShadowApplication;
 import org.robolectric.shadows.ShadowLooper;
 
 /**
@@ -53,10 +55,9 @@ public class CarDrivingStateMonitorTest extends BaseRobolectricTest {
     private CarUxRestrictionsManager mMockRestrictionsManager;
     @Mock
     private CarUxRestrictions mMockRestrictions;
-    @Mock
-    private CarDrivingStateMonitor.DrivingStateChangeListener mMockDrivingExitListener;
 
     private CarDrivingStateMonitor mCarDrivingStateMonitor;
+    private ShadowApplication mShadowApplication;
 
     private static final int DEFAULT_NO_RESTRICTIONS = CarUxRestrictions.UX_RESTRICTIONS_BASELINE;
 
@@ -67,7 +68,7 @@ public class CarDrivingStateMonitorTest extends BaseRobolectricTest {
         doReturn(mMockRestrictions).when(mMockRestrictionsManager).getCurrentCarUxRestrictions();
         doReturn(DEFAULT_NO_RESTRICTIONS).when(mMockRestrictions).getActiveRestrictions();
         mCarDrivingStateMonitor = CarDrivingStateMonitor.get(application);
-
+        mShadowApplication = Shadows.shadowOf(application);
     }
 
     @After
@@ -112,20 +113,20 @@ public class CarDrivingStateMonitorTest extends BaseRobolectricTest {
     @Test
     public void testOnUxRestrictionsChanged_triggersExit() {
         mCarDrivingStateMonitor.startMonitor();
-        mCarDrivingStateMonitor.addDrivingExitListener(mMockDrivingExitListener);
         doReturn(CarUxRestrictions.UX_RESTRICTIONS_NO_SETUP).when(mMockRestrictions)
                 .getActiveRestrictions();
         mCarDrivingStateMonitor.onUxRestrictionsChanged(mMockRestrictions);
-        verify(mMockDrivingExitListener).onDrivingExitTriggered();
+        assertThat(mShadowApplication.getBroadcastIntents().get(0).getAction())
+                .isEqualTo(CarDrivingStateMonitor.EXIT_BROADCAST_ACTION);
     }
 
     @Test
     public void testStartMonitorWhileDriving_triggersExit() {
         doReturn(CarUxRestrictions.UX_RESTRICTIONS_NO_SETUP).when(mMockRestrictions)
                 .getActiveRestrictions();
-        mCarDrivingStateMonitor.addDrivingExitListener(mMockDrivingExitListener);
         mCarDrivingStateMonitor.startMonitor();
-        verify(mMockDrivingExitListener).onDrivingExitTriggered();
+        assertThat(mShadowApplication.getBroadcastIntents().get(0).getAction())
+                .isEqualTo(CarDrivingStateMonitor.EXIT_BROADCAST_ACTION);
     }
 
     @Test
