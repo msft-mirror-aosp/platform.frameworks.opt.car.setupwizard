@@ -19,6 +19,7 @@ package com.android.car.setupwizardlib;
 import static com.google.common.truth.Truth.assertThat;
 
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import android.app.Activity;
@@ -204,7 +205,7 @@ public class BaseActivityTest extends BaseRobolectricTest {
         assertThat(spyBaseActivity.getSupportFragmentManager().getBackStackEntryCount()).isEqualTo(
                 0);
         // Verify that onContentFragmentSet is not called
-        verify(spyBaseActivity, Mockito.times(0)).onContentFragmentSet(fragment);
+        verify(spyBaseActivity, times(0)).onContentFragmentSet(fragment);
     }
 
     /**
@@ -241,7 +242,7 @@ public class BaseActivityTest extends BaseRobolectricTest {
         assertThat(spyBaseActivity.getSupportFragmentManager().getBackStackEntryCount()).isEqualTo(
                 0);
         // Verify that onContentFragmentSet is not called
-        verify(spyBaseActivity, Mockito.times(0)).onContentFragmentSet(fragment);
+        verify(spyBaseActivity, times(0)).onContentFragmentSet(fragment);
     }
 
     /**
@@ -550,5 +551,24 @@ public class BaseActivityTest extends BaseRobolectricTest {
     public void testBaseActivityOnStop_stopsDrivingMonitor() {
         mActivityController.start().stop();
         assertThat(ShadowCar.hasDisconnected()).isFalse();
+    }
+
+    @Test
+    public void testNextActionTwice_onlyTriggersOneStartActivity() {
+        BaseActivity spyBaseActivity = createSpyBaseActivity();
+        spyBaseActivity.nextAction(Activity.RESULT_OK);
+        spyBaseActivity.nextAction(Activity.RESULT_OK);
+        verify(spyBaseActivity, times(1)).startActivity(Mockito.any());
+    }
+
+    @Test
+    public void testNextActionCanBeTriggeredAgain_onResume() {
+        BaseActivity spyBaseActivity = createSpyBaseActivity();
+        spyBaseActivity.onResume();
+        spyBaseActivity.nextAction(Activity.RESULT_OK);
+        spyBaseActivity.onPause();
+        spyBaseActivity.onResume();
+        spyBaseActivity.nextAction(Activity.RESULT_OK);
+        verify(spyBaseActivity, times(2)).startActivity(Mockito.any());
     }
 }

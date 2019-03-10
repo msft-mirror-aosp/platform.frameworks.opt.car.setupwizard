@@ -19,6 +19,7 @@ package com.android.car.setupwizardlib;
 import android.annotation.CallSuper;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.LayoutRes;
@@ -53,6 +54,8 @@ public class BaseActivity extends FragmentActivity {
      * onActivityResult with RESULT_CANCELED when navigating backward.
      */
     protected static final int REQUEST_CODE_NEXT = 10000;
+
+    private boolean mNextActionAlreadyTriggered;
 
     /**
      * To implement a specific request code, see the following:
@@ -112,6 +115,21 @@ public class BaseActivity extends FragmentActivity {
         mAllowFragmentCommits = true;
         // Need to check for UX restrictions to setup wizard running and exit if they are enabled.
         CarDrivingStateMonitor.get(this).startMonitor();
+    }
+
+    @Override
+    @CallSuper
+    protected void onResume() {
+        super.onResume();
+        // Need to reset next buttons so that they can be pressed again.
+        mNextActionAlreadyTriggered = false;
+    }
+
+    @Override
+    @CallSuper
+    protected void onPause() {
+        super.onPause();
+        // Need this for visibility for tests.
     }
 
     @Override
@@ -241,8 +259,15 @@ public class BaseActivity extends FragmentActivity {
         if (resultCode == RESULT_CANCELED) {
             throw new IllegalArgumentException("Cannot call nextAction with RESULT_CANCELED");
         }
-        onNextActionInvoked();
         setResultCode(resultCode, data);
+        if (mNextActionAlreadyTriggered) {
+            Log.v("CarSetupWizard",
+                    "BaseActivity: nextAction triggered multiple times without page refresh, "
+                            + "ignoring.");
+            return;
+        }
+        mNextActionAlreadyTriggered = true;
+        onNextActionInvoked();
         Intent nextIntent =
                 CarWizardManagerHelper.getNextIntent(getIntent(), mResultCode, mResultData);
         startActivity(nextIntent);
@@ -381,9 +406,11 @@ public class BaseActivity extends FragmentActivity {
      * RESULT_OK
      */
     protected void resetPrimaryToolbarButtonOnClickListener() {
-        setPrimaryToolbarButtonOnClickListener(v -> nextAction(RESULT_OK));
-    }
+        setPrimaryToolbarButtonOnClickListener(v -> {
+            nextAction(RESULT_OK);
+        });
 
+    }
 
     /**
      * Sets whether the secondary continue button is visible.
@@ -422,7 +449,9 @@ public class BaseActivity extends FragmentActivity {
      * RESULT_OK
      */
     protected void resetSecondaryToolbarButtonOnClickListener() {
-        setSecondaryToolbarButtonOnClickListener(v -> nextAction(RESULT_OK));
+        setSecondaryToolbarButtonOnClickListener(v -> {
+            nextAction(RESULT_OK);
+        });
     }
 
     /**
