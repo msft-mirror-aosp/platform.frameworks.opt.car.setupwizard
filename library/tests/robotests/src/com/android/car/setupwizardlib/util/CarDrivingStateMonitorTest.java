@@ -74,7 +74,7 @@ public class CarDrivingStateMonitorTest extends BaseRobolectricTest {
     @After
     public void resetCarState() {
         ShadowCar.reset();
-        CarDrivingStateMonitor.reset();
+        CarDrivingStateMonitor.reset(application);
     }
 
     @Test
