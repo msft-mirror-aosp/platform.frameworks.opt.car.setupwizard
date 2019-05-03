@@ -61,8 +61,8 @@ public enum PartnerConfig {
     CONFIG_TOOLBAR_LOADING_INDICATOR_COLOR(
             PartnerConfigKey.KEY_TOOLBAR_LOADING_INDICATOR_COLOR, ResourceType.COLOR),
 
-    CONFIG_TOOLBAR_LAYOUT_BG_COLOR(
-            PartnerConfigKey.KEY_TOOLBAR_LAYOUT_BG_COLOR, ResourceType.COLOR);
+    CONFIG_LAYOUT_BG_COLOR(
+            PartnerConfigKey.KEY_LAYOUT_BG_COLOR, ResourceType.COLOR);
 
     public enum ResourceType {
         COLOR,
