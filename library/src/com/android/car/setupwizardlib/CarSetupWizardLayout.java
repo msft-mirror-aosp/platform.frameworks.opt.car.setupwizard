@@ -35,6 +35,9 @@ import android.widget.TextView;
 import androidx.annotation.StyleRes;
 import androidx.annotation.VisibleForTesting;
 
+import com.android.car.setupwizardlib.partner.PartnerConfig;
+import com.android.car.setupwizardlib.partner.PartnerConfigHelper;
+
 import java.util.Locale;
 
 /**
@@ -148,6 +151,10 @@ public class CarSetupWizardLayout extends LinearLayout {
         LayoutInflater inflater = LayoutInflater.from(getContext());
         inflater.inflate(R.layout.car_setup_wizard_layout, this);
 
+        PartnerConfigHelper partnerConfigHelper = PartnerConfigHelper.get(getContext());
+        setBackgroundColor(
+                partnerConfigHelper.getColor(getContext(), PartnerConfig.CONFIG_LAYOUT_BG_COLOR));
+
         // Set the back button visibility based on the custom attribute.
         setBackButton(findViewById(R.id.back_button));
         setBackButtonVisible(showBackButton);
@@ -156,6 +163,8 @@ public class CarSetupWizardLayout extends LinearLayout {
         setTitleBar(findViewById(R.id.application_bar));
         mTitleBarElevation =
                 getContext().getResources().getDimension(R.dimen.title_bar_drop_shadow_elevation);
+        mTitleBar.setBackgroundColor(
+                partnerConfigHelper.getColor(getContext(), PartnerConfig.CONFIG_TOOLBAR_BG_COLOR));
 
         // Set the toolbar title visibility and text based on the custom attributes.
         setToolbarTitle(findViewById(R.id.toolbar_title));

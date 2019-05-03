@@ -25,6 +25,7 @@ import android.widget.TextView;
 
 import androidx.annotation.StyleRes;
 
+import com.android.car.setupwizardlib.partner.FakeOverrideContentProvider;
 import com.android.car.setupwizardlib.robolectric.BaseRobolectricTest;
 import com.android.car.setupwizardlib.robolectric.TestHelper;
 
@@ -54,6 +55,8 @@ public class CarSetupWizardLayoutTest extends BaseRobolectricTest {
 
     @Before
     public void setUp() {
+        FakeOverrideContentProvider.installDefaultProvider();
+
         mCarSetupWizardLayoutTestActivity = Robolectric
                 .buildActivity(CarSetupWizardLayoutTestActivity.class)
                 .create()
