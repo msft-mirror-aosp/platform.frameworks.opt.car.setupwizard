@@ -45,8 +45,6 @@ public class CarDrivingStateMonitor implements
     private static final String TAG = "CarDrivingStateMonitor";
     private static final long DISCONNECT_DELAY_MS = 700;
 
-    private static CarDrivingStateMonitor sCarDrivingStateMonitor;
-
     private Car mCar;
     private CarUxRestrictionsManager mRestrictionsManager;
     // Need to track the number of times the monitor is started so a single stopMonitor call does
@@ -70,10 +68,10 @@ public class CarDrivingStateMonitor implements
      * Returns the singleton instance of CarDrivingStateMonitor.
      */
     public static CarDrivingStateMonitor get(Context context) {
-        if (sCarDrivingStateMonitor == null) {
-            sCarDrivingStateMonitor = new CarDrivingStateMonitor(context);
-        }
-        return sCarDrivingStateMonitor;
+        return CarHelperRegistry.getOrCreateWithAppContext(
+                context.getApplicationContext(),
+                CarDrivingStateMonitor.class,
+                CarDrivingStateMonitor::new);
     }
 
     /**
@@ -265,7 +263,8 @@ public class CarDrivingStateMonitor implements
      * Resets the car driving state monitor. This is only for use in testing.
      */
     @VisibleForTesting
-    public static void reset() {
-        sCarDrivingStateMonitor = null;
+    public static void reset(Context context) {
+        CarHelperRegistry.getRegistry(context).putHelper(
+                CarDrivingStateMonitor.class, new CarDrivingStateMonitor(context));
     }
 }
