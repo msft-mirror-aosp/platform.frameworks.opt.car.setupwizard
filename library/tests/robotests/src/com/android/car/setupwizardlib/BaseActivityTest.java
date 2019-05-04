@@ -38,9 +38,7 @@ import androidx.fragment.app.Fragment;
 import com.android.car.setupwizardlib.robolectric.BaseRobolectricTest;
 import com.android.car.setupwizardlib.robolectric.TestHelper;
 import com.android.car.setupwizardlib.shadows.ShadowCar;
-import com.android.car.setupwizardlib.util.CarDrivingStateMonitor;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -76,11 +74,6 @@ public class BaseActivityTest extends BaseRobolectricTest {
         doReturn(mMockRestrictions).when(mMockRestrictionsManager).getCurrentCarUxRestrictions();
         doReturn(CarUxRestrictions.UX_RESTRICTIONS_BASELINE).when(mMockRestrictions)
                 .getActiveRestrictions();
-    }
-
-    @After
-    public void resetCarState() {
-        CarDrivingStateMonitor.reset();
     }
 
     /**

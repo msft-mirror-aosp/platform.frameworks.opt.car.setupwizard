@@ -32,6 +32,8 @@ import org.robolectric.Robolectric;
  */
 public class FakeOverrideContentProvider extends ContentProvider {
 
+    private static final String TEST_PACKAGE_NAME = "test.packageName";
+
     private final Bundle mFakeProviderResultBundle = new Bundle();
 
     public FakeOverrideContentProvider injectResourceEntry(ResourceEntry resourceEntry) {
@@ -47,8 +49,37 @@ public class FakeOverrideContentProvider extends ContentProvider {
     }
 
     public static FakeOverrideContentProvider installDefaultProvider() {
-        return installEmptyProvider()
-                .injectResourceEntry(new ResourceEntry("test", "testResource", 123));
+        FakeOverrideContentProvider contentProvider = installEmptyProvider();
+
+        ExternalResources.Resources testResources =
+                ExternalResources.injectExternalResources(TEST_PACKAGE_NAME);
+
+        testResources.putColor(
+                PartnerConfig.CONFIG_LAYOUT_BG_COLOR.getResourceName(),
+                android.R.color.darker_gray);
+        testResources.putColor(
+                PartnerConfig.CONFIG_TOOLBAR_BG_COLOR.getResourceName(),
+                android.R.color.darker_gray);
+
+        contentProvider.injectResourceEntry(new ResourceEntry(
+                TEST_PACKAGE_NAME,
+                PartnerConfig.CONFIG_LAYOUT_BG_COLOR.getResourceName(),
+                testResources.getIdentifier(
+                        PartnerConfig.CONFIG_LAYOUT_BG_COLOR.getResourceName(),
+                        /* defType= */ "color",
+                        TEST_PACKAGE_NAME)
+        ));
+
+        contentProvider.injectResourceEntry(new ResourceEntry(
+                TEST_PACKAGE_NAME,
+                PartnerConfig.CONFIG_TOOLBAR_BG_COLOR.getResourceName(),
+                testResources.getIdentifier(
+                        PartnerConfig.CONFIG_TOOLBAR_BG_COLOR.getResourceName(),
+                        /* defType= */ "color",
+                        TEST_PACKAGE_NAME)
+        ));
+
+        return contentProvider;
     }
 
     @Override
