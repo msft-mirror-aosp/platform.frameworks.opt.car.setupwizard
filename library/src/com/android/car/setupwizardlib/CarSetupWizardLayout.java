@@ -18,10 +18,14 @@ package com.android.car.setupwizardlib;
 import android.animation.ValueAnimator;
 import android.annotation.Nullable;
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
 import android.graphics.Rect;
+import android.graphics.Typeface;
 import android.text.TextUtils;
 import android.util.AttributeSet;
+import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.TouchDelegate;
 import android.view.View;
@@ -35,7 +39,11 @@ import android.widget.TextView;
 import androidx.annotation.StyleRes;
 import androidx.annotation.VisibleForTesting;
 
+import com.android.car.setupwizardlib.partner.PartnerConfig;
+import com.android.car.setupwizardlib.partner.PartnerConfigHelper;
+
 import java.util.Locale;
+import java.util.Objects;
 
 /**
  * Custom layout for the Car Setup Wizard. Provides accessors for modifying elements such as buttons
@@ -44,12 +52,14 @@ import java.util.Locale;
  * not possible so as to keep the state internally consistent.
  */
 public class CarSetupWizardLayout extends LinearLayout {
+    private static final String TAG = CarSetupWizardLayout.class.getSimpleName();
     private static final int ANIMATION_DURATION_MS = 100;
 
     private View mBackButton;
     private View mTitleBar;
     private Float mTitleBarElevation;
     private TextView mToolbarTitle;
+    private PartnerConfigHelper mPartnerConfigHelper;
 
     /* <p>The Primary Toolbar Button should always be used when there is only a single action that
      * moves the wizard to the next screen (e.g. Only need a 'Skip' button).
@@ -88,6 +98,7 @@ public class CarSetupWizardLayout extends LinearLayout {
             int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
 
+        mPartnerConfigHelper = PartnerConfigHelper.get(context);
         TypedArray attrArray = context.getTheme().obtainStyledAttributes(
                 attrs,
                 R.styleable.CarSetupWizardLayout,
@@ -148,6 +159,12 @@ public class CarSetupWizardLayout extends LinearLayout {
         LayoutInflater inflater = LayoutInflater.from(getContext());
         inflater.inflate(R.layout.car_setup_wizard_layout, this);
 
+        int bgColor =
+                mPartnerConfigHelper.getColor(getContext(), PartnerConfig.CONFIG_LAYOUT_BG_COLOR);
+        if (bgColor != 0) {
+            setBackgroundColor(bgColor);
+        }
+
         // Set the back button visibility based on the custom attribute.
         setBackButton(findViewById(R.id.back_button));
         setBackButtonVisible(showBackButton);
@@ -156,6 +173,11 @@ public class CarSetupWizardLayout extends LinearLayout {
         setTitleBar(findViewById(R.id.application_bar));
         mTitleBarElevation =
                 getContext().getResources().getDimension(R.dimen.title_bar_drop_shadow_elevation);
+        int toolbarBgColor =
+                mPartnerConfigHelper.getColor(getContext(), PartnerConfig.CONFIG_TOOLBAR_BG_COLOR);
+        if (toolbarBgColor != 0) {
+            mTitleBar.setBackgroundColor(toolbarBgColor);
+        }
 
         // Set the toolbar title visibility and text based on the custom attributes.
         setToolbarTitle(findViewById(R.id.toolbar_title));
@@ -177,6 +199,13 @@ public class CarSetupWizardLayout extends LinearLayout {
         if (showPrimaryToolbarButton) {
             setPrimaryToolbarButtonText(primaryToolbarButtonText);
             setPrimaryToolbarButtonEnabled(primaryToolbarButtonEnabled);
+
+            setButtonTypeFace(mPrimaryToolbarButton);
+            setButtonTextSize(mPrimaryToolbarButton);
+            setButtonTextColor(
+                    mPrimaryToolbarButton,
+                    PartnerConfig.CONFIG_TOOLBAR_PRIMARY_BUTTON_TEXT_COLOR);
+
         } else {
             setPrimaryToolbarButtonVisible(false);
         }
@@ -195,6 +224,12 @@ public class CarSetupWizardLayout extends LinearLayout {
         mProgressBar = findViewById(R.id.progress_bar);
         setProgressBarVisible(showProgressBar);
         setProgressBarIndeterminate(indeterminateProgressBar);
+        int tintColor = mPartnerConfigHelper.getColor(
+                getContext(),
+                PartnerConfig.CONFIG_TOOLBAR_LOADING_INDICATOR_COLOR);
+        if (tintColor != 0) {
+            mProgressBar.setIndeterminateTintList(ColorStateList.valueOf(tintColor));
+        }
 
         // Set orientation programmatically since the inflated layout uses <merge>
         setOrientation(LinearLayout.VERTICAL);
@@ -277,13 +312,6 @@ public class CarSetupWizardLayout extends LinearLayout {
     public void setBackButtonVisible(boolean visible) {
         setViewVisible(mBackButton, visible);
         updateBackButtonTouchDelegate(visible);
-    }
-
-    /**
-     * Sets the title bar view.
-     */
-    private void setTitleBar(View titleBar) {
-        mTitleBar = titleBar;
     }
 
     /**
@@ -452,22 +480,6 @@ public class CarSetupWizardLayout extends LinearLayout {
     }
 
     /**
-     * A method that will inflate the SecondaryToolbarButton if it is has not already been
-     * inflated. If it has been inflated already this method will do nothing.
-     */
-    private void maybeInflateSecondaryToolbarButton() {
-        ViewStub secondaryToolbarButtonStub = findViewById(R.id.secondary_toolbar_button_stub);
-        // If the secondaryToolbarButtonStub is null then the stub has been inflated so there is
-        // nothing to do.
-        if (secondaryToolbarButtonStub != null) {
-            secondaryToolbarButtonStub.inflate();
-            mSecondaryToolbarButton = findViewById(R.id.secondary_toolbar_button);
-            setSecondaryToolbarButtonVisible(false);
-        }
-
-    }
-
-    /**
      * Gets the progress bar.
      */
     public ProgressBar getProgressBar() {
@@ -556,5 +568,69 @@ public class CarSetupWizardLayout extends LinearLayout {
         } else {
             mTitleBar.setElevation(0f);
         }
+    }
+
+    /**
+     * Sets the title bar view.
+     */
+    private void setTitleBar(View titleBar) {
+        mTitleBar = titleBar;
+    }
+
+    /**
+     * A method that inflates the SecondaryToolbarButton if it is has not already been
+     * inflated. If it has been inflated already this method will do nothing.
+     */
+    private void maybeInflateSecondaryToolbarButton() {
+        ViewStub secondaryToolbarButtonStub = findViewById(R.id.secondary_toolbar_button_stub);
+        // If the secondaryToolbarButtonStub is null then the stub has been inflated so there is
+        // nothing to do.
+        if (secondaryToolbarButtonStub != null) {
+            secondaryToolbarButtonStub.inflate();
+            mSecondaryToolbarButton = findViewById(R.id.secondary_toolbar_button);
+            setSecondaryToolbarButtonVisible(false);
+
+            setButtonTypeFace(mSecondaryToolbarButton);
+            setButtonTextSize(mSecondaryToolbarButton);
+            setButtonTextColor(
+                    mSecondaryToolbarButton,
+                    PartnerConfig.CONFIG_TOOLBAR_SECONDARY_BUTTON_TEXT_COLOR);
+        }
+    }
+
+    /** Sets button text color using partner overlay if exists */
+    private void setButtonTextColor(TextView button, PartnerConfig config) {
+        int color = mPartnerConfigHelper.getColor(getContext(), config);
+        if (color != 0) {
+            button.setTextColor(color);
+        }
+    }
+
+    /** Sets button text size using partner overlay if exists */
+    private void setButtonTextSize(TextView button) {
+        float dimension = mPartnerConfigHelper.getDimension(
+                getContext(),
+                PartnerConfig.CONFIG_TOOLBAR_BUTTON_TEXT_SIZE);
+        if (dimension != 0) {
+            button.setTextSize(TypedValue.COMPLEX_UNIT_PX, dimension);
+        }
+    }
+
+    /** Sets button type face with partner overlay if exists */
+    private void setButtonTypeFace(TextView button) {
+        String fontFamily = mPartnerConfigHelper.getString(
+                getContext(),
+                PartnerConfig.CONFIG_TOOLBAR_BUTTON_FONT_FAMILY);
+        if (TextUtils.isEmpty(fontFamily)) {
+            return;
+        }
+
+        Typeface typeface = Typeface.create(fontFamily, Typeface.NORMAL);
+        if (Objects.equals(typeface, Typeface.DEFAULT)) {
+            Log.w(TAG, String.format(
+                    "Couldn't find font: %s. Setting default font.",
+                    fontFamily));
+        }
+        button.setTypeface(typeface);
     }
 }

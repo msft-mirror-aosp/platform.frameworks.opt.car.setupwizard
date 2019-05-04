@@ -86,7 +86,8 @@ public class PartnerConfigHelper {
             String resourceName = partnerConfig.getResourceName();
             ResourceEntry resourceEntry = getResourceEntryFromKey(resourceName);
             if (resourceEntry == null) {
-                throw new RuntimeException("Missing default value: " + resourceName);
+                Log.w(TAG, "Resource not found: " + resourceName);
+                return 0;
             }
             Resources resource = getResourcesByPackageName(context, resourceEntry.getPackageName());
             result = resource.getColor(resourceEntry.getResourceId(), null);
@@ -120,7 +121,8 @@ public class PartnerConfigHelper {
             String resourceName = partnerConfig.getResourceName();
             ResourceEntry resourceEntry = getResourceEntryFromKey(resourceName);
             if (resourceEntry == null) {
-                throw new RuntimeException("Missing default value: " + resourceName);
+                Log.w(TAG, "Resource not found: " + resourceName);
+                return null;
             }
             Resources resource = getResourcesByPackageName(context, resourceEntry.getPackageName());
 
@@ -162,7 +164,8 @@ public class PartnerConfigHelper {
             String resourceName = partnerConfig.getResourceName();
             ResourceEntry resourceEntry = getResourceEntryFromKey(resourceName);
             if (resourceEntry == null) {
-                throw new RuntimeException("Missing default value: " + resourceName);
+                Log.w(TAG, "Resource not found: " + resourceName);
+                return null;
             }
             Resources resource = getResourcesByPackageName(context, resourceEntry.getPackageName());
             result = resource.getString(resourceEntry.getResourceId());
@@ -207,7 +210,8 @@ public class PartnerConfigHelper {
             String resourceName = partnerConfig.getResourceName();
             ResourceEntry resourceEntry = getResourceEntryFromKey(resourceName);
             if (resourceEntry == null) {
-                throw new RuntimeException("Missing default value: " + resourceName);
+                Log.w(TAG, "Resource not found: " + resourceName);
+                return defaultValue;
             }
             Resources resource = getResourcesByPackageName(context, resourceEntry.getPackageName());
             result = resource.getDimension(resourceEntry.getResourceId());
