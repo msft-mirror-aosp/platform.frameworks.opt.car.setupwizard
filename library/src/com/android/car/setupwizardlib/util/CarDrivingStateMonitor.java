@@ -77,7 +77,7 @@ public class CarDrivingStateMonitor implements
     /**
      * Starts the monitor listening to driving state changes.
      */
-    public void startMonitor() {
+    public synchronized void startMonitor() {
         if (isVerboseLoggable()) {
             Log.v(TAG, "Starting monitor");
         }
@@ -150,7 +150,7 @@ public class CarDrivingStateMonitor implements
      * to the service repeatedly. This monitor also maintains parity between started and stopped so
      * 2 started calls requires two stop calls to stop.
      */
-    public void stopMonitor() {
+    public synchronized void stopMonitor() {
         if (isVerboseLoggable()) {
             Log.v(TAG, "stopMonitor");
         }
