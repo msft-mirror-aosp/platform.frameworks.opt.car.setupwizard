@@ -35,7 +35,6 @@ import android.widget.ImageView;
 import androidx.annotation.StyleRes;
 import androidx.fragment.app.Fragment;
 
-import com.android.car.setupwizardlib.partner.FakeOverrideContentProvider;
 import com.android.car.setupwizardlib.robolectric.BaseRobolectricTest;
 import com.android.car.setupwizardlib.robolectric.TestHelper;
 import com.android.car.setupwizardlib.shadows.ShadowCar;
@@ -68,8 +67,6 @@ public class BaseActivityTest extends BaseRobolectricTest {
 
     @Before
     public void setupBaseActivityAndLayout() throws CarNotConnectedException {
-        FakeOverrideContentProvider.installDefaultProvider();
-
         mActivityController = Robolectric.buildActivity(BaseActivity.class).create();
         mBaseActivity = mActivityController.get();
         mCarSetupWizardLayout = mBaseActivity.getCarSetupWizardLayout();
