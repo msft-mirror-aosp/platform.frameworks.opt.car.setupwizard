@@ -20,8 +20,13 @@ import android.annotation.Nullable;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
+import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.InsetDrawable;
+import android.graphics.drawable.RippleDrawable;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -32,6 +37,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewStub;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -167,6 +173,11 @@ public class CarSetupWizardLayout extends LinearLayout {
 
         // Set the back button visibility based on the custom attribute.
         setBackButton(findViewById(R.id.back_button));
+        Drawable drawable = mPartnerConfigHelper.getDrawable(
+                getContext(), PartnerConfig.CONFIG_TOOLBAR_BUTTON_ICON_BACK);
+        if (drawable != null) {
+            ((ImageView) mBackButton).setImageDrawable(drawable);
+        }
         setBackButtonVisible(showBackButton);
 
         // Se the title bar.
@@ -199,6 +210,11 @@ public class CarSetupWizardLayout extends LinearLayout {
         if (showPrimaryToolbarButton) {
             setPrimaryToolbarButtonText(primaryToolbarButtonText);
             setPrimaryToolbarButtonEnabled(primaryToolbarButtonEnabled);
+
+            setBackground(
+                    mPrimaryToolbarButton,
+                    PartnerConfig.CONFIG_TOOLBAR_PRIMARY_BUTTON_BG,
+                    PartnerConfig.CONFIG_TOOLBAR_PRIMARY_BUTTON_BG_COLOR);
 
             setButtonTypeFace(mPrimaryToolbarButton);
             setButtonTextSize(mPrimaryToolbarButton);
@@ -238,13 +254,13 @@ public class CarSetupWizardLayout extends LinearLayout {
     /**
      * Set a given view's visibility.
      */
-    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    @VisibleForTesting
     void setViewVisible(View view, boolean visible) {
         view.setVisibility(visible ? View.VISIBLE : View.GONE);
     }
 
     // Add or remove the back button touch delegate depending on whether it is visible.
-    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    @VisibleForTesting
     void updateBackButtonTouchDelegate(boolean visible) {
         if (visible) {
             // Post this action in the parent's message queue to make sure the parent
@@ -293,7 +309,7 @@ public class CarSetupWizardLayout extends LinearLayout {
         return mBackButton;
     }
 
-    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    @VisibleForTesting
     final void setBackButton(View backButton) {
         mBackButton = backButton;
     }
@@ -321,7 +337,7 @@ public class CarSetupWizardLayout extends LinearLayout {
         return mToolbarTitle;
     }
 
-    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    @VisibleForTesting
     final void setToolbarTitle(TextView toolbarTitle) {
         mToolbarTitle = toolbarTitle;
     }
@@ -354,7 +370,7 @@ public class CarSetupWizardLayout extends LinearLayout {
         return mPrimaryToolbarButton;
     }
 
-    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    @VisibleForTesting
     final void setPrimaryToolbarButton(Button primaryToolbarButton) {
         mPrimaryToolbarButton = primaryToolbarButton;
     }
@@ -421,7 +437,7 @@ public class CarSetupWizardLayout extends LinearLayout {
         mPrimaryToolbarButtonFlat = isFlat;
     }
 
-    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    @VisibleForTesting
     Button createPrimaryToolbarButton(boolean isFlat) {
         int layoutId = isFlat ? R.layout.flat_button : R.layout.primary_button;
         Button newPrimaryButton = (Button) inflate(getContext(), layoutId, null);
@@ -590,24 +606,70 @@ public class CarSetupWizardLayout extends LinearLayout {
             mSecondaryToolbarButton = findViewById(R.id.secondary_toolbar_button);
             setSecondaryToolbarButtonVisible(false);
 
+            setBackground(
+                    mSecondaryToolbarButton,
+                    PartnerConfig.CONFIG_TOOLBAR_SECONDARY_BUTTON_BG,
+                    PartnerConfig.CONFIG_TOOLBAR_SECONDARY_BUTTON_BG_COLOR);
+
             setButtonTypeFace(mSecondaryToolbarButton);
             setButtonTextSize(mSecondaryToolbarButton);
             setButtonTextColor(
                     mSecondaryToolbarButton,
                     PartnerConfig.CONFIG_TOOLBAR_SECONDARY_BUTTON_TEXT_COLOR);
+
+            // Set button spacing
+            float marginEnd = PartnerConfigHelper.get(getContext()).getDimension(
+                    getContext(),
+                    PartnerConfig.CONFIG_TOOLBAR_BUTTON_SPACING);
+
+            MarginLayoutParams layoutParams =
+                    (MarginLayoutParams) mSecondaryToolbarButton.getLayoutParams();
+            layoutParams.setMarginEnd(Math.round(marginEnd));
         }
     }
 
     /** Sets button text color using partner overlay if exists */
-    private void setButtonTextColor(TextView button, PartnerConfig config) {
+    @VisibleForTesting
+    void setButtonTextColor(TextView button, PartnerConfig config) {
         int color = mPartnerConfigHelper.getColor(getContext(), config);
         if (color != 0) {
             button.setTextColor(color);
         }
     }
 
+    /**
+     * Sets background using partner overlay if exists. Background color and radius are only
+     * applied if background resource doesn't exist. Otherwise default background color and radius
+     * may override what's set in the background.
+     */
+    @VisibleForTesting
+    void setBackground(View view, PartnerConfig bgConfig, PartnerConfig bgColorConfig) {
+        Drawable background = mPartnerConfigHelper.getDrawable(getContext(), bgConfig);
+        if (background == null) {
+            if (view instanceof Button) {
+                setButtonRadius((Button) view);
+            }
+            setBackgroundColor(view, bgColorConfig);
+        } else {
+            view.setBackground(background);
+        }
+    }
+
+    /** Sets button background color using partner overlay if exists */
+    @VisibleForTesting
+    void setBackgroundColor(View button, PartnerConfig config) {
+        int color = mPartnerConfigHelper.getColor(getContext(), config);
+        if (color != 0) {
+            Drawable background = button.getBackground();
+            if (background != null) {
+                background.mutate().setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
+            }
+        }
+    }
+
     /** Sets button text size using partner overlay if exists */
-    private void setButtonTextSize(TextView button) {
+    @VisibleForTesting
+    void setButtonTextSize(TextView button) {
         float dimension = mPartnerConfigHelper.getDimension(
                 getContext(),
                 PartnerConfig.CONFIG_TOOLBAR_BUTTON_TEXT_SIZE);
@@ -632,5 +694,38 @@ public class CarSetupWizardLayout extends LinearLayout {
                     fontFamily));
         }
         button.setTypeface(typeface);
+    }
+
+    /** Sets button radius using partner overlay if exists */
+    private void setButtonRadius(Button button) {
+        float radius = mPartnerConfigHelper.getDimension(
+                getContext(),
+                PartnerConfig.CONFIG_TOOLBAR_BUTTON_RADIUS);
+
+        GradientDrawable gradientDrawable = getGradientDrawable(button);
+        if (gradientDrawable != null) {
+            gradientDrawable.setCornerRadius(radius);
+        }
+    }
+
+    private GradientDrawable getGradientDrawable(Button button) {
+        Drawable drawable = button.getBackground();
+        if (drawable instanceof InsetDrawable) {
+            return getGradientDrawableFromInsetDrawable((InsetDrawable) drawable);
+        }
+
+        if (drawable instanceof RippleDrawable) {
+            drawable = ((RippleDrawable) drawable).getDrawable(0);
+            if (drawable instanceof InsetDrawable) {
+                return getGradientDrawableFromInsetDrawable((InsetDrawable) drawable);
+            }
+            return (GradientDrawable) drawable;
+        }
+
+        return null;
+    }
+
+    private GradientDrawable getGradientDrawableFromInsetDrawable(InsetDrawable insetDrawable) {
+        return (GradientDrawable) insetDrawable.getDrawable();
     }
 }
