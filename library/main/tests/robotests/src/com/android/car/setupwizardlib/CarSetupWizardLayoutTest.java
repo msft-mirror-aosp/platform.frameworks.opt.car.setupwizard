@@ -59,8 +59,8 @@ public class CarSetupWizardLayoutTest extends BaseRobolectricTest {
                 .create()
                 .get();
 
-        mCarSetupWizardLayout = mCarSetupWizardLayoutTestActivity.
-                findViewById(R.id.car_setup_wizard_layout);
+        mCarSetupWizardLayout = mCarSetupWizardLayoutTestActivity
+                .findViewById(R.id.car_setup_wizard_layout);
 
         // Have to make this call first to ensure secondaryToolbar button is created from stub.
         mCarSetupWizardLayout.setSecondaryToolbarButtonVisible(true);
