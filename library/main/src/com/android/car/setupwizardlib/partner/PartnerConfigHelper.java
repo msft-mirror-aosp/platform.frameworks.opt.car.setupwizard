@@ -89,6 +89,7 @@ public class PartnerConfigHelper {
                 Log.w(TAG, "Resource not found: " + resourceName);
                 return 0;
             }
+
             Resources resource = getResourcesByPackageName(context, resourceEntry.getPackageName());
             result = resource.getColor(resourceEntry.getResourceId(), null);
             mPartnerResourceCache.put(partnerConfig, result);

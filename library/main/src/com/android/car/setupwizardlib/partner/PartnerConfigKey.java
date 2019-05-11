@@ -25,15 +25,16 @@ import java.lang.annotation.RetentionPolicy;
 @StringDef({
         PartnerConfigKey.KEY_TOOLBAR_BG_COLOR,
         PartnerConfigKey.KEY_TOOLBAR_BUTTON_ICON_BACK,
-        PartnerConfigKey.KEY_TOOLBAR_BUTTON_ICON_NEXT,
-        PartnerConfigKey.KEY_TOOLBAR_BUTTON_ICON_SKIP,
         PartnerConfigKey.KEY_TOOLBAR_BUTTON_FONT_FAMILY,
         PartnerConfigKey.KEY_TOOLBAR_BUTTON_PADDING_BOTTOM,
         PartnerConfigKey.KEY_TOOLBAR_BUTTON_PADDING_TOP,
         PartnerConfigKey.KEY_TOOLBAR_BUTTON_RADIUS,
+        PartnerConfigKey.KEY_TOOLBAR_BUTTON_SPACING,
         PartnerConfigKey.KEY_TOOLBAR_BUTTON_TEXT_SIZE,
+        PartnerConfigKey.KEY_TOOLBAR_PRIMARY_BUTTON_BG,
         PartnerConfigKey.KEY_TOOLBAR_PRIMARY_BUTTON_BG_COLOR,
         PartnerConfigKey.KEY_TOOLBAR_PRIMARY_BUTTON_TEXT_COLOR,
+        PartnerConfigKey.KEY_TOOLBAR_SECONDARY_BUTTON_BG,
         PartnerConfigKey.KEY_TOOLBAR_SECONDARY_BUTTON_BG_COLOR,
         PartnerConfigKey.KEY_TOOLBAR_SECONDARY_BUTTON_TEXT_COLOR,
         PartnerConfigKey.KEY_TOOLBAR_LOADING_INDICATOR_COLOR,
@@ -47,10 +48,6 @@ public @interface PartnerConfigKey {
 
     String KEY_TOOLBAR_BUTTON_ICON_BACK = "suw_compat_toolbar_button_icon_back";
 
-    String KEY_TOOLBAR_BUTTON_ICON_NEXT = "suw_compat_toolbar_button_icon_next";
-
-    String KEY_TOOLBAR_BUTTON_ICON_SKIP = "suw_compat_toolbar_button_icon_skip";
-
     String KEY_TOOLBAR_BUTTON_FONT_FAMILY = "suw_compat_toolbar_button_font_family";
 
     String KEY_TOOLBAR_BUTTON_TEXT_SIZE = "suw_compat_toolbar_button_text_size";
@@ -61,10 +58,16 @@ public @interface PartnerConfigKey {
 
     String KEY_TOOLBAR_BUTTON_RADIUS = "suw_compat_toolbar_button_radius";
 
+    String KEY_TOOLBAR_BUTTON_SPACING = "suw_compat_toolbar_button_spacing";
+
+    String KEY_TOOLBAR_PRIMARY_BUTTON_BG = "suw_compat_toolbar_primary_button_bg";
+
     String KEY_TOOLBAR_PRIMARY_BUTTON_BG_COLOR =
             "suw_compat_toolbar_primary_button_bg_color";
 
     String KEY_TOOLBAR_PRIMARY_BUTTON_TEXT_COLOR = "suw_compat_toolbar_primary_button_text_color";
+
+    String KEY_TOOLBAR_SECONDARY_BUTTON_BG = "suw_compat_toolbar_secondary_button_bg";
 
     String KEY_TOOLBAR_SECONDARY_BUTTON_BG_COLOR = "suw_compat_toolbar_secondary_button_bg_color";
 
