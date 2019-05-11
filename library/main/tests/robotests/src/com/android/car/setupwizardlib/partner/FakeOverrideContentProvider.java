@@ -16,12 +16,18 @@
 
 package com.android.car.setupwizardlib.partner;
 
+import static org.robolectric.RuntimeEnvironment.application;
+
 import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
+
+import androidx.annotation.ColorRes;
+
+import com.android.car.setupwizardlib.R;
 
 import org.robolectric.Robolectric;
 
@@ -31,6 +37,9 @@ import org.robolectric.Robolectric;
  * Robolectric tests.
  */
 public class FakeOverrideContentProvider extends ContentProvider {
+
+    public static final @ColorRes int ANDROID_COLOR_DARK_GRAY = android.R.color.darker_gray;
+    public static final float DEFAULT_DIMENSION = 28.0f;
 
     private static final String TEST_PACKAGE_NAME = "test.packageName";
 
@@ -56,10 +65,7 @@ public class FakeOverrideContentProvider extends ContentProvider {
 
         testResources.putColor(
                 PartnerConfig.CONFIG_LAYOUT_BG_COLOR.getResourceName(),
-                android.R.color.darker_gray);
-        testResources.putColor(
-                PartnerConfig.CONFIG_TOOLBAR_BG_COLOR.getResourceName(),
-                android.R.color.darker_gray);
+                ANDROID_COLOR_DARK_GRAY);
 
         contentProvider.injectResourceEntry(new ResourceEntry(
                 TEST_PACKAGE_NAME,
@@ -70,12 +76,29 @@ public class FakeOverrideContentProvider extends ContentProvider {
                         TEST_PACKAGE_NAME)
         ));
 
+        testResources.putDrawable(
+                PartnerConfig.CONFIG_TOOLBAR_PRIMARY_BUTTON_BG.getResourceName(),
+                application.getResources().getDrawable(R.drawable.button_ripple_bg));
+
         contentProvider.injectResourceEntry(new ResourceEntry(
                 TEST_PACKAGE_NAME,
-                PartnerConfig.CONFIG_TOOLBAR_BG_COLOR.getResourceName(),
+                PartnerConfig.CONFIG_TOOLBAR_PRIMARY_BUTTON_BG.getResourceName(),
                 testResources.getIdentifier(
-                        PartnerConfig.CONFIG_TOOLBAR_BG_COLOR.getResourceName(),
-                        /* defType= */ "color",
+                        PartnerConfig.CONFIG_TOOLBAR_PRIMARY_BUTTON_BG.getResourceName(),
+                        /* defType= */ "drawable",
+                        TEST_PACKAGE_NAME)
+        ));
+
+        testResources.putDimension(
+                PartnerConfig.CONFIG_TOOLBAR_BUTTON_TEXT_SIZE.getResourceName(),
+                DEFAULT_DIMENSION);
+
+        contentProvider.injectResourceEntry(new ResourceEntry(
+                TEST_PACKAGE_NAME,
+                PartnerConfig.CONFIG_TOOLBAR_BUTTON_TEXT_SIZE.getResourceName(),
+                testResources.getIdentifier(
+                        PartnerConfig.CONFIG_TOOLBAR_BUTTON_TEXT_SIZE.getResourceName(),
+                        /* defType= */ "dimen",
                         TEST_PACKAGE_NAME)
         ));
 
