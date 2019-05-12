@@ -18,13 +18,21 @@ package com.android.car.setupwizardlib;
 
 import static com.google.common.truth.Truth.assertThat;
 
-import android.content.res.Resources;
+import static org.robolectric.RuntimeEnvironment.application;
+
+import android.app.Activity;
+import android.content.res.ColorStateList;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import androidx.annotation.ColorRes;
 import androidx.annotation.StyleRes;
 
+import com.android.car.setupwizardlib.partner.FakeOverrideContentProvider;
+import com.android.car.setupwizardlib.partner.PartnerConfig;
 import com.android.car.setupwizardlib.robolectric.BaseRobolectricTest;
 import com.android.car.setupwizardlib.robolectric.TestHelper;
 
@@ -34,9 +42,9 @@ import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
-import org.robolectric.RuntimeEnvironment;
 import org.robolectric.Shadows;
 import org.robolectric.shadows.ShadowTextView;
+import org.robolectric.util.ReflectionHelpers;
 
 import java.util.Locale;
 
@@ -50,17 +58,10 @@ public class CarSetupWizardLayoutTest extends BaseRobolectricTest {
     private static final Locale LOCALE_IW_IL = new Locale("iw", "IL");
 
     private CarSetupWizardLayout mCarSetupWizardLayout;
-    private CarSetupWizardLayoutTestActivity mCarSetupWizardLayoutTestActivity;
 
     @Before
     public void setUp() {
-        mCarSetupWizardLayoutTestActivity = Robolectric
-                .buildActivity(CarSetupWizardLayoutTestActivity.class)
-                .create()
-                .get();
-
-        mCarSetupWizardLayout = mCarSetupWizardLayoutTestActivity.
-                findViewById(R.id.car_setup_wizard_layout);
+        mCarSetupWizardLayout = createCarSetupWizardLayout();
 
         // Have to make this call first to ensure secondaryToolbar button is created from stub.
         mCarSetupWizardLayout.setSecondaryToolbarButtonVisible(true);
@@ -417,11 +418,82 @@ public class CarSetupWizardLayoutTest extends BaseRobolectricTest {
     public void testTitleBarElevationChange() {
         mCarSetupWizardLayout.addElevationToTitleBar(/*animate= */ false);
         View titleBar = mCarSetupWizardLayout.findViewById(R.id.application_bar);
-        final Resources resources = RuntimeEnvironment.application.getResources();
-        float expected = resources.getDimension(R.dimen.title_bar_drop_shadow_elevation);
-        assertThat(titleBar.getElevation()).isEqualTo(expected);
+        assertThat(titleBar.getElevation()).isEqualTo(
+                application.getResources().getDimension(
+                        R.dimen.title_bar_drop_shadow_elevation));
 
         mCarSetupWizardLayout.removeElevationFromTitleBar(/*animate= */ false);
         assertThat(titleBar.getElevation()).isEqualTo(0f);
+    }
+
+    @Test
+    public void testPartnerResourcesAreApplied() {
+        setupFakeContentProvider();
+
+        CarSetupWizardLayout layout = createCarSetupWizardLayout();
+
+        // Verify layout container background color
+        ColorDrawable bg = (ColorDrawable) layout.getBackground();
+        assertThat(bg.getColor()).isEqualTo(FakeOverrideContentProvider.ANDROID_COLOR_DARK_GRAY);
+
+        // Verify primary button background
+        Button primary = layout.getPrimaryToolbarButton();
+        Drawable expected = application.getResources().getDrawable(R.drawable.button_ripple_bg);
+        assertThat(getDrawbleDefaultColor(primary.getBackground()))
+                .isEqualTo(getDrawbleDefaultColor(expected));
+
+        // Verify primary button text size
+        assertThat(primary.getTextSize())
+                .isEqualTo(FakeOverrideContentProvider.DEFAULT_DIMENSION);
+    }
+
+    @Test
+    public void testSetButtonTextColor() {
+        setupFakeContentProvider();
+        CarSetupWizardLayout layout = createCarSetupWizardLayout();
+        Button primary = layout.getPrimaryToolbarButton();
+
+        layout.setButtonTextColor(
+                primary, PartnerConfig.CONFIG_LAYOUT_BG_COLOR);
+
+        assertThat(primary.getCurrentTextColor())
+                .isEqualTo(FakeOverrideContentProvider.ANDROID_COLOR_DARK_GRAY);
+    }
+
+    @Test
+    public void testSetBackground() {
+        setupFakeContentProvider();
+        CarSetupWizardLayout layout = createCarSetupWizardLayout();
+        layout.setSecondaryToolbarButtonVisible(true);
+        Button secondary = layout.getSecondaryToolbarButton();
+
+        layout.setBackground(
+                secondary,
+                PartnerConfig.CONFIG_TOOLBAR_PRIMARY_BUTTON_BG,
+                PartnerConfig.CONFIG_TOOLBAR_SECONDARY_BUTTON_BG_COLOR);
+
+        Drawable expected = application.getResources().getDrawable(R.drawable.button_ripple_bg);
+        assertThat(getDrawbleDefaultColor(secondary.getBackground()))
+                .isEqualTo(getDrawbleDefaultColor(expected));
+    }
+
+    private void setupFakeContentProvider() {
+        FakeOverrideContentProvider fakeOverrideDataProvider =
+                FakeOverrideContentProvider.installDefaultProvider();
+    }
+
+    private CarSetupWizardLayout createCarSetupWizardLayout() {
+        Activity activity = Robolectric
+                .buildActivity(CarSetupWizardLayoutTestActivity.class)
+                .create()
+                .get();
+
+        return activity.findViewById(R.id.car_setup_wizard_layout);
+    }
+
+    private @ColorRes int getDrawbleDefaultColor(Drawable drawable) {
+        Drawable.ConstantState state = drawable.getConstantState();
+        ColorStateList colorStateList = ReflectionHelpers.getField(state, "mColor");
+        return colorStateList.getDefaultColor();
     }
 }
