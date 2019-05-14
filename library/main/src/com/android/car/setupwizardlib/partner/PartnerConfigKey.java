@@ -26,8 +26,8 @@ import java.lang.annotation.RetentionPolicy;
         PartnerConfigKey.KEY_TOOLBAR_BG_COLOR,
         PartnerConfigKey.KEY_TOOLBAR_BUTTON_ICON_BACK,
         PartnerConfigKey.KEY_TOOLBAR_BUTTON_FONT_FAMILY,
-        PartnerConfigKey.KEY_TOOLBAR_BUTTON_PADDING_BOTTOM,
-        PartnerConfigKey.KEY_TOOLBAR_BUTTON_PADDING_TOP,
+        PartnerConfigKey.KEY_TOOLBAR_BUTTON_PADDING_HORIZONTAL,
+        PartnerConfigKey.KEY_TOOLBAR_BUTTON_PADDING_VERTICAL,
         PartnerConfigKey.KEY_TOOLBAR_BUTTON_RADIUS,
         PartnerConfigKey.KEY_TOOLBAR_BUTTON_SPACING,
         PartnerConfigKey.KEY_TOOLBAR_BUTTON_TEXT_SIZE,
@@ -52,9 +52,9 @@ public @interface PartnerConfigKey {
 
     String KEY_TOOLBAR_BUTTON_TEXT_SIZE = "suw_compat_toolbar_button_text_size";
 
-    String KEY_TOOLBAR_BUTTON_PADDING_TOP = "suw_compat_toolbar_button_padding_top";
+    String KEY_TOOLBAR_BUTTON_PADDING_HORIZONTAL = "suw_compat_toolbar_button_padding_horizontal";
 
-    String KEY_TOOLBAR_BUTTON_PADDING_BOTTOM = "suw_compat_toolbar_button_padding_bottom";
+    String KEY_TOOLBAR_BUTTON_PADDING_VERTICAL = "suw_compat_toolbar_button_padding_vertical";
 
     String KEY_TOOLBAR_BUTTON_RADIUS = "suw_compat_toolbar_button_radius";
 
