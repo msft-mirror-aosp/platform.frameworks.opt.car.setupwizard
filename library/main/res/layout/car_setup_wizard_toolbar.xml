@@ -56,13 +56,13 @@
         android:layout_height="match_parent"
         android:layout_alignParentEnd="true"
         android:layout_marginEnd="@dimen/car_keyline_1"
+        android:gravity="center_vertical"
         android:orientation="horizontal">
 
         <ViewStub
             android:id="@+id/secondary_toolbar_button_stub"
             android:layout_width="wrap_content"
-            android:layout_height="@dimen/car_button_height"
-            android:layout_gravity="center_vertical"
+            android:layout_height="wrap_content"
             android:layout_marginEnd="@dimen/car_padding_4"
             android:inflatedId="@+id/secondary_toolbar_button"
             android:layout="@layout/flat_button"/>
@@ -70,8 +70,7 @@
         <ViewStub
             android:id="@+id/primary_toolbar_button_stub"
             android:layout_width="wrap_content"
-            android:layout_height="@dimen/car_button_height"
-            android:layout_gravity="center_vertical"
+            android:layout_height="wrap_content"
             android:inflatedId="@+id/primary_toolbar_button"
             android:layout="@layout/primary_button"/>
     </LinearLayout>
