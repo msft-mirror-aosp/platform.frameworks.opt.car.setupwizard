@@ -22,7 +22,6 @@ import static org.robolectric.RuntimeEnvironment.application;
 
 import android.app.Activity;
 import android.content.res.ColorStateList;
-import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.view.View;
 import android.widget.Button;
@@ -432,10 +431,6 @@ public class CarSetupWizardLayoutTest extends BaseRobolectricTest {
 
         CarSetupWizardLayout layout = createCarSetupWizardLayout();
 
-        // Verify layout container background color
-        ColorDrawable bg = (ColorDrawable) layout.getBackground();
-        assertThat(bg.getColor()).isEqualTo(FakeOverrideContentProvider.ANDROID_COLOR_DARK_GRAY);
-
         // Verify primary button background
         Button primary = layout.getPrimaryToolbarButton();
         Drawable expected = application.getResources().getDrawable(R.drawable.button_ripple_bg);
@@ -445,6 +440,19 @@ public class CarSetupWizardLayoutTest extends BaseRobolectricTest {
         // Verify primary button text size
         assertThat(primary.getTextSize())
                 .isEqualTo(FakeOverrideContentProvider.DEFAULT_DIMENSION);
+
+        // Verify paddings
+        assertThat(primary.getPaddingStart())
+                .isEqualTo(FakeOverrideContentProvider.DEFAULT_H_PADDING);
+
+        assertThat(primary.getPaddingEnd())
+                .isEqualTo(FakeOverrideContentProvider.DEFAULT_H_PADDING);
+
+        assertThat(primary.getPaddingTop())
+                .isEqualTo(FakeOverrideContentProvider.DEFAULT_V_PADDING);
+
+        assertThat(primary.getPaddingBottom())
+                .isEqualTo(FakeOverrideContentProvider.DEFAULT_V_PADDING);
     }
 
     @Test
