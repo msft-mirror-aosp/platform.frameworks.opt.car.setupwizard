@@ -165,12 +165,6 @@ public class CarSetupWizardLayout extends LinearLayout {
         LayoutInflater inflater = LayoutInflater.from(getContext());
         inflater.inflate(R.layout.car_setup_wizard_layout, this);
 
-        int bgColor =
-                mPartnerConfigHelper.getColor(getContext(), PartnerConfig.CONFIG_LAYOUT_BG_COLOR);
-        if (bgColor != 0) {
-            setBackgroundColor(bgColor);
-        }
-
         // Set the back button visibility based on the custom attribute.
         setBackButton(findViewById(R.id.back_button));
         Drawable drawable = mPartnerConfigHelper.getDrawable(
@@ -216,12 +210,12 @@ public class CarSetupWizardLayout extends LinearLayout {
                     PartnerConfig.CONFIG_TOOLBAR_PRIMARY_BUTTON_BG,
                     PartnerConfig.CONFIG_TOOLBAR_PRIMARY_BUTTON_BG_COLOR);
 
+            setButtonPadding(mPrimaryToolbarButton);
             setButtonTypeFace(mPrimaryToolbarButton);
             setButtonTextSize(mPrimaryToolbarButton);
             setButtonTextColor(
                     mPrimaryToolbarButton,
                     PartnerConfig.CONFIG_TOOLBAR_PRIMARY_BUTTON_TEXT_COLOR);
-
         } else {
             setPrimaryToolbarButtonVisible(false);
         }
@@ -611,6 +605,7 @@ public class CarSetupWizardLayout extends LinearLayout {
                     PartnerConfig.CONFIG_TOOLBAR_SECONDARY_BUTTON_BG,
                     PartnerConfig.CONFIG_TOOLBAR_SECONDARY_BUTTON_BG_COLOR);
 
+            setButtonPadding(mSecondaryToolbarButton);
             setButtonTypeFace(mSecondaryToolbarButton);
             setButtonTextSize(mSecondaryToolbarButton);
             setButtonTextColor(
@@ -706,6 +701,20 @@ public class CarSetupWizardLayout extends LinearLayout {
         if (gradientDrawable != null) {
             gradientDrawable.setCornerRadius(radius);
         }
+    }
+
+    private void setButtonPadding(Button button) {
+        int hPadding = Math.round(
+                PartnerConfigHelper.get(getContext()).getDimension(
+                        getContext(),
+                        PartnerConfig.CONFIG_TOOLBAR_BUTTON_PADDING_HORIZONTAL)
+        );
+        int vPadding = Math.round(
+                PartnerConfigHelper.get(getContext()).getDimension(
+                        getContext(),
+                        PartnerConfig.CONFIG_TOOLBAR_BUTTON_PADDING_VERTICAL)
+        );
+        button.setPadding(hPadding, vPadding, hPadding, vPadding);
     }
 
     private GradientDrawable getGradientDrawable(Button button) {
