@@ -40,6 +40,8 @@ public class FakeOverrideContentProvider extends ContentProvider {
 
     public static final @ColorRes int ANDROID_COLOR_DARK_GRAY = android.R.color.darker_gray;
     public static final float DEFAULT_DIMENSION = 28.0f;
+    public static final int DEFAULT_H_PADDING = 5;
+    public static final int DEFAULT_V_PADDING = 15;
 
     private static final String TEST_PACKAGE_NAME = "test.packageName";
 
@@ -98,6 +100,32 @@ public class FakeOverrideContentProvider extends ContentProvider {
                 PartnerConfig.CONFIG_TOOLBAR_BUTTON_TEXT_SIZE.getResourceName(),
                 testResources.getIdentifier(
                         PartnerConfig.CONFIG_TOOLBAR_BUTTON_TEXT_SIZE.getResourceName(),
+                        /* defType= */ "dimen",
+                        TEST_PACKAGE_NAME)
+        ));
+
+        testResources.putDimension(
+                PartnerConfig.CONFIG_TOOLBAR_BUTTON_PADDING_HORIZONTAL.getResourceName(),
+                DEFAULT_H_PADDING);
+
+        contentProvider.injectResourceEntry(new ResourceEntry(
+                TEST_PACKAGE_NAME,
+                PartnerConfig.CONFIG_TOOLBAR_BUTTON_PADDING_HORIZONTAL.getResourceName(),
+                testResources.getIdentifier(
+                        PartnerConfig.CONFIG_TOOLBAR_BUTTON_PADDING_HORIZONTAL.getResourceName(),
+                        /* defType= */ "dimen",
+                        TEST_PACKAGE_NAME)
+        ));
+
+        testResources.putDimension(
+                PartnerConfig.CONFIG_TOOLBAR_BUTTON_PADDING_VERTICAL.getResourceName(),
+                DEFAULT_V_PADDING);
+
+        contentProvider.injectResourceEntry(new ResourceEntry(
+                TEST_PACKAGE_NAME,
+                PartnerConfig.CONFIG_TOOLBAR_BUTTON_PADDING_VERTICAL.getResourceName(),
+                testResources.getIdentifier(
+                        PartnerConfig.CONFIG_TOOLBAR_BUTTON_PADDING_VERTICAL.getResourceName(),
                         /* defType= */ "dimen",
                         TEST_PACKAGE_NAME)
         ));
