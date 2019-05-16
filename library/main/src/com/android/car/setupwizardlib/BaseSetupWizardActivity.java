@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 The Android Open Source Project
+ * Copyright (C) 2019 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,12 +31,11 @@ import androidx.fragment.app.FragmentActivity;
 import com.android.car.setupwizardlib.util.CarDrivingStateMonitor;
 import com.android.car.setupwizardlib.util.CarWizardManagerHelper;
 
-
 /**
  * Base Activity for CarSetupWizard screens that provides a variety of helper functions that make
  * it easier to work with the CarSetupWizardLayout and moving between Setup Wizard screens.
  *
- * <p>This activity sets an instance of {@link CarSetupWizardLayout} as the Content View.
+ * <p>This activity sets an instance of {@link CarSetupWizardCompatLayout} as the Content View.
  * <p>Provides helper methods like {@link #setContentFragment} and {@link #onContentFragmentSet} for
  * easy updating of the CarSetupWizard layout components based on the current Fragment being
  * displayed
@@ -44,11 +43,9 @@ import com.android.car.setupwizardlib.util.CarWizardManagerHelper;
  * moving to the next and previous screens in a Setup Wizard
  * <p>Provides setters {@link #setBackButtonVisible(boolean)} for setting CarSetupWizardLayout
  * component attributes
- *
- * @deprecated Use {@link BaseCompatActivity} or {@link BaseDesignActivity}.
  */
-public class BaseActivity extends FragmentActivity {
-    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+abstract class BaseSetupWizardActivity extends FragmentActivity {
+    @VisibleForTesting
     static final String CONTENT_FRAGMENT_TAG = "CONTENT_FRAGMENT_TAG";
     /**
      * Wizard Manager does not actually return an activity result, but if we invoke Wizard
@@ -80,14 +77,14 @@ public class BaseActivity extends FragmentActivity {
      * {@link #onSaveInstanceState(Bundle)} that fragment commits are not allowed.
      */
     private boolean mAllowFragmentCommits = true;
-    private CarSetupWizardLayout mCarSetupWizardLayout;
+    private CarSetupWizardBaseLayout mCarSetupWizardLayout;
     private Intent mResultData;
 
     @Override
     @CallSuper
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.base_activity);
+        setContentView(getLayout());
 
         mCarSetupWizardLayout = findViewById(R.id.car_setup_wizard_layout);
 
@@ -264,8 +261,8 @@ public class BaseActivity extends FragmentActivity {
         setResultCode(resultCode, data);
         if (mNextActionAlreadyTriggered) {
             Log.v("CarSetupWizard",
-                    "BaseActivity: nextAction triggered multiple times without page refresh, "
-                            + "ignoring.");
+                    "BaseSetupWizardActivity: nextAction triggered multiple times without"
+                            + "page refresh, ignoring.");
             return;
         }
         mNextActionAlreadyTriggered = true;
@@ -331,7 +328,6 @@ public class BaseActivity extends FragmentActivity {
     protected Intent getResultData() {
         return mResultData;
     }
-
 
     // CarSetupWizardLayout Accessors
 
@@ -411,7 +407,6 @@ public class BaseActivity extends FragmentActivity {
         setPrimaryToolbarButtonOnClickListener(v -> {
             nextAction(RESULT_OK);
         });
-
     }
 
     /**
@@ -477,12 +472,15 @@ public class BaseActivity extends FragmentActivity {
         mCarSetupWizardLayout.setProgressBarVisible(visible);
     }
 
-    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    @VisibleForTesting
     boolean getAllowFragmentCommits() {
         return mAllowFragmentCommits;
     }
 
-    protected CarSetupWizardLayout getCarSetupWizardLayout() {
+    protected CarSetupWizardBaseLayout getCarSetupWizardLayout() {
         return mCarSetupWizardLayout;
     }
+
+    @LayoutRes
+    abstract int getLayout();
 }
