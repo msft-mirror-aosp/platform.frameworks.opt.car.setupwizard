@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 The Android Open Source Project
+ * Copyright (C) 2019 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.android.car.setupwizardlib;
 
 import android.animation.ValueAnimator;
@@ -53,14 +54,12 @@ import java.util.Objects;
 
 /**
  * Custom layout for the Car Setup Wizard. Provides accessors for modifying elements such as buttons
- * and progress bars. Any modifications to elements built by
- * the CarSetupWizardLayout should be done through methods provided by this class unless that is
- * not possible so as to keep the state internally consistent.
- *
- * @deprecated Use {@link CarSetupWizardCompatLayout} or {@link CarSetupWizardDesignLayout}.
+ * and progress bars. Any modifications to elements built by the CarSetupWizardBaseLayout should be
+ * done through methods provided by this class unless that is not possible so as to keep the state
+ * internally consistent.
  */
-public class CarSetupWizardLayout extends LinearLayout {
-    private static final String TAG = CarSetupWizardLayout.class.getSimpleName();
+class CarSetupWizardBaseLayout extends LinearLayout {
+    private static final String TAG = CarSetupWizardBaseLayout.class.getSimpleName();
     private static final int ANIMATION_DURATION_MS = 100;
 
     private View mBackButton;
@@ -86,15 +85,16 @@ public class CarSetupWizardLayout extends LinearLayout {
     private Button mSecondaryToolbarButton;
     private ProgressBar mProgressBar;
 
-    public CarSetupWizardLayout(Context context) {
+    CarSetupWizardBaseLayout(Context context) {
         this(context, null);
     }
 
-    public CarSetupWizardLayout(Context context, @Nullable AttributeSet attrs) {
+    CarSetupWizardBaseLayout(Context context, @Nullable AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
-    public CarSetupWizardLayout(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+    CarSetupWizardBaseLayout(Context context, @Nullable AttributeSet attrs,
+            int defStyleAttr) {
         this(context, attrs, defStyleAttr, 0);
     }
 
@@ -102,14 +102,14 @@ public class CarSetupWizardLayout extends LinearLayout {
      * On initialization, the layout gets all of the custom attributes and initializes
      * the custom views that can be set by the user (e.g. back button, continue button).
      */
-    public CarSetupWizardLayout(Context context, @Nullable AttributeSet attrs, int defStyleAttr,
-            int defStyleRes) {
+    CarSetupWizardBaseLayout(Context context, @Nullable AttributeSet attrs,
+            int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
 
         mPartnerConfigHelper = PartnerConfigHelper.get(context);
         TypedArray attrArray = context.getTheme().obtainStyledAttributes(
                 attrs,
-                R.styleable.CarSetupWizardLayout,
+                R.styleable.CarSetupWizardBaseLayout,
                 0, 0);
 
         init(attrArray);
@@ -137,29 +137,29 @@ public class CarSetupWizardLayout extends LinearLayout {
 
         try {
             showBackButton = attrArray.getBoolean(
-                    R.styleable.CarSetupWizardLayout_showBackButton, true);
+                    R.styleable.CarSetupWizardBaseLayout_showBackButton, true);
             showToolbarTitle = attrArray.getBoolean(
-                    R.styleable.CarSetupWizardLayout_showToolbarTitle, false);
+                    R.styleable.CarSetupWizardBaseLayout_showToolbarTitle, false);
             toolbarTitleText = attrArray.getString(
-                    R.styleable.CarSetupWizardLayout_toolbarTitleText);
+                    R.styleable.CarSetupWizardBaseLayout_toolbarTitleText);
             showPrimaryToolbarButton = attrArray.getBoolean(
-                    R.styleable.CarSetupWizardLayout_showPrimaryToolbarButton, true);
+                    R.styleable.CarSetupWizardBaseLayout_showPrimaryToolbarButton, true);
             primaryToolbarButtonText = attrArray.getString(
-                    R.styleable.CarSetupWizardLayout_primaryToolbarButtonText);
+                    R.styleable.CarSetupWizardBaseLayout_primaryToolbarButtonText);
             primaryToolbarButtonEnabled = attrArray.getBoolean(
-                    R.styleable.CarSetupWizardLayout_primaryToolbarButtonEnabled, true);
+                    R.styleable.CarSetupWizardBaseLayout_primaryToolbarButtonEnabled, true);
             mPrimaryToolbarButtonFlat = attrArray.getBoolean(
-                    R.styleable.CarSetupWizardLayout_primaryToolbarButtonFlat, false);
+                    R.styleable.CarSetupWizardBaseLayout_primaryToolbarButtonFlat, false);
             showSecondaryToolbarButton = attrArray.getBoolean(
-                    R.styleable.CarSetupWizardLayout_showSecondaryToolbarButton, false);
+                    R.styleable.CarSetupWizardBaseLayout_showSecondaryToolbarButton, false);
             secondaryToolbarButtonText = attrArray.getString(
-                    R.styleable.CarSetupWizardLayout_secondaryToolbarButtonText);
+                    R.styleable.CarSetupWizardBaseLayout_secondaryToolbarButtonText);
             secondaryToolbarButtonEnabled = attrArray.getBoolean(
-                    R.styleable.CarSetupWizardLayout_secondaryToolbarButtonEnabled, true);
+                    R.styleable.CarSetupWizardBaseLayout_secondaryToolbarButtonEnabled, true);
             showProgressBar = attrArray.getBoolean(
-                    R.styleable.CarSetupWizardLayout_showProgressBar, false);
+                    R.styleable.CarSetupWizardBaseLayout_showProgressBar, false);
             indeterminateProgressBar = attrArray.getBoolean(
-                    R.styleable.CarSetupWizardLayout_indeterminateProgressBar, true);
+                    R.styleable.CarSetupWizardBaseLayout_indeterminateProgressBar, true);
         } finally {
             attrArray.recycle();
         }
