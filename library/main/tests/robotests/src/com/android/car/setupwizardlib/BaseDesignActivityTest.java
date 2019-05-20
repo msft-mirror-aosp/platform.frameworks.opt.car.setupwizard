@@ -49,4 +49,10 @@ public class BaseDesignActivityTest extends BaseRobolectricTest {
     public void testLayoutIsDesign() {
         assertThat(mDesignActivity.getLayout()).isEqualTo(R.layout.base_design_activity);
     }
+
+    @Test
+    public void testGetCarSetupWizardLayout() {
+        assertThat(mDesignActivity.getCarSetupWizardLayout())
+                .isInstanceOf(CarSetupWizardDesignLayout.class);
+    }
 }
