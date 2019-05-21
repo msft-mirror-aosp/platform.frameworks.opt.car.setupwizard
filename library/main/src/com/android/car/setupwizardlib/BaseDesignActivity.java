@@ -26,4 +26,9 @@ public class BaseDesignActivity extends BaseSetupWizardActivity {
     int getLayout() {
         return R.layout.base_design_activity;
     }
+
+    @Override
+    protected CarSetupWizardDesignLayout getCarSetupWizardLayout() {
+        return (CarSetupWizardDesignLayout) super.getCarSetupWizardLayout();
+    }
 }
