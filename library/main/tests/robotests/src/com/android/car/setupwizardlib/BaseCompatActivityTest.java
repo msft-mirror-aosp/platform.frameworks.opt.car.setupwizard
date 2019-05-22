@@ -81,6 +81,12 @@ public class BaseCompatActivityTest extends BaseRobolectricTest {
         assertThat(mBaseCompatActivity.getLayout()).isEqualTo(R.layout.base_compat_activity);
     }
 
+    @Test
+    public void testGetCarSetupWizardLayout() {
+        assertThat(mBaseCompatActivity.getCarSetupWizardLayout())
+                .isInstanceOf(CarSetupWizardCompatLayout.class);
+    }
+
     /**
      * Test that the BaseCompatActivity's content view is set to be a CarSetupWizardLayout
      */
