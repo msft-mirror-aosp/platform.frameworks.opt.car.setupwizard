@@ -26,4 +26,9 @@ public class BaseCompatActivity extends BaseSetupWizardActivity {
     int getLayout() {
         return R.layout.base_compat_activity;
     }
+
+    @Override
+    protected CarSetupWizardCompatLayout getCarSetupWizardLayout() {
+        return (CarSetupWizardCompatLayout) super.getCarSetupWizardLayout();
+    }
 }
