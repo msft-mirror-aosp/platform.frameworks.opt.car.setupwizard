@@ -59,14 +59,11 @@ public class CarDrivingStateMonitorTest extends BaseRobolectricTest {
     private CarDrivingStateMonitor mCarDrivingStateMonitor;
     private ShadowApplication mShadowApplication;
 
-    private static final int DEFAULT_NO_RESTRICTIONS = CarUxRestrictions.UX_RESTRICTIONS_BASELINE;
-
     @Before
     public void setupCarState() throws CarNotConnectedException {
         ShadowCar.setIsConnected(false);
         ShadowCar.setCarManager(Car.CAR_UX_RESTRICTION_SERVICE, mMockRestrictionsManager);
         doReturn(mMockRestrictions).when(mMockRestrictionsManager).getCurrentCarUxRestrictions();
-        doReturn(DEFAULT_NO_RESTRICTIONS).when(mMockRestrictions).getActiveRestrictions();
         mCarDrivingStateMonitor = CarDrivingStateMonitor.get(application);
         mShadowApplication = Shadows.shadowOf(application);
     }
