@@ -76,5 +76,5 @@ public @interface PartnerConfigKey {
 
     String KEY_TOOLBAR_LOADING_INDICATOR_COLOR = "suw_compat_toolbar_loading_indicator_color";
 
-    String KEY_LAYOUT_BG_COLOR = "suw_compat_layout_bg_color";
+    String KEY_LAYOUT_BG_COLOR = "suw_design_layout_bg_color";
 }
