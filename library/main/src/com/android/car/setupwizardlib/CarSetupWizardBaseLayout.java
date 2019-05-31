@@ -19,7 +19,6 @@ package com.android.car.setupwizardlib;
 import android.animation.ValueAnimator;
 import android.annotation.Nullable;
 import android.content.Context;
-import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
@@ -206,18 +205,7 @@ class CarSetupWizardBaseLayout extends LinearLayout {
         if (showPrimaryToolbarButton) {
             setPrimaryToolbarButtonText(primaryToolbarButtonText);
             setPrimaryToolbarButtonEnabled(primaryToolbarButtonEnabled);
-
-            setBackground(
-                    mPrimaryToolbarButton,
-                    PartnerConfig.CONFIG_TOOLBAR_PRIMARY_BUTTON_BG,
-                    PartnerConfig.CONFIG_TOOLBAR_PRIMARY_BUTTON_BG_COLOR);
-
-            setButtonPadding(mPrimaryToolbarButton);
-            setButtonTypeFace(mPrimaryToolbarButton);
-            setButtonTextSize(mPrimaryToolbarButton);
-            setButtonTextColor(
-                    mPrimaryToolbarButton,
-                    PartnerConfig.CONFIG_TOOLBAR_PRIMARY_BUTTON_TEXT_COLOR);
+            stylePrimaryToolbarButton(mPrimaryToolbarButton);
         } else {
             setPrimaryToolbarButtonVisible(false);
         }
@@ -236,12 +224,6 @@ class CarSetupWizardBaseLayout extends LinearLayout {
         mProgressBar = findViewById(R.id.progress_bar);
         setProgressBarVisible(showProgressBar);
         setProgressBarIndeterminate(indeterminateProgressBar);
-        int tintColor = mPartnerConfigHelper.getColor(
-                getContext(),
-                PartnerConfig.CONFIG_TOOLBAR_LOADING_INDICATOR_COLOR);
-        if (tintColor != 0) {
-            mProgressBar.setIndeterminateTintList(ColorStateList.valueOf(tintColor));
-        }
 
         // Set orientation programmatically since the inflated layout uses <merge>
         setOrientation(LinearLayout.VERTICAL);
@@ -421,6 +403,7 @@ class CarSetupWizardBaseLayout extends LinearLayout {
         if (isFlat == mPrimaryToolbarButtonFlat) {
             return;
         }
+        mPrimaryToolbarButtonFlat = isFlat;
         Button newPrimaryButton = createPrimaryToolbarButton(isFlat);
 
         ViewGroup parent = (ViewGroup) findViewById(R.id.button_container);
@@ -430,7 +413,6 @@ class CarSetupWizardBaseLayout extends LinearLayout {
 
         // Update state of layout
         setPrimaryToolbarButton(newPrimaryButton);
-        mPrimaryToolbarButtonFlat = isFlat;
     }
 
     @VisibleForTesting
@@ -443,6 +425,7 @@ class CarSetupWizardBaseLayout extends LinearLayout {
         newPrimaryButton.setText(mPrimaryToolbarButton.getText());
         newPrimaryButton.setOnClickListener(mPrimaryToolbarButtonOnClick);
         newPrimaryButton.setLayoutParams(mPrimaryToolbarButton.getLayoutParams());
+        stylePrimaryToolbarButton(newPrimaryButton);
 
         return newPrimaryButton;
     }
@@ -717,6 +700,24 @@ class CarSetupWizardBaseLayout extends LinearLayout {
                         PartnerConfig.CONFIG_TOOLBAR_BUTTON_PADDING_VERTICAL)
         );
         button.setPadding(hPadding, vPadding, hPadding, vPadding);
+    }
+
+    private void stylePrimaryToolbarButton(Button primaryButton) {
+        if (!mPrimaryToolbarButtonFlat) {
+            setBackground(
+                    primaryButton,
+                    PartnerConfig.CONFIG_TOOLBAR_PRIMARY_BUTTON_BG,
+                    PartnerConfig.CONFIG_TOOLBAR_PRIMARY_BUTTON_BG_COLOR);
+        }
+
+        setButtonPadding(primaryButton);
+        setButtonTypeFace(primaryButton);
+        setButtonTextSize(primaryButton);
+
+        PartnerConfig textColorConfig = mPrimaryToolbarButtonFlat
+                ? PartnerConfig.CONFIG_TOOLBAR_SECONDARY_BUTTON_TEXT_COLOR
+                : PartnerConfig.CONFIG_TOOLBAR_PRIMARY_BUTTON_TEXT_COLOR;
+        setButtonTextColor(primaryButton, textColorConfig);
     }
 
     private GradientDrawable getGradientDrawable(Button button) {
