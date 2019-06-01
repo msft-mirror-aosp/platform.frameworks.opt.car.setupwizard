@@ -18,6 +18,7 @@ package com.android.car.setupwizardlib;
 
 import android.annotation.Nullable;
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.util.AttributeSet;
 
 import com.android.car.setupwizardlib.partner.PartnerConfig;
@@ -48,11 +49,19 @@ public class CarSetupWizardDesignLayout extends CarSetupWizardBaseLayout {
             int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
 
-        int bgColor = PartnerConfigHelper.get(context).getColor(
-                getContext(),
+        PartnerConfigHelper partnerConfigHelper = PartnerConfigHelper.get(context);
+        int bgColor = partnerConfigHelper.getColor(
+                context,
                 PartnerConfig.CONFIG_LAYOUT_BG_COLOR);
         if (bgColor != 0) {
             setBackgroundColor(bgColor);
+        }
+
+        int tintColor = partnerConfigHelper.getColor(
+                context,
+                PartnerConfig.CONFIG_LOADING_INDICATOR_COLOR);
+        if (tintColor != 0) {
+            getProgressBar().setIndeterminateTintList(ColorStateList.valueOf(tintColor));
         }
     }
 }
