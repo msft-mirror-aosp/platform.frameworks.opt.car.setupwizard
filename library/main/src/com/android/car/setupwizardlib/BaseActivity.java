@@ -47,6 +47,7 @@ import com.android.car.setupwizardlib.util.CarWizardManagerHelper;
  *
  * @deprecated Use {@link BaseCompatActivity} or {@link BaseDesignActivity}.
  */
+@Deprecated
 public class BaseActivity extends FragmentActivity {
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     static final String CONTENT_FRAGMENT_TAG = "CONTENT_FRAGMENT_TAG";
