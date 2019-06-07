@@ -29,6 +29,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 
 import com.android.car.setupwizardlib.util.CarDrivingStateMonitor;
+import com.android.car.setupwizardlib.util.CarSetupWizardUiUtils;
 import com.android.car.setupwizardlib.util.CarWizardManagerHelper;
 
 /**
@@ -109,6 +110,8 @@ abstract class BaseSetupWizardActivity extends FragmentActivity {
     @CallSuper
     protected void onStart() {
         super.onStart();
+        // Must be done here so that the SystemUI is hidden when back button is clicked
+        CarSetupWizardUiUtils.maybeHideSystemUI(this);
         // Fragment commits are not allowed once the Activity's state has been saved. Once
         // onStart() has been called, the FragmentManager should now allow commits.
         mAllowFragmentCommits = true;
