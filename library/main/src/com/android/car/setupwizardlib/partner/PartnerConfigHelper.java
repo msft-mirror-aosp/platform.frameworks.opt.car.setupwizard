@@ -223,6 +223,42 @@ public class PartnerConfigHelper {
         return result;
     }
 
+    /**
+     * Returns the boolean value of given {@code partnerConfig}. If the given {@code partnerConfig}
+     * not found, will return {@code defaultValue}. If the {@code ResourceType} of given {@code
+     * resourceConfig} is not boolean, will throw IllegalArgumentException.
+     *
+     * @param context The context of client activity
+     * @param partnerConfig The {@code PartnerConfig} of target resource
+     * @param defaultValue The default value
+     */
+    public boolean getBoolean(
+            @NonNull Context context, PartnerConfig partnerConfig, boolean defaultValue) {
+        if (partnerConfig.getResourceType() != PartnerConfig.ResourceType.BOOLEAN) {
+            throw new IllegalArgumentException("Not a boolean resource");
+        }
+
+        if (mPartnerResourceCache.containsKey(partnerConfig)) {
+            return (boolean) mPartnerResourceCache.get(partnerConfig);
+        }
+
+        boolean result = defaultValue;
+        try {
+            String resourceName = partnerConfig.getResourceName();
+            ResourceEntry resourceEntry = getResourceEntryFromKey(resourceName);
+            if (resourceEntry == null) {
+                Log.w(TAG, "Resource not found: " + resourceName);
+                return defaultValue;
+            }
+            Resources resource = getResourcesByPackageName(context, resourceEntry.getPackageName());
+            result = resource.getBoolean(resourceEntry.getResourceId());
+            mPartnerResourceCache.put(partnerConfig, result);
+        } catch (PackageManager.NameNotFoundException exception) {
+            Log.e(TAG, exception.getMessage());
+        }
+        return result;
+    }
+
     private void getPartnerConfigBundle(Context context) {
         if (mResultBundle == null) {
             try {
