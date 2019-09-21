@@ -152,6 +152,14 @@ abstract class BaseSetupWizardActivity extends FragmentActivity {
         super.onSaveInstanceState(outState);
     }
 
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        if (hasFocus) {
+            CarSetupWizardUiUtils.maybeHideSystemUI(this);
+        }
+    }
+
     // Content Fragment accessors
 
     /**
