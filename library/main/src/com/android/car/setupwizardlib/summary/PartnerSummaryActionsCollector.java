@@ -17,6 +17,7 @@
 
 package com.android.car.setupwizardlib.summary;
 
+import android.annotation.Nullable;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
@@ -25,7 +26,6 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.net.Uri;
 import android.os.Bundle;
-import android.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -143,9 +143,9 @@ public class PartnerSummaryActionsCollector {
                 queryResults.stream()
                         .filter(
                                 resolveInfo ->
-                                        resolveInfo.activityInfo != null
-                                                && resolveInfo.activityInfo.applicationInfo != null
-                                                && (resolveInfo.activityInfo.applicationInfo.flags
+                                        resolveInfo.providerInfo != null
+                                                && resolveInfo.providerInfo.applicationInfo != null
+                                                && (resolveInfo.providerInfo.applicationInfo.flags
                                                 & ApplicationInfo.FLAG_SYSTEM)
                                                 != 0)
                         .collect(Collectors.toList());
@@ -240,14 +240,11 @@ public class PartnerSummaryActionsCollector {
      *                                  properly.
      */
     private ArrayList<String> getPartnerSummaryActionsFromContentProvider(Uri contentProviderUri) {
-        Bundle result =
-                context
-                        .getContentResolver()
-                        .call(
-                                contentProviderUri,
-                                METHOD_GET_SUMMARY_ACTIONS,
-                                /* arg= */ null,
-                                /* extras= */ null);
+        Bundle result = context.getContentResolver().call(
+                        contentProviderUri,
+                        METHOD_GET_SUMMARY_ACTIONS,
+                        /* arg= */ null,
+                        /* extras= */ null);
         if (result == null || result.getStringArrayList(EXTRA_SUMMARY_ACTIONS_LIST) == null) {
             Log.e(
                     TAG,
@@ -271,14 +268,11 @@ public class PartnerSummaryActionsCollector {
             String actionId, Uri contentProviderUri) {
         Bundle completionStateArgs = new Bundle();
         completionStateArgs.putString(EXTRA_ACTION_ID, actionId);
-        Bundle result =
-                context
-                        .getContentResolver()
-                        .call(
-                                contentProviderUri,
-                                METHOD_GET_ACTION_COMPLETION_STATE,
-                                /* arg= */ null,
-                                completionStateArgs);
+        Bundle result = context.getContentResolver().call(
+                        contentProviderUri,
+                        METHOD_GET_ACTION_COMPLETION_STATE,
+                        /* arg= */ null,
+                        completionStateArgs);
         if (result == null || !result.containsKey(EXTRA_IS_ACTION_COMPLETED)) {
             throw new IllegalArgumentException(
                     "No action with id " + actionId + " found in content provider");
@@ -290,14 +284,11 @@ public class PartnerSummaryActionsCollector {
             Uri contentProviderUri) {
         Bundle summaryStateArgs = new Bundle();
         summaryStateArgs.putString(EXTRA_ACTION_ID, actionId);
-        Bundle result =
-                context
-                        .getContentResolver()
-                        .call(
-                                contentProviderUri,
-                                METHOD_GET_ACTION_SUMMARY_STATE,
-                                /* arg= */ null,
-                                summaryStateArgs);
+        Bundle result = context.getContentResolver().call(
+                        contentProviderUri,
+                        METHOD_GET_ACTION_SUMMARY_STATE,
+                        /* arg= */ null,
+                        summaryStateArgs);
         if (result == null) {
             throw new IllegalArgumentException(
                     "No action summary found in content provider for " + actionId);
