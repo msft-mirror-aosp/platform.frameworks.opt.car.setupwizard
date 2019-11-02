@@ -202,20 +202,14 @@ class CarSetupWizardBaseLayout extends LinearLayout {
         }
         primaryToolbarButtonStub.inflate();
         setPrimaryToolbarButton(findViewById(R.id.primary_toolbar_button));
-        if (showPrimaryToolbarButton) {
-            setPrimaryToolbarButtonText(primaryToolbarButtonText);
-            setPrimaryToolbarButtonEnabled(primaryToolbarButtonEnabled);
-            stylePrimaryToolbarButton(mPrimaryToolbarButton);
-        } else {
-            setPrimaryToolbarButtonVisible(false);
-        }
+        stylePrimaryToolbarButton(mPrimaryToolbarButton);
+        setPrimaryToolbarButtonText(primaryToolbarButtonText);
+        setPrimaryToolbarButtonEnabled(primaryToolbarButtonEnabled);
+        setPrimaryToolbarButtonVisible(showPrimaryToolbarButton);
 
         // Set the secondary continue button visibility and text based on the custom attributes.
-        ViewStub secondaryToolbarButtonStub =
-                (ViewStub) findViewById(R.id.secondary_toolbar_button_stub);
         if (showSecondaryToolbarButton || !TextUtils.isEmpty(secondaryToolbarButtonText)) {
-            secondaryToolbarButtonStub.inflate();
-            mSecondaryToolbarButton = findViewById(R.id.secondary_toolbar_button);
+            inflateSecondaryToolbarButtonIfNecessary();
             setSecondaryToolbarButtonText(secondaryToolbarButtonText);
             setSecondaryToolbarButtonEnabled(secondaryToolbarButtonEnabled);
             setSecondaryToolbarButtonVisible(showSecondaryToolbarButton);
@@ -445,7 +439,7 @@ class CarSetupWizardBaseLayout extends LinearLayout {
         if (!visible && mSecondaryToolbarButton == null) {
             return;
         }
-        maybeInflateSecondaryToolbarButton();
+        inflateSecondaryToolbarButtonIfNecessary();
         setViewVisible(mSecondaryToolbarButton, visible);
     }
 
@@ -453,7 +447,7 @@ class CarSetupWizardBaseLayout extends LinearLayout {
      * Sets whether the secondary continue button is enabled.
      */
     public void setSecondaryToolbarButtonEnabled(boolean enabled) {
-        maybeInflateSecondaryToolbarButton();
+        inflateSecondaryToolbarButtonIfNecessary();
         mSecondaryToolbarButton.setEnabled(enabled);
     }
 
@@ -461,7 +455,7 @@ class CarSetupWizardBaseLayout extends LinearLayout {
      * Sets the secondary continue button text to the given text.
      */
     public void setSecondaryToolbarButtonText(String text) {
-        maybeInflateSecondaryToolbarButton();
+        inflateSecondaryToolbarButtonIfNecessary();
         mSecondaryToolbarButton.setText(text);
     }
 
@@ -470,7 +464,7 @@ class CarSetupWizardBaseLayout extends LinearLayout {
      * listener should be overridden so no callback is made.
      */
     public void setSecondaryToolbarButtonListener(@Nullable View.OnClickListener listener) {
-        maybeInflateSecondaryToolbarButton();
+        inflateSecondaryToolbarButtonIfNecessary();
         mSecondaryToolbarButton.setOnClickListener(listener);
     }
 
@@ -576,7 +570,7 @@ class CarSetupWizardBaseLayout extends LinearLayout {
      * A method that inflates the SecondaryToolbarButton if it is has not already been
      * inflated. If it has been inflated already this method will do nothing.
      */
-    private void maybeInflateSecondaryToolbarButton() {
+    private void inflateSecondaryToolbarButtonIfNecessary() {
         ViewStub secondaryToolbarButtonStub = findViewById(R.id.secondary_toolbar_button_stub);
         // If the secondaryToolbarButtonStub is null then the stub has been inflated so there is
         // nothing to do.
