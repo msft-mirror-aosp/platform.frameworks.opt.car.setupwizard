@@ -44,7 +44,7 @@ import java.util.Map;
  * used with {@link org.robolectric.shadows.ShadowPackageManager#resources} to simulate loading
  * resources from another package.
  */
-class ExternalResources {
+public class ExternalResources {
 
     public static Resources injectExternalResources(String packageName) {
         return injectExternalResources(createPackageInfo(packageName));
