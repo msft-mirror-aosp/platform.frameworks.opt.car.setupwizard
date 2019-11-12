@@ -732,6 +732,9 @@ class CarSetupWizardBaseLayout extends LinearLayout {
     }
 
     private GradientDrawable getGradientDrawableFromInsetDrawable(InsetDrawable insetDrawable) {
-        return (GradientDrawable) insetDrawable.getDrawable();
+        if (insetDrawable.getDrawable() instanceof GradientDrawable) {
+            return (GradientDrawable) insetDrawable.getDrawable();
+        }
+        return null;
     }
 }
