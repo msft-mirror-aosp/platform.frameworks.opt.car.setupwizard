@@ -16,9 +16,9 @@
 
 package com.android.car.setupwizardlib;
 
-import android.animation.ValueAnimator;
 import android.annotation.Nullable;
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
@@ -59,11 +59,10 @@ import java.util.Objects;
  */
 class CarSetupWizardBaseLayout extends LinearLayout {
     private static final String TAG = CarSetupWizardBaseLayout.class.getSimpleName();
-    private static final int ANIMATION_DURATION_MS = 100;
+    private static final int INVALID_COLOR = 0;
 
     private View mBackButton;
     private View mTitleBar;
-    private Float mTitleBarElevation;
     private TextView mToolbarTitle;
     private PartnerConfigHelper mPartnerConfigHelper;
 
@@ -82,6 +81,7 @@ class CarSetupWizardBaseLayout extends LinearLayout {
     private boolean mPrimaryToolbarButtonFlat;
     private View.OnClickListener mPrimaryToolbarButtonOnClick;
     private Button mSecondaryToolbarButton;
+    private ImageView mDivider;
     private ProgressBar mProgressBar;
 
     CarSetupWizardBaseLayout(Context context) {
@@ -177,8 +177,6 @@ class CarSetupWizardBaseLayout extends LinearLayout {
 
         // Se the title bar.
         setTitleBar(findViewById(R.id.application_bar));
-        mTitleBarElevation =
-                getContext().getResources().getDimension(R.dimen.title_bar_drop_shadow_elevation);
         int toolbarBgColor =
                 mPartnerConfigHelper.getColor(getContext(), PartnerConfig.CONFIG_TOOLBAR_BG_COLOR);
         if (toolbarBgColor != 0) {
@@ -218,6 +216,23 @@ class CarSetupWizardBaseLayout extends LinearLayout {
         mProgressBar = findViewById(R.id.progress_bar);
         setProgressBarVisible(showProgressBar);
         setProgressBarIndeterminate(indeterminateProgressBar);
+        int tintColor = mPartnerConfigHelper.getColor(
+                getContext(),
+                PartnerConfig.CONFIG_LOADING_INDICATOR_COLOR);
+        if (tintColor != INVALID_COLOR) {
+            mProgressBar.setIndeterminateTintList(ColorStateList.valueOf(tintColor));
+        }
+
+        float lineWeight = mPartnerConfigHelper.getDimension(
+                getContext(),
+                PartnerConfig.CONFIG_LOADING_INDICATOR_LINE_WEIGHT);
+        if (lineWeight > 0) {
+            ViewGroup.LayoutParams layoutParams = mProgressBar.getLayoutParams();
+            layoutParams.height = Math.round(lineWeight);
+            mProgressBar.setLayoutParams(layoutParams);
+        }
+
+        initDivider();
 
         // Set orientation programmatically since the inflated layout uses <merge>
         setOrientation(LinearLayout.VERTICAL);
@@ -518,48 +533,6 @@ class CarSetupWizardBaseLayout extends LinearLayout {
     }
 
     /**
-     * Adds elevation to the title bar in order to produce a drop shadow. An animation can be used
-     * in cases where a direct elevation changes would be too jarring.
-     *
-     * @param animate True when a smooth animation is wanted for the adding of the elevation.
-     */
-    public void addElevationToTitleBar(boolean animate) {
-        if (animate) {
-            ValueAnimator elevationAnimator =
-                    ValueAnimator.ofFloat(mTitleBar.getElevation(), mTitleBarElevation);
-            elevationAnimator
-                    .setDuration(ANIMATION_DURATION_MS)
-                    .addUpdateListener(
-                            animation -> mTitleBar.setElevation(
-                                    (float) animation.getAnimatedValue()));
-            elevationAnimator.start();
-        } else {
-            mTitleBar.setElevation(mTitleBarElevation);
-        }
-    }
-
-    /**
-     * Removes the elevation from the title bar, an animation can be used in cases where a direct
-     * elevation changes would be too jarring.
-     *
-     * @param animate True when a smooth animation is wanted for the removal of the elevation.
-     */
-    public void removeElevationFromTitleBar(boolean animate) {
-        if (animate) {
-            ValueAnimator elevationAnimator =
-                    ValueAnimator.ofFloat(mTitleBar.getElevation(), 0f);
-            elevationAnimator
-                    .setDuration(ANIMATION_DURATION_MS)
-                    .addUpdateListener(
-                            animation -> mTitleBar.setElevation(
-                                    (float) animation.getAnimatedValue()));
-            elevationAnimator.start();
-        } else {
-            mTitleBar.setElevation(0f);
-        }
-    }
-
-    /**
      * Sets the title bar view.
      */
     private void setTitleBar(View titleBar) {
@@ -714,6 +687,26 @@ class CarSetupWizardBaseLayout extends LinearLayout {
         setButtonTextColor(primaryButton, textColorConfig);
     }
 
+    private void initDivider() {
+        mDivider = findViewById(R.id.divider);
+        float dividerHeight = mPartnerConfigHelper.getDimension(
+                getContext(),
+                PartnerConfig.CONFIG_TOOLBAR_DIVIDER_LINE_WEIGHT);
+        if (dividerHeight >= 0) {
+            ViewGroup.LayoutParams layoutParams = mDivider.getLayoutParams();
+            layoutParams.height = Math.round(dividerHeight);
+            mDivider.setLayoutParams(layoutParams);
+        }
+        if (dividerHeight > 0) {
+            Drawable dividerBg = mPartnerConfigHelper.getDrawable(
+                    getContext(),
+                    PartnerConfig.CONFIG_TOOLBAR_DIVIDER_BG);
+            if (dividerBg != null) {
+                mDivider.setBackground(dividerBg);
+            }
+        }
+    }
+
     private GradientDrawable getGradientDrawable(Button button) {
         Drawable drawable = button.getBackground();
         if (drawable instanceof InsetDrawable) {
@@ -732,6 +725,9 @@ class CarSetupWizardBaseLayout extends LinearLayout {
     }
 
     private GradientDrawable getGradientDrawableFromInsetDrawable(InsetDrawable insetDrawable) {
-        return (GradientDrawable) insetDrawable.getDrawable();
+        if (insetDrawable.getDrawable() instanceof GradientDrawable) {
+            return (GradientDrawable) insetDrawable.getDrawable();
+        }
+        return null;
     }
 }
