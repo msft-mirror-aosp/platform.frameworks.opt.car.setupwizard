@@ -64,6 +64,10 @@ public class PartnerSummaryActionsCollector {
             "summary_action_requires_network";
     private static final String EXTRA_SUMMARY_ACTION_WIZARD_SCRIPT = "summary_action_wizard_script";
     private static final String EXTRA_SUMMARY_ACTION_PRIORITY = "summary_action_priority";
+    private static final String EXTRA_SUMMARY_ICON_RESOURCE_NAME =
+            "summary_action_icon_resource_name";
+    private static final String EXTRA_SUMMARY_COMPLETED_DESCRIPTION =
+            "summary_action_completed_description";
 
     // Extra used as a key for the action id passed in to query summary action state.
     private static final String EXTRA_ACTION_ID = "action_id";
@@ -122,7 +126,13 @@ public class PartnerSummaryActionsCollector {
         // Fetch priority, default 0 so that if no priority is provided they will be placed above
         // the Google items which are located in 100-200.
         int priority = summaryStateBundle.getInt(EXTRA_SUMMARY_ACTION_PRIORITY, 0);
+        String iconResourceName = null;
+        if (summaryStateBundle.containsKey(EXTRA_SUMMARY_ICON_RESOURCE_NAME)) {
+            iconResourceName = summaryStateBundle.getString(EXTRA_SUMMARY_ICON_RESOURCE_NAME, "");
+        }
 
+        String completedDescription =
+                summaryStateBundle.getString(EXTRA_SUMMARY_COMPLETED_DESCRIPTION, description);
         return new SummaryAction(
                 title,
                 description,
@@ -131,7 +141,9 @@ public class PartnerSummaryActionsCollector {
                 priority,
                 scriptUri,
                 hasUnfinishedDependency,
-                unfinishedDependencyDescription);
+                unfinishedDependencyDescription,
+                iconResourceName,
+                completedDescription);
     }
 
     private static ResolveInfo getSummaryContentProviderResolveInfo(PackageManager packageManager) {
