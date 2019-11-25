@@ -23,7 +23,6 @@ import java.lang.annotation.RetentionPolicy;
 
 @Retention(RetentionPolicy.SOURCE)
 @StringDef({
-        PartnerConfigKey.KEY_IS_IMMERSIVE,
         PartnerConfigKey.KEY_TOOLBAR_BG_COLOR,
         PartnerConfigKey.KEY_TOOLBAR_BUTTON_ICON_BACK,
         PartnerConfigKey.KEY_TOOLBAR_BUTTON_FONT_FAMILY,
@@ -44,8 +43,6 @@ import java.lang.annotation.RetentionPolicy;
 
 /** Resource names that can be customized by partner overlay APK. */
 public @interface PartnerConfigKey {
-
-    String KEY_IS_IMMERSIVE = "suw_compat_is_immersive";
 
     String KEY_TOOLBAR_BG_COLOR = "suw_compat_toolbar_bg_color";
 
