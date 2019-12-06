@@ -18,6 +18,7 @@ package com.android.car.setupwizardlib;
 
 import android.annotation.Nullable;
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
@@ -58,6 +59,7 @@ import java.util.Objects;
  */
 class CarSetupWizardBaseLayout extends LinearLayout {
     private static final String TAG = CarSetupWizardBaseLayout.class.getSimpleName();
+    private static final int INVALID_COLOR = 0;
 
     private View mBackButton;
     private View mTitleBar;
@@ -213,6 +215,12 @@ class CarSetupWizardBaseLayout extends LinearLayout {
         mProgressBar = findViewById(R.id.progress_bar);
         setProgressBarVisible(showProgressBar);
         setProgressBarIndeterminate(indeterminateProgressBar);
+        int tintColor = mPartnerConfigHelper.getColor(
+                getContext(),
+                PartnerConfig.CONFIG_LOADING_INDICATOR_COLOR);
+        if (tintColor != INVALID_COLOR) {
+            mProgressBar.setIndeterminateTintList(ColorStateList.valueOf(tintColor));
+        }
 
         // Set orientation programmatically since the inflated layout uses <merge>
         setOrientation(LinearLayout.VERTICAL);
