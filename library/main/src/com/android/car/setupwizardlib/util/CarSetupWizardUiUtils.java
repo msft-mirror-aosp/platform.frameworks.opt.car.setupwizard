@@ -27,7 +27,15 @@ public final class CarSetupWizardUiUtils {
     private static final String TAG = CarSetupWizardUiUtils.class.getSimpleName();
     private static final boolean VERBOSE = Log.isLoggable(TAG, Log.VERBOSE);
 
-    /** Hide system UI if configured as such by partner */
+    /** Hide system UI */
+    public static void hideSystemUI(Activity activity) {
+        maybeHideSystemUI(activity);
+    }
+
+    /** Hide system UI
+     * @deprecated Use {@code hideSystemUI}
+     **/
+    @Deprecated
     public static void maybeHideSystemUI(Activity activity) {
         Preconditions.checkNotNull(activity);
 

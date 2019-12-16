@@ -111,7 +111,7 @@ abstract class BaseSetupWizardActivity extends FragmentActivity {
     protected void onStart() {
         super.onStart();
         // Must be done here so that the SystemUI is hidden when back button is clicked
-        CarSetupWizardUiUtils.maybeHideSystemUI(this);
+        CarSetupWizardUiUtils.hideSystemUI(this);
         // Fragment commits are not allowed once the Activity's state has been saved. Once
         // onStart() has been called, the FragmentManager should now allow commits.
         mAllowFragmentCommits = true;
@@ -156,7 +156,7 @@ abstract class BaseSetupWizardActivity extends FragmentActivity {
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
         if (hasFocus) {
-            CarSetupWizardUiUtils.maybeHideSystemUI(this);
+            CarSetupWizardUiUtils.hideSystemUI(this);
         }
     }
 
