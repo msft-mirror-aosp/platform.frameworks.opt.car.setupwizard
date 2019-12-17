@@ -58,7 +58,6 @@ import java.util.Objects;
  */
 class CarSetupWizardBaseLayout extends LinearLayout {
     private static final String TAG = CarSetupWizardBaseLayout.class.getSimpleName();
-    private static final int ANIMATION_DURATION_MS = 100;
 
     private View mBackButton;
     private View mTitleBar;

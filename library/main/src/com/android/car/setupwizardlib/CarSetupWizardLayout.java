@@ -60,7 +60,6 @@ import java.util.Objects;
 @Deprecated
 public class CarSetupWizardLayout extends LinearLayout {
     private static final String TAG = CarSetupWizardLayout.class.getSimpleName();
-    private static final int ANIMATION_DURATION_MS = 100;
 
     private View mBackButton;
     private View mTitleBar;

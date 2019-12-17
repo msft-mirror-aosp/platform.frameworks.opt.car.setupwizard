@@ -17,7 +17,6 @@
 package com.android.car.setupwizardlib.util;
 
 import android.app.Activity;
-import android.util.Log;
 import android.view.View;
 
 import androidx.core.util.Preconditions;
@@ -25,7 +24,6 @@ import androidx.core.util.Preconditions;
 /** Utilities to aid in UI for car setup wizard flow. */
 public final class CarSetupWizardUiUtils {
     private static final String TAG = CarSetupWizardUiUtils.class.getSimpleName();
-    private static final boolean VERBOSE = Log.isLoggable(TAG, Log.VERBOSE);
 
     /** Hide system UI */
     public static void hideSystemUI(Activity activity) {
