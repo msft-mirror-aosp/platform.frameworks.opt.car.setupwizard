@@ -18,10 +18,8 @@
      standard Car Toolbar/Application Bar, it doesn't require the same functionality, so it
      doesn't extend it.
 -->
-<!-- Note: This layout needs a background in order for elevation to show up. -->
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:background="?attr/android:windowBackground"
     android:layout_width="match_parent"
     android:layout_height="@dimen/car_app_bar_height">
 
