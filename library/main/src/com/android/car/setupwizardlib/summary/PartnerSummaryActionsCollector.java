@@ -47,6 +47,8 @@ public class PartnerSummaryActionsCollector {
     // Methods for fetching info from the content provider.
     private static final String METHOD_GET_ACTION_COMPLETION_STATE = "get_action_completion_state";
     private static final String METHOD_GET_ACTION_SUMMARY_STATE = "get_action_summary_state";
+    private static final String METHOD_GET_DEFERRED_ACTION_STATE =
+            "get_deferred_action_state";
     private static final String METHOD_GET_SUMMARY_ACTIONS = "get_summary_actions";
 
     // Constants for fetching information from the bundles passed back by the content provider.
@@ -68,15 +70,30 @@ public class PartnerSummaryActionsCollector {
             "summary_action_icon_resource_name";
     private static final String EXTRA_SUMMARY_COMPLETED_DESCRIPTION =
             "summary_action_completed_description";
+    private static final String EXTRA_SUMMARY_ACTION_DEFERRED_NOTIFICATION_DESCRIPTION =
+            "summary_action_deferred_notification_description";
 
     // Extra used as a key for the action id passed in to query summary action state.
     private static final String EXTRA_ACTION_ID = "action_id";
     private static PartnerSummaryActionsCollector partnerSummaryActionsCollector;
     private final Context context;
+    private Uri mContentProviderUri;
 
     /** private constructor, should use getter. */
     private PartnerSummaryActionsCollector(Context context) {
         this.context = context;
+        ResolveInfo resolveInfo = getSummaryContentProviderResolveInfo(context.getPackageManager());
+
+        if (resolveInfo == null) {
+            Log.e(TAG, "Could not find partner content provider, ignoring partner summary items.");
+            return;
+        }
+
+        mContentProviderUri = getSummaryContentProviderUri(resolveInfo);
+
+        if (mContentProviderUri == null) {
+            Log.e(TAG, "Could not fetch content provider URI, ignoring partner summary items.");
+        }
     }
 
     /** Gets the current instance of the {@link PartnerSummaryActionsCollector}. */
@@ -146,6 +163,28 @@ public class PartnerSummaryActionsCollector {
                 completedDescription);
     }
 
+    /**
+     * Creates a {@link DeferredAction} based on the passed in completion state and deferred action
+     * state bundle. Will return null if there is no notification description or a null bundle.
+     */
+    private static DeferredAction buildDeferredAction(boolean completed,
+            Bundle deferredActionState) {
+        if (deferredActionState == null) {
+            Log.e(TAG, "Cannot build deferred action with null deferredActionState");
+            return null;
+        }
+
+        String deferredNotificationDescription = deferredActionState.getString(
+                EXTRA_SUMMARY_ACTION_DEFERRED_NOTIFICATION_DESCRIPTION);
+        if (deferredNotificationDescription == null) {
+            Log.v(TAG, "Cannot build deferred action with no notification description");
+            return null;
+        }
+
+        int priority = deferredActionState.getInt(EXTRA_SUMMARY_ACTION_PRIORITY, 0);
+        return new DeferredAction(deferredNotificationDescription, completed, priority);
+    }
+
     private static ResolveInfo getSummaryContentProviderResolveInfo(PackageManager packageManager) {
         Intent contentProviderQueryIntent = new Intent(CONTENT_PROVIDER_INTENT_ACTION);
         List<ResolveInfo> queryResults =
@@ -188,26 +227,17 @@ public class PartnerSummaryActionsCollector {
 
     /**
      * Gets the list of provided partner summary actions. Will return an empty list if none are
-     * found
-     * or there is an error loading them.
+     * found or there is an error loading them.
      */
     public List<SummaryAction> getPartnerSummaryActions() {
-        ResolveInfo resolveInfo = getSummaryContentProviderResolveInfo(context.getPackageManager());
-
-        if (resolveInfo == null) {
-            Log.v(TAG, "Could not find partner content provider.");
-            return new ArrayList<>();
-        }
-
-        Uri contentProviderUri = getSummaryContentProviderUri(resolveInfo);
-
-        if (contentProviderUri == null) {
-            Log.e(TAG, "Could not fetch content provider URI, ignoring partner summary items");
+        if (mContentProviderUri == null) {
+            Log.e(TAG, "No content provider URI found, summary actions ignored");
             return new ArrayList<>();
         }
         ArrayList<String> partnerSummaryActions;
         try {
-            partnerSummaryActions = getPartnerSummaryActionsFromContentProvider(contentProviderUri);
+            partnerSummaryActions = getPartnerSummaryActionsFromContentProvider(
+                    mContentProviderUri);
         } catch (NullPointerException | IllegalArgumentException e) {
             Log.e(TAG, "Unable to find or successfully query content provider, ignoring action", e);
             return new ArrayList<>();
@@ -223,9 +253,9 @@ public class PartnerSummaryActionsCollector {
             Log.v(TAG, "Attempting to generate summary action for id: " + actionId);
             try {
                 boolean completed =
-                        getActionCompletionStateFromContentProvider(actionId, contentProviderUri);
+                        getActionCompletionStateFromContentProvider(actionId, mContentProviderUri);
                 Bundle summaryActionBundle =
-                        getActionSummaryStateFromContentProvider(actionId, contentProviderUri);
+                        getActionSummaryStateFromContentProvider(actionId, mContentProviderUri);
                 SummaryAction summaryAction = buildSummaryAction(completed, summaryActionBundle);
                 if (summaryAction != null) {
                     summaryActionList.add(summaryAction);
@@ -236,10 +266,58 @@ public class PartnerSummaryActionsCollector {
                         "Unable to load the completion or config state for summary action: "
                                 + actionId,
                         e);
-                continue;
             }
         }
         return summaryActionList;
+    }
+
+    /** Returns the set of partner deferred actions provided by the partner content provider. */
+    public List<DeferredAction> getPartnerDeferredActions() {
+        if (mContentProviderUri == null) {
+            Log.e(TAG, "No content provider URI found, deferred actions ignored");
+            return new ArrayList<>();
+        }
+
+        ArrayList<String> partnerSummaryActions;
+        try {
+            partnerSummaryActions = getPartnerSummaryActionsFromContentProvider(
+                    mContentProviderUri);
+        } catch (NullPointerException | IllegalArgumentException e) {
+            Log.e(TAG, "Unable to find or successfully query content provider, ignoring action", e);
+            return new ArrayList<>();
+        }
+
+        if (partnerSummaryActions == null || partnerSummaryActions.isEmpty()) {
+            Log.v(TAG, "No actions were fetched for partners");
+            return new ArrayList<>();
+        }
+
+        List<DeferredAction> deferredActions = new ArrayList<>();
+        for (String actionId : partnerSummaryActions) {
+            Log.v(TAG, "Attempting to generate deferred action for id: " + actionId);
+            try {
+                boolean completed =
+                        getActionCompletionStateFromContentProvider(actionId, mContentProviderUri);
+                Bundle deferredActionBundle =
+                        getDeferredActionStateFromContentProvider(actionId, mContentProviderUri);
+                if (deferredActionBundle == null) {
+                    Log.v(TAG, "No valid deferredActionBundle for action: " + actionId);
+                    continue;
+                }
+                DeferredAction deferredAction = buildDeferredAction(completed,
+                        deferredActionBundle);
+                if (deferredAction != null) {
+                    deferredActions.add(deferredAction);
+                }
+            } catch (NullPointerException e) {
+                Log.e(
+                        TAG,
+                        "Unable to load the completion or config state for deferred action: "
+                                + actionId,
+                        e);
+            }
+        }
+        return deferredActions;
     }
 
     /**
@@ -253,10 +331,10 @@ public class PartnerSummaryActionsCollector {
      */
     private ArrayList<String> getPartnerSummaryActionsFromContentProvider(Uri contentProviderUri) {
         Bundle result = context.getContentResolver().call(
-                        contentProviderUri,
-                        METHOD_GET_SUMMARY_ACTIONS,
-                        /* arg= */ null,
-                        /* extras= */ null);
+                contentProviderUri,
+                METHOD_GET_SUMMARY_ACTIONS,
+                /* arg= */ null,
+                /* extras= */ null);
         if (result == null || result.getStringArrayList(EXTRA_SUMMARY_ACTIONS_LIST) == null) {
             Log.e(
                     TAG,
@@ -281,10 +359,10 @@ public class PartnerSummaryActionsCollector {
         Bundle completionStateArgs = new Bundle();
         completionStateArgs.putString(EXTRA_ACTION_ID, actionId);
         Bundle result = context.getContentResolver().call(
-                        contentProviderUri,
-                        METHOD_GET_ACTION_COMPLETION_STATE,
-                        /* arg= */ null,
-                        completionStateArgs);
+                contentProviderUri,
+                METHOD_GET_ACTION_COMPLETION_STATE,
+                /* arg= */ null,
+                completionStateArgs);
         if (result == null || !result.containsKey(EXTRA_IS_ACTION_COMPLETED)) {
             throw new IllegalArgumentException(
                     "No action with id " + actionId + " found in content provider");
@@ -297,14 +375,26 @@ public class PartnerSummaryActionsCollector {
         Bundle summaryStateArgs = new Bundle();
         summaryStateArgs.putString(EXTRA_ACTION_ID, actionId);
         Bundle result = context.getContentResolver().call(
-                        contentProviderUri,
-                        METHOD_GET_ACTION_SUMMARY_STATE,
-                        /* arg= */ null,
-                        summaryStateArgs);
+                contentProviderUri,
+                METHOD_GET_ACTION_SUMMARY_STATE,
+                /* arg= */ null,
+                summaryStateArgs);
         if (result == null) {
             throw new IllegalArgumentException(
                     "No action summary found in content provider for " + actionId);
         }
+        return result;
+    }
+
+    private Bundle getDeferredActionStateFromContentProvider(String actionId,
+            Uri contentProviderUri) {
+        Bundle deferredStateArgs = new Bundle();
+        deferredStateArgs.putString(EXTRA_ACTION_ID, actionId);
+        Bundle result = context.getContentResolver().call(
+                contentProviderUri,
+                METHOD_GET_DEFERRED_ACTION_STATE,
+                /* arg= */ null,
+                deferredStateArgs);
         return result;
     }
 }
