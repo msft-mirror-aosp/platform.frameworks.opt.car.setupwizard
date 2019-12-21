@@ -38,6 +38,7 @@ import java.lang.annotation.RetentionPolicy;
         PartnerConfigKey.KEY_TOOLBAR_SECONDARY_BUTTON_BG_COLOR,
         PartnerConfigKey.KEY_TOOLBAR_SECONDARY_BUTTON_TEXT_COLOR,
         PartnerConfigKey.KEY_LOADING_INDICATOR_COLOR,
+        PartnerConfigKey.KEY_LOADING_INDICATOR_LINE_WEIGHT,
         PartnerConfigKey.KEY_LAYOUT_BG_COLOR
 })
 
@@ -75,6 +76,8 @@ public @interface PartnerConfigKey {
             "suw_compat_toolbar_secondary_button_text_color";
 
     String KEY_LOADING_INDICATOR_COLOR = "suw_compat_loading_indicator_color";
+
+    String KEY_LOADING_INDICATOR_LINE_WEIGHT = "suw_compat_loading_indicator_line_weight";
 
     String KEY_LAYOUT_BG_COLOR = "suw_design_layout_bg_color";
 }

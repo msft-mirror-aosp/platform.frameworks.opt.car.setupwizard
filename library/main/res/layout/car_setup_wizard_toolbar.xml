@@ -77,8 +77,11 @@
         android:id="@+id/progress_bar"
         style="?android:attr/progressBarStyleHorizontal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="2dp"
+        android:minHeight="0dp"
+        android:maxHeight="20dp"
         android:layout_alignParentBottom="true"
+        android:indeterminateDrawable="@drawable/progress_indeterminate_horizontal_material_trimmed"
         android:indeterminateTint="?android:attr/colorAccent"
         android:indeterminateTintMode="src_in"/>
 </RelativeLayout>

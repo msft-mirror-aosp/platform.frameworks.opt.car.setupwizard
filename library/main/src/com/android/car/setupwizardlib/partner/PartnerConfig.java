@@ -64,6 +64,9 @@ public enum PartnerConfig {
     CONFIG_LOADING_INDICATOR_COLOR(
             PartnerConfigKey.KEY_LOADING_INDICATOR_COLOR, ResourceType.COLOR),
 
+    CONFIG_LOADING_INDICATOR_LINE_WEIGHT(
+            PartnerConfigKey.KEY_LOADING_INDICATOR_LINE_WEIGHT, ResourceType.DIMENSION),
+
     CONFIG_LAYOUT_BG_COLOR(
             PartnerConfigKey.KEY_LAYOUT_BG_COLOR, ResourceType.COLOR);
 
