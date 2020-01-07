@@ -222,6 +222,15 @@ class CarSetupWizardBaseLayout extends LinearLayout {
             mProgressBar.setIndeterminateTintList(ColorStateList.valueOf(tintColor));
         }
 
+        float lineWeight = mPartnerConfigHelper.getDimension(
+                getContext(),
+                PartnerConfig.CONFIG_LOADING_INDICATOR_LINE_WEIGHT);
+        if (lineWeight > 0) {
+            ViewGroup.LayoutParams layoutParams = mProgressBar.getLayoutParams();
+            layoutParams.height = Math.round(lineWeight);
+            mProgressBar.setLayoutParams(layoutParams);
+        }
+
         // Set orientation programmatically since the inflated layout uses <merge>
         setOrientation(LinearLayout.VERTICAL);
     }
