@@ -81,6 +81,7 @@ class CarSetupWizardBaseLayout extends LinearLayout {
     private boolean mPrimaryToolbarButtonFlat;
     private View.OnClickListener mPrimaryToolbarButtonOnClick;
     private Button mSecondaryToolbarButton;
+    private ImageView mDivider;
     private ProgressBar mProgressBar;
 
     CarSetupWizardBaseLayout(Context context) {
@@ -230,6 +231,8 @@ class CarSetupWizardBaseLayout extends LinearLayout {
             layoutParams.height = Math.round(lineWeight);
             mProgressBar.setLayoutParams(layoutParams);
         }
+
+        initDivider();
 
         // Set orientation programmatically since the inflated layout uses <merge>
         setOrientation(LinearLayout.VERTICAL);
@@ -682,6 +685,26 @@ class CarSetupWizardBaseLayout extends LinearLayout {
                 ? PartnerConfig.CONFIG_TOOLBAR_SECONDARY_BUTTON_TEXT_COLOR
                 : PartnerConfig.CONFIG_TOOLBAR_PRIMARY_BUTTON_TEXT_COLOR;
         setButtonTextColor(primaryButton, textColorConfig);
+    }
+
+    private void initDivider() {
+        mDivider = findViewById(R.id.divider);
+        float dividerHeight = mPartnerConfigHelper.getDimension(
+                getContext(),
+                PartnerConfig.CONFIG_TOOLBAR_DIVIDER_LINE_WEIGHT);
+        if (dividerHeight >= 0) {
+            ViewGroup.LayoutParams layoutParams = mDivider.getLayoutParams();
+            layoutParams.height = Math.round(dividerHeight);
+            mDivider.setLayoutParams(layoutParams);
+        }
+        if (dividerHeight > 0) {
+            Drawable dividerBg = mPartnerConfigHelper.getDrawable(
+                    getContext(),
+                    PartnerConfig.CONFIG_TOOLBAR_DIVIDER_BG);
+            if (dividerBg != null) {
+                mDivider.setBackground(dividerBg);
+            }
+        }
     }
 
     private GradientDrawable getGradientDrawable(Button button) {

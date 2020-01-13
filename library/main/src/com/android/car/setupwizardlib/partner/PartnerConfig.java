@@ -61,6 +61,12 @@ public enum PartnerConfig {
     CONFIG_TOOLBAR_SECONDARY_BUTTON_TEXT_COLOR(
             PartnerConfigKey.KEY_TOOLBAR_SECONDARY_BUTTON_TEXT_COLOR, ResourceType.COLOR),
 
+    CONFIG_TOOLBAR_DIVIDER_BG(
+            PartnerConfigKey.KEY_TOOLBAR_DIVIDER_BG, ResourceType.DRAWABLE),
+
+    CONFIG_TOOLBAR_DIVIDER_LINE_WEIGHT(
+            PartnerConfigKey.KEY_TOOLBAR_DIVIDER_LINE_WEIGHT, ResourceType.DIMENSION),
+
     CONFIG_LOADING_INDICATOR_COLOR(
             PartnerConfigKey.KEY_LOADING_INDICATOR_COLOR, ResourceType.COLOR),
 
