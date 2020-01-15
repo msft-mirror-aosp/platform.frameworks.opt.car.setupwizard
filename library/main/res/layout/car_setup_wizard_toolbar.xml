@@ -73,6 +73,14 @@
             android:layout="@layout/primary_button"/>
     </LinearLayout>
 
+    <ImageView
+        android:id="@+id/divider"
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="@color/car_suw_tint"
+        android:layout_above="@id/progress_bar"
+        android:layout_alignWithParentIfMissing="true"/>
+
     <ProgressBar
         android:id="@+id/progress_bar"
         style="?android:attr/progressBarStyleHorizontal"
