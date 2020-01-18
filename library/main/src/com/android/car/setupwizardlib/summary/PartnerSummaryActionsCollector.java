@@ -390,11 +390,17 @@ public class PartnerSummaryActionsCollector {
             Uri contentProviderUri) {
         Bundle deferredStateArgs = new Bundle();
         deferredStateArgs.putString(EXTRA_ACTION_ID, actionId);
-        Bundle result = context.getContentResolver().call(
-                contentProviderUri,
-                METHOD_GET_DEFERRED_ACTION_STATE,
-                /* arg= */ null,
-                deferredStateArgs);
+        Bundle result;
+        try {
+            result = context.getContentResolver().call(
+                    contentProviderUri,
+                    METHOD_GET_DEFERRED_ACTION_STATE,
+                    /* arg= */ null,
+                    deferredStateArgs);
+        } catch (UnsupportedOperationException e) {
+            Log.v(TAG, "Deferred notification query not supported by partner content provider");
+            return null;
+        }
         return result;
     }
 }
