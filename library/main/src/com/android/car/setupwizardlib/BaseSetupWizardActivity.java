@@ -266,21 +266,14 @@ abstract class BaseSetupWizardActivity extends FragmentActivity {
      * Moves to the next Activity in the SetupWizard flow, and save the intent data.
      */
     protected void nextAction(int resultCode, Intent data) {
-        if (resultCode == RESULT_CANCELED) {
-            throw new IllegalArgumentException("Cannot call nextAction with RESULT_CANCELED");
-        }
-        setResultCode(resultCode, data);
-        if (mNextActionAlreadyTriggered) {
-            Log.v("CarSetupWizard",
-                    "BaseSetupWizardActivity: nextAction triggered multiple times without"
-                            + "page refresh, ignoring.");
-            return;
-        }
-        mNextActionAlreadyTriggered = true;
-        onNextActionInvoked();
-        Intent nextIntent =
-                CarWizardManagerHelper.getNextIntent(getIntent(), mResultCode, mResultData);
-        startActivity(nextIntent);
+        launchNextAction(resultCode, data, /* forResult= */ false);
+    }
+
+    /**
+     * Moves to the next Activity in the SetupWizard flow. Start next activity for result.
+     */
+    protected void nextActionForResult(int resultCode) {
+        launchNextAction(resultCode, null, /* forResult= */ true);
     }
 
     /**
@@ -467,6 +460,28 @@ abstract class BaseSetupWizardActivity extends FragmentActivity {
      */
     protected void setProgressBarVisible(boolean visible) {
         mCarSetupWizardLayout.setProgressBarVisible(visible);
+    }
+
+    private void launchNextAction(int resultCode, Intent data, boolean forResult) {
+        if (resultCode == RESULT_CANCELED) {
+            throw new IllegalArgumentException("Cannot call nextAction with RESULT_CANCELED");
+        }
+        setResultCode(resultCode, data);
+        if (mNextActionAlreadyTriggered) {
+            Log.v("CarSetupWizard",
+                    "BaseSetupWizardActivity: nextAction triggered multiple times without"
+                            + "page refresh, ignoring.");
+            return;
+        }
+        mNextActionAlreadyTriggered = true;
+        onNextActionInvoked();
+        Intent nextIntent =
+                CarWizardManagerHelper.getNextIntent(getIntent(), mResultCode, mResultData);
+        if (forResult) {
+            startActivityForResult(nextIntent, REQUEST_CODE_NEXT);
+        } else  {
+            startActivity(nextIntent);
+        }
     }
 
     @VisibleForTesting
