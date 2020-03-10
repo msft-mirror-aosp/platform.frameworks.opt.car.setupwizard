@@ -269,6 +269,7 @@ public class CarDrivingStateMonitor implements
     }
 
     /** Testing only */
+    @VisibleForTesting
     public static void replace(Context context, CarDrivingStateMonitor monitor) {
         CarHelperRegistry.getRegistry(context).putHelper(CarDrivingStateMonitor.class, monitor);
     }
