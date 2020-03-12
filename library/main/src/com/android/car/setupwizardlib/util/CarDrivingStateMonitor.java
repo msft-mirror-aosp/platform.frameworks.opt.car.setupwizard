@@ -18,6 +18,7 @@ package com.android.car.setupwizardlib.util;
 
 import android.car.Car;
 import android.car.CarNotConnectedException;
+import android.car.VehicleAreaType;
 import android.car.VehicleGear;
 import android.car.VehiclePropertyIds;
 import android.car.drivingstate.CarUxRestrictions;
@@ -49,6 +50,9 @@ public class CarDrivingStateMonitor implements
     private static final String TAG = "CarDrivingStateMonitor";
     private static final long DISCONNECT_DELAY_MS = 700;
 
+    private static final String SETUP_PACKAGE = "com.google.android.car.setupwizard";
+    private static final String SETUP_CLASS = SETUP_PACKAGE + ".ExitActivity";
+
     private Car mCar;
     private CarUxRestrictionsManager mRestrictionsManager;
     private CarPropertyManager mCarPropertyManager;
@@ -73,11 +77,8 @@ public class CarDrivingStateMonitor implements
             switch (value.getPropertyId()) {
                 case VehiclePropertyIds.GEAR_SELECTION:
                     if ((Integer) value.getValue() == VehicleGear.GEAR_REVERSE) {
-                        Intent intent = new Intent(Intent.ACTION_MAIN);
-                        intent.addCategory(Intent.CATEGORY_HOME);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                        Log.v(TAG, "Sending home intent on gear reversal.");
-                        mContext.startActivity(intent);
+                        Log.v(TAG, "Gear has reversed, exiting SetupWizard.");
+                        sendExitActivityIntent();
                     }
                     break;
             }
@@ -314,6 +315,25 @@ public class CarDrivingStateMonitor implements
         mCarPropertyManager.registerCallback(
                 mGearChangeCallback, VehiclePropertyIds.GEAR_SELECTION,
                 CarPropertyManager.SENSOR_RATE_ONCHANGE);
+        CarPropertyValue<Integer> gearSelection =
+                mCarPropertyManager.getProperty(Integer.class, VehiclePropertyIds.GEAR_SELECTION,
+                    VehicleAreaType.VEHICLE_AREA_TYPE_GLOBAL);
+        if (gearSelection != null
+                && gearSelection.getStatus() == CarPropertyValue.STATUS_AVAILABLE) {
+            if (gearSelection.getValue() == VehicleGear.GEAR_REVERSE) {
+                Log.v(TAG, "SetupWizard started when gear is in reverse, exiting.");
+                sendExitActivityIntent();
+            }
+        } else {
+            Log.e(TAG, "GEAR_SELECTION is not available.");
+        }
+    }
+
+    private void sendExitActivityIntent() {
+        Intent intent = new Intent();
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.setComponent(new ComponentName(SETUP_PACKAGE, SETUP_CLASS));
+        mContext.startActivity(intent);
     }
 
 }
