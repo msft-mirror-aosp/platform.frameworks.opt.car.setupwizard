@@ -18,8 +18,12 @@ package com.android.car.setupwizardlib.util;
 
 import android.car.Car;
 import android.car.CarNotConnectedException;
+import android.car.VehicleGear;
+import android.car.VehiclePropertyIds;
 import android.car.drivingstate.CarUxRestrictions;
 import android.car.drivingstate.CarUxRestrictionsManager;
+import android.car.hardware.CarPropertyValue;
+import android.car.hardware.property.CarPropertyManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -47,6 +51,7 @@ public class CarDrivingStateMonitor implements
 
     private Car mCar;
     private CarUxRestrictionsManager mRestrictionsManager;
+    private CarPropertyManager mCarPropertyManager;
     // Need to track the number of times the monitor is started so a single stopMonitor call does
     // not override them all.
     private int mMonitorStartedCount;
@@ -59,6 +64,28 @@ public class CarDrivingStateMonitor implements
     final Handler mHandler = new Handler(Looper.getMainLooper());
     @VisibleForTesting
     final Runnable mDisconnectRunnable = this::disconnectCarMonitor;
+
+    private final CarPropertyManager.CarPropertyEventCallback mGearChangeCallback =
+            new CarPropertyManager.CarPropertyEventCallback() {
+        @SuppressWarnings("rawtypes")
+        @Override
+        public void onChangeEvent(CarPropertyValue value) {
+            switch (value.getPropertyId()) {
+                case VehiclePropertyIds.GEAR_SELECTION:
+                    if ((Integer) value.getValue() == VehicleGear.GEAR_REVERSE) {
+                        Intent intent = new Intent(Intent.ACTION_MAIN);
+                        intent.addCategory(Intent.CATEGORY_HOME);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        Log.v(TAG, "Sending home intent on gear reversal.");
+                        mContext.startActivity(intent);
+                    }
+                    break;
+            }
+        }
+
+        @Override
+        public void onErrorEvent(int propertyId, int zone) {}
+    };
 
     private CarDrivingStateMonitor(Context context) {
         mContext = context.getApplicationContext();
@@ -107,18 +134,9 @@ public class CarDrivingStateMonitor implements
             @Override
             public void onServiceConnected(ComponentName name, IBinder service) {
                 try {
-                    mRestrictionsManager = (CarUxRestrictionsManager)
-                            mCar.getCarManager(Car.CAR_UX_RESTRICTION_SERVICE);
-                    if (mRestrictionsManager == null) {
-                        Log.e(TAG, "Unable to get CarUxRestrictionsManager");
-                        return;
-                    }
-                    onUxRestrictionsChanged(mRestrictionsManager.getCurrentCarUxRestrictions());
-                    mRestrictionsManager.registerListener(CarDrivingStateMonitor.this);
-                    if (mStopMonitorAfterUxCheck) {
-                        mStopMonitorAfterUxCheck = false;
-                        stopMonitor();
-                    }
+                    registerPropertyManager();
+                    registerRestrictionsManager();
+
                 } catch (CarNotConnectedException e) {
                     Log.e(TAG, "Car not connected", e);
                 }
@@ -178,6 +196,10 @@ public class CarDrivingStateMonitor implements
             if (mRestrictionsManager != null) {
                 mRestrictionsManager.unregisterListener();
                 mRestrictionsManager = null;
+            }
+            if (mCarPropertyManager != null) {
+                mCarPropertyManager.unregisterCallback(mGearChangeCallback);
+                mCarPropertyManager = null;
             }
         } catch (CarNotConnectedException e) {
             Log.e(TAG, "Car not connected for unregistering listener", e);
@@ -273,4 +295,31 @@ public class CarDrivingStateMonitor implements
     public static void replace(Context context, CarDrivingStateMonitor monitor) {
         CarHelperRegistry.getRegistry(context).putHelper(CarDrivingStateMonitor.class, monitor);
     }
+
+    private void registerRestrictionsManager() {
+        mRestrictionsManager = (CarUxRestrictionsManager)
+                mCar.getCarManager(Car.CAR_UX_RESTRICTION_SERVICE);
+        if (mRestrictionsManager == null) {
+            Log.e(TAG, "Unable to get CarUxRestrictionsManager");
+            return;
+        }
+        onUxRestrictionsChanged(mRestrictionsManager.getCurrentCarUxRestrictions());
+        mRestrictionsManager.registerListener(CarDrivingStateMonitor.this);
+        if (mStopMonitorAfterUxCheck) {
+            mStopMonitorAfterUxCheck = false;
+            stopMonitor();
+        }
+    }
+
+    private void registerPropertyManager() {
+        mCarPropertyManager = (CarPropertyManager) mCar.getCarManager(Car.PROPERTY_SERVICE);
+        if (mCarPropertyManager == null) {
+            Log.e(TAG, "Unable to get CarPropertyManager");
+            return;
+        }
+        mCarPropertyManager.registerCallback(
+                mGearChangeCallback, VehiclePropertyIds.GEAR_SELECTION,
+                CarPropertyManager.SENSOR_RATE_ONCHANGE);
+    }
+
 }
