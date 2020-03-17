@@ -19,7 +19,6 @@ package com.android.car.setupwizardlib.util;
 import android.car.Car;
 import android.car.CarNotConnectedException;
 import android.car.VehicleAreaType;
-import android.car.VehicleGear;
 import android.car.VehiclePropertyIds;
 import android.car.drivingstate.CarUxRestrictions;
 import android.car.drivingstate.CarUxRestrictionsManager;
@@ -52,6 +51,7 @@ public class CarDrivingStateMonitor implements
 
     private static final String SETUP_PACKAGE = "com.google.android.car.setupwizard";
     private static final String SETUP_CLASS = SETUP_PACKAGE + ".ExitActivity";
+    private static final int GEAR_REVERSE = 2;
 
     private Car mCar;
     private CarUxRestrictionsManager mRestrictionsManager;
@@ -76,7 +76,7 @@ public class CarDrivingStateMonitor implements
         public void onChangeEvent(CarPropertyValue value) {
             switch (value.getPropertyId()) {
                 case VehiclePropertyIds.GEAR_SELECTION:
-                    if ((Integer) value.getValue() == VehicleGear.GEAR_REVERSE) {
+                    if ((Integer) value.getValue() == GEAR_REVERSE) {
                         Log.v(TAG, "Gear has reversed, exiting SetupWizard.");
                         sendExitActivityIntent();
                     }
@@ -320,7 +320,7 @@ public class CarDrivingStateMonitor implements
                     VehicleAreaType.VEHICLE_AREA_TYPE_GLOBAL);
         if (gearSelection != null
                 && gearSelection.getStatus() == CarPropertyValue.STATUS_AVAILABLE) {
-            if (gearSelection.getValue() == VehicleGear.GEAR_REVERSE) {
+            if (gearSelection.getValue() == GEAR_REVERSE) {
                 Log.v(TAG, "SetupWizard started when gear is in reverse, exiting.");
                 sendExitActivityIntent();
             }
