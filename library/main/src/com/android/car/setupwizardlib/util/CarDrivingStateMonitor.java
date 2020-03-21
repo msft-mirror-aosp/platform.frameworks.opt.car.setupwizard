@@ -47,11 +47,11 @@ public class CarDrivingStateMonitor implements
     public static final String EXIT_BROADCAST_ACTION =
             "com.android.car.setupwizardlib.driving_exit";
 
+    public static final String INTENT_EXTRA_REASON = "reason";
+    public static final String REASON_GEAR_REVERSAL = "gear_reversal";
+
     private static final String TAG = "CarDrivingStateMonitor";
     private static final long DISCONNECT_DELAY_MS = 700;
-
-    private static final String SETUP_PACKAGE = "com.google.android.car.setupwizard";
-    private static final String SETUP_CLASS = SETUP_PACKAGE + ".ExitActivity";
 
     private Car mCar;
     private CarUxRestrictionsManager mRestrictionsManager;
@@ -78,7 +78,7 @@ public class CarDrivingStateMonitor implements
                 case VehiclePropertyIds.GEAR_SELECTION:
                     if ((Integer) value.getValue() == VehicleGear.GEAR_REVERSE) {
                         Log.v(TAG, "Gear has reversed, exiting SetupWizard.");
-                        sendExitActivityIntent();
+                        broadcastGearReversal();
                     }
                     break;
             }
@@ -328,18 +328,18 @@ public class CarDrivingStateMonitor implements
                 && gearSelection.getStatus() == CarPropertyValue.STATUS_AVAILABLE) {
             if (gearSelection.getValue() == VehicleGear.GEAR_REVERSE) {
                 Log.v(TAG, "SetupWizard started when gear is in reverse, exiting.");
-                sendExitActivityIntent();
+                broadcastGearReversal();
             }
         } else {
             Log.e(TAG, "GEAR_SELECTION is not available.");
         }
     }
 
-    private void sendExitActivityIntent() {
+    private void broadcastGearReversal() {
         Intent intent = new Intent();
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        intent.setComponent(new ComponentName(SETUP_PACKAGE, SETUP_CLASS));
-        mContext.startActivity(intent);
+        intent.setAction(EXIT_BROADCAST_ACTION);
+        intent.putExtra(INTENT_EXTRA_REASON, REASON_GEAR_REVERSAL);
+        mContext.sendBroadcast(intent);
     }
 
 }
