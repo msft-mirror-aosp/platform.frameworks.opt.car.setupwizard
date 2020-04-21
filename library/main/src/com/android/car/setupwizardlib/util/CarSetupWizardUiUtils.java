@@ -18,6 +18,7 @@ package com.android.car.setupwizardlib.util;
 
 import android.app.Activity;
 import android.view.View;
+import android.view.Window;
 
 import androidx.core.util.Preconditions;
 
@@ -35,14 +36,22 @@ public final class CarSetupWizardUiUtils {
      **/
     @Deprecated
     public static void maybeHideSystemUI(Activity activity) {
-        Preconditions.checkNotNull(activity);
+        enableImmersiveMode(activity.getWindow());
+    }
+
+    /**
+     * Enables immersive mode hiding system UI.
+     *
+     * @param window to apply immersive mode.
+     */
+    public static void enableImmersiveMode(Window window) {
+        Preconditions.checkNotNull(window);
 
         // See https://developer.android.com/training/system-ui/immersive#EnableFullscreen
         // Enables regular immersive mode.
         // For "lean back" mode, remove SYSTEM_UI_FLAG_IMMERSIVE.
         // Or for "sticky immersive," replace it with SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-        View decorView = activity.getWindow().getDecorView();
-        decorView.setSystemUiVisibility(
+        window.getDecorView().setSystemUiVisibility(
                 View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
                         // Set the content to appear under the system bars so that the
                         // content doesn't resize when the system bars hide and show.
