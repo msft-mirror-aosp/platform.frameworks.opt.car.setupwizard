@@ -23,7 +23,13 @@ import android.view.Window;
 
 import androidx.core.util.Preconditions;
 
-/** Utilities to aid in UI for car setup wizard flow. */
+/**
+ * Utilities to aid in UI for car setup wizard flow.
+ *
+ * @deprecated This class has been deprecated in favour of {@link ImmersiveModeHelper} that offers
+ * the same functionalities without the static approach.
+ */
+@Deprecated
 public final class CarSetupWizardUiUtils {
     private static final String TAG = CarSetupWizardUiUtils.class.getSimpleName();
 
