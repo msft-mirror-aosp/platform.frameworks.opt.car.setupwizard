@@ -223,7 +223,7 @@ public class CarDrivingStateMonitor implements
     }
 
     private boolean checkIsSetupRestricted(CarUxRestrictions restrictionInfo) {
-        return (restrictionInfo.getActiveRestrictions()
+        return restrictionInfo != null && (restrictionInfo.getActiveRestrictions()
                 & CarUxRestrictions.UX_RESTRICTIONS_NO_SETUP) != 0;
     }
 
