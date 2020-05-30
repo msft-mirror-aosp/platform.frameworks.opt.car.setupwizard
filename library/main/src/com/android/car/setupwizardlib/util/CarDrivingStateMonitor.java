@@ -29,6 +29,7 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.util.Log;
 
+import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
 
 /**
@@ -222,7 +223,7 @@ public class CarDrivingStateMonitor implements
         return false;
     }
 
-    private boolean checkIsSetupRestricted(CarUxRestrictions restrictionInfo) {
+    private boolean checkIsSetupRestricted(@Nullable CarUxRestrictions restrictionInfo) {
         return restrictionInfo != null && (restrictionInfo.getActiveRestrictions()
                 & CarUxRestrictions.UX_RESTRICTIONS_NO_SETUP) != 0;
     }
