@@ -440,18 +440,6 @@ public class CarSetupWizardCompatLayoutTest extends BaseRobolectricTest {
     }
 
     @Test
-    public void testTitleBarElevationChange() {
-        mCarSetupWizardCompatLayout.addElevationToTitleBar(/*animate= */ false);
-        View titleBar = mCarSetupWizardCompatLayout.findViewById(R.id.application_bar);
-        assertThat(titleBar.getElevation()).isEqualTo(
-                application.getResources().getDimension(
-                        R.dimen.title_bar_drop_shadow_elevation));
-
-        mCarSetupWizardCompatLayout.removeElevationFromTitleBar(/*animate= */ false);
-        assertThat(titleBar.getElevation()).isEqualTo(0f);
-    }
-
-    @Test
     public void testPartnerResourcesAreApplied() {
         setupFakeContentProvider();
 
