@@ -268,4 +268,9 @@ public class CarDrivingStateMonitor implements
         CarHelperRegistry.getRegistry(context).putHelper(
                 CarDrivingStateMonitor.class, new CarDrivingStateMonitor(context));
     }
+
+    /** Testing only */
+    public static void replace(Context context, CarDrivingStateMonitor monitor) {
+        CarHelperRegistry.getRegistry(context).putHelper(CarDrivingStateMonitor.class, monitor);
+    }
 }
