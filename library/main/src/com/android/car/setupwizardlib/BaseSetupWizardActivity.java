@@ -479,7 +479,7 @@ abstract class BaseSetupWizardActivity extends FragmentActivity {
                 CarWizardManagerHelper.getNextIntent(getIntent(), mResultCode, mResultData);
         if (forResult) {
             startActivityForResult(nextIntent, REQUEST_CODE_NEXT);
-        } else  {
+        } else {
             startActivity(nextIntent);
         }
     }
