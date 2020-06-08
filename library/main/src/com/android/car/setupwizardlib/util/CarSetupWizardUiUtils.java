@@ -17,7 +17,10 @@
 package com.android.car.setupwizardlib.util;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Color;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 
@@ -25,11 +28,7 @@ import androidx.core.util.Preconditions;
 
 /**
  * Utilities to aid in UI for car setup wizard flow.
- *
- * @deprecated This class has been deprecated in favour of {@link ImmersiveModeHelper} that offers
- * the same functionalities without the static approach.
  */
-@Deprecated
 public final class CarSetupWizardUiUtils {
     private static final String TAG = CarSetupWizardUiUtils.class.getSimpleName();
 
@@ -52,6 +51,10 @@ public final class CarSetupWizardUiUtils {
      * @param window to apply immersive mode.
      */
     public static void enableImmersiveMode(Window window) {
+        if (Log.isLoggable(TAG, Log.INFO)) {
+            Log.i(TAG, "enableImmersiveMode");
+        }
+
         Preconditions.checkNotNull(window);
 
         // See https://developer.android.com/training/system-ui/immersive#EnableFullscreen
@@ -71,6 +74,45 @@ public final class CarSetupWizardUiUtils {
         // Workaround for the issue, StatusBar background hides the buttons (b/154227638).
         window.setNavigationBarColor(Color.TRANSPARENT);
         window.setStatusBarColor(Color.TRANSPARENT);
+    }
+
+    /**
+     * Disables immersive mode hiding system UI and restores the previous colors.
+     *
+     * @param window the current window instance.
+     */
+    public static void disableImmersiveMode(Window window) {
+        if (Log.isLoggable(TAG, Log.INFO)) {
+            Log.i(TAG, "disableImmersiveMode");
+        }
+
+        Preconditions.checkNotNull(window);
+
+        // Restores the decor view flags to disable the immersive mode.
+        window.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);
+
+        // Tries to restore colors for nav and status bar from resources.
+        Context context = window.getContext();
+        if (context == null) {
+            if (Log.isLoggable(TAG, Log.WARN)) {
+                Log.w(TAG, "Can't restore colors for navigation and status bar.");
+            }
+            return;
+        }
+
+        // Reads the colors for navigation and status bar from resources.
+        final TypedArray typedArray =
+                context.obtainStyledAttributes(
+                        new int[]{
+                                android.R.attr.statusBarColor,
+                                android.R.attr.navigationBarColor});
+        int statusBarColor = typedArray.getColor(0, 0);
+        int navigationBarColor = typedArray.getColor(1, 0);
+
+        window.setStatusBarColor(statusBarColor);
+        window.setNavigationBarColor(navigationBarColor);
+
+        typedArray.recycle();
     }
 
     private CarSetupWizardUiUtils() {
