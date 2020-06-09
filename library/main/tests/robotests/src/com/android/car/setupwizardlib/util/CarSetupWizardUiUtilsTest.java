@@ -19,9 +19,11 @@ package com.android.car.setupwizardlib.util;
 import static com.google.common.truth.Truth.assertThat;
 
 import android.app.Activity;
+import android.graphics.Color;
 import android.view.View;
+import android.view.Window;
 
-import com.android.car.setupwizardlib.BaseDesignActivity;
+import com.android.car.setupwizardlib.robotests.R;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -40,24 +42,58 @@ public class CarSetupWizardUiUtilsTest {
                     | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
                     | View.SYSTEM_UI_FLAG_FULLSCREEN;
 
+    private static final int NON_IMMERSIVE_MODE_FLAGS =
+            View.SYSTEM_UI_FLAG_VISIBLE;
+
+    private static final int[] RES_ID_NAV_AND_STATUS_BARS = new int[]{
+            android.R.attr.statusBarColor,
+            android.R.attr.navigationBarColor};
+
+    // Note that these colors are defined in the test theme
+    private static final int TEST_THEME = R.style.NavAndStatusBarTestTheme;
+    private static final int EXPECTED_COLOR_STATUS_BAR = Color.getHtmlColor("#001");
+    private static final int EXPECTED_COLOR_NAVIGATION_BAR = Color.getHtmlColor("#002");
+
     private Activity mActivity;
+    private Window mWindow;
 
     @Before
     public void setup() {
-        mActivity = Robolectric.buildActivity(BaseDesignActivity.class).create().get();
+        mActivity = Robolectric
+                .buildActivity(Activity.class)
+                .create()
+                .get();
+        mActivity.setTheme(TEST_THEME);
+        mWindow = mActivity.getWindow();
     }
 
     @Test
     public void maybeHideSystemUI() {
         CarSetupWizardUiUtils.maybeHideSystemUI(mActivity);
-        assertThat(mActivity.getWindow().getDecorView().getSystemUiVisibility())
+        assertThat(mWindow.getDecorView().getSystemUiVisibility())
                 .isEqualTo(IMMERSIVE_MODE_FLAGS);
     }
 
     @Test
     public void enableImmersiveMode() {
-        CarSetupWizardUiUtils.enableImmersiveMode(mActivity.getWindow());
-        assertThat(mActivity.getWindow().getDecorView().getSystemUiVisibility())
+        CarSetupWizardUiUtils.enableImmersiveMode(mWindow);
+        assertThat(mWindow.getDecorView().getSystemUiVisibility())
                 .isEqualTo(IMMERSIVE_MODE_FLAGS);
+    }
+
+    @Test
+    public void disableImmersiveMode() {
+        // Resetting the status bar colors.
+        mWindow.setNavigationBarColor(Color.TRANSPARENT);
+        mWindow.setStatusBarColor(Color.TRANSPARENT);
+
+        CarSetupWizardUiUtils.disableImmersiveMode(mWindow);
+
+        assertThat(mWindow.getDecorView().getSystemUiVisibility())
+                .isEqualTo(NON_IMMERSIVE_MODE_FLAGS);
+        assertThat(mWindow.getNavigationBarColor())
+                .isEqualTo(EXPECTED_COLOR_NAVIGATION_BAR);
+        assertThat(mWindow.getStatusBarColor())
+                .isEqualTo(EXPECTED_COLOR_STATUS_BAR);
     }
 }
