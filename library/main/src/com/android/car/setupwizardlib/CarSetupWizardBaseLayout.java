@@ -20,7 +20,6 @@ import android.annotation.Nullable;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
-import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
@@ -578,9 +577,10 @@ class CarSetupWizardBaseLayout extends LinearLayout {
     /** Sets button text color using partner overlay if exists */
     @VisibleForTesting
     void setButtonTextColor(TextView button, PartnerConfig config) {
-        int color = mPartnerConfigHelper.getColor(getContext(), config);
-        if (color != 0) {
-            button.setTextColor(color);
+        ColorStateList colorStateList =
+                mPartnerConfigHelper.getColorStateList(getContext(), config);
+        if (colorStateList != null) {
+            button.setTextColor(colorStateList);
         }
     }
 
@@ -605,12 +605,9 @@ class CarSetupWizardBaseLayout extends LinearLayout {
     /** Sets button background color using partner overlay if exists */
     @VisibleForTesting
     void setBackgroundColor(View button, PartnerConfig config) {
-        int color = mPartnerConfigHelper.getColor(getContext(), config);
-        if (color != 0) {
-            Drawable background = button.getBackground();
-            if (background != null) {
-                background.mutate().setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
-            }
+        ColorStateList color = mPartnerConfigHelper.getColorStateList(getContext(), config);
+        if (color != null) {
+            button.setBackgroundTintList(color);
         }
     }
 
