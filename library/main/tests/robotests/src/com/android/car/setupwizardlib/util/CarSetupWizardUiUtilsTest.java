@@ -36,7 +36,7 @@ import org.robolectric.RobolectricTestRunner;
 public class CarSetupWizardUiUtilsTest {
 
     private static final int IMMERSIVE_MODE_FLAGS =
-            View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+            View.SYSTEM_UI_FLAG_IMMERSIVE
                     | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                     | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                     | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
@@ -45,6 +45,11 @@ public class CarSetupWizardUiUtilsTest {
 
     private static final int NON_IMMERSIVE_MODE_FLAGS =
             View.SYSTEM_UI_FLAG_VISIBLE;
+
+    private static final int IMMERSIVE_WITH_STATUS_MODE_FLAGS =
+            View.SYSTEM_UI_FLAG_IMMERSIVE
+                    | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                    | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
 
     private static final int[] RES_ID_NAV_AND_STATUS_BARS = new int[]{
             android.R.attr.statusBarColor,
@@ -97,4 +102,30 @@ public class CarSetupWizardUiUtilsTest {
         assertThat(mWindow.getStatusBarColor())
                 .isEqualTo(EXPECTED_COLOR_STATUS_BAR);
     }
+
+    @Test
+    public void setWindow_Immersive() {
+        CarSetupWizardUiUtils.setWindowImmersiveMode(mWindow,
+                CarSetupWizardUiUtils.ImmersiveModeTypes.IMMERSIVE.toString());
+        assertThat(mWindow.getDecorView().getSystemUiVisibility())
+                .isEqualTo(IMMERSIVE_MODE_FLAGS);
+    }
+
+    @Test
+    public void setWindow_ImmersiveWithStatus() {
+        CarSetupWizardUiUtils.setWindowImmersiveMode(mWindow,
+                CarSetupWizardUiUtils.ImmersiveModeTypes.IMMERSIVE_WITH_STATUS.toString());
+        assertThat(mWindow.getDecorView().getSystemUiVisibility())
+                .isEqualTo(IMMERSIVE_WITH_STATUS_MODE_FLAGS);
+    }
+
+
+    @Test
+    public void setWindow_NonImmersive() {
+        CarSetupWizardUiUtils.setWindowImmersiveMode(mWindow,
+                CarSetupWizardUiUtils.ImmersiveModeTypes.NON_IMMERSIVE.toString());
+        assertThat(mWindow.getDecorView().getSystemUiVisibility())
+                .isEqualTo(NON_IMMERSIVE_MODE_FLAGS);
+    }
+
 }
