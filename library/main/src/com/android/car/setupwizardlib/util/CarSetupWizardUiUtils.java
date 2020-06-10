@@ -19,7 +19,6 @@ package com.android.car.setupwizardlib.util;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.graphics.Color;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
@@ -71,9 +70,6 @@ public final class CarSetupWizardUiUtils {
                         // Hide the nav bar and status bar
                         | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
                         | View.SYSTEM_UI_FLAG_FULLSCREEN);
-        // Workaround for the issue, StatusBar background hides the buttons (b/154227638).
-        window.setNavigationBarColor(Color.TRANSPARENT);
-        window.setStatusBarColor(Color.TRANSPARENT);
     }
 
     /**
