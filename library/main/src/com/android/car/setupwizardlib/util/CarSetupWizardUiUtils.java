@@ -31,6 +31,9 @@ import androidx.core.util.Preconditions;
 public final class CarSetupWizardUiUtils {
     private static final String TAG = CarSetupWizardUiUtils.class.getSimpleName();
 
+    /** Key for immersive mode value pased to 1P apps */
+    public static final String IMMERSIVE_MODE_TYPE = "immersiveModeType";
+
     /** Hide system UI */
     public static void hideSystemUI(Activity activity) {
         maybeHideSystemUI(activity);
@@ -45,10 +48,49 @@ public final class CarSetupWizardUiUtils {
     }
 
     /**
+    * Set the appropriate immersive mode according to immersiveModeValue
+    */
+    public static void setWindowImmersiveMode(Window window, String immersiveModeValue) {
+        Preconditions.checkNotNull(window);
+        ImmersiveModeTypes immersiveModeType;
+        try {
+            immersiveModeType = ImmersiveModeTypes.valueOf(immersiveModeValue);
+        } catch (IllegalArgumentException | NullPointerException e) {
+            Log.w(TAG, "Immersive Mode value: " + immersiveModeValue
+                    + " not valid, using IMMERSIVE");
+            immersiveModeType = ImmersiveModeTypes.IMMERSIVE;
+        }
+        Log.v(TAG, "Enable " + immersiveModeType + " mode");
+        switch (immersiveModeType) {
+            case IMMERSIVE:
+                enableImmersiveMode(window);
+                window.getDecorView().setOnSystemUiVisibilityChangeListener(
+                        visibility -> enableImmersiveMode(window));
+                break;
+            case IMMERSIVE_WITH_STATUS:
+                enableImmersiveModeWithStatus(window);
+                window.getDecorView().setOnSystemUiVisibilityChangeListener(
+                        visibility -> enableImmersiveModeWithStatus(window));
+                break;
+            case NON_IMMERSIVE:
+                disableImmersiveMode(window);
+                window.getDecorView().setOnSystemUiVisibilityChangeListener(
+                        visibility -> disableImmersiveMode(window));
+                break;
+            case SYSTEM_DEFAULT:
+                //SUW won't change the current immersive mode.
+                break;
+        }
+    }
+
+    /**
      * Enables immersive mode hiding system UI.
      *
      * @param window to apply immersive mode.
+     *
+     * @deprecated Use {@code setWindowImmersiveMode}
      */
+    @Deprecated
     public static void enableImmersiveMode(Window window) {
         if (Log.isLoggable(TAG, Log.INFO)) {
             Log.i(TAG, "enableImmersiveMode");
@@ -61,7 +103,7 @@ public final class CarSetupWizardUiUtils {
         // For "lean back" mode, remove SYSTEM_UI_FLAG_IMMERSIVE.
         // Or for "sticky immersive," replace it with SYSTEM_UI_FLAG_IMMERSIVE_STICKY
         window.getDecorView().setSystemUiVisibility(
-                View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                View.SYSTEM_UI_FLAG_IMMERSIVE
                         // Set the content to appear under the system bars so that the
                         // content doesn't resize when the system bars hide and show.
                         | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
@@ -73,10 +115,36 @@ public final class CarSetupWizardUiUtils {
     }
 
     /**
+     * Enables immersive mode hiding only navigation bar.
+     *
+     * @param window to apply immersive mode.
+     */
+    private static void enableImmersiveModeWithStatus(Window window) {
+        if (Log.isLoggable(TAG, Log.INFO)) {
+            Log.i(TAG, "enableImmersiveModeWithStatus");
+        }
+
+        Preconditions.checkNotNull(window);
+
+        // See https://developer.android.com/training/system-ui/immersive#EnableFullscreen
+        // Enables regular immersive mode.
+        window.getDecorView().setSystemUiVisibility(
+                View.SYSTEM_UI_FLAG_IMMERSIVE
+                        // Set the content to appear under the system bars so that the
+                        // content doesn't resize when the system bars hide and show.
+                        | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                        // Hide the nav bar
+                        | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+    }
+
+    /**
      * Disables immersive mode hiding system UI and restores the previous colors.
      *
      * @param window the current window instance.
+     *
+     * @deprecated Use {@code setWindowImmersiveMode}
      */
+    @Deprecated
     public static void disableImmersiveMode(Window window) {
         if (Log.isLoggable(TAG, Log.INFO)) {
             Log.i(TAG, "disableImmersiveMode");
@@ -109,6 +177,14 @@ public final class CarSetupWizardUiUtils {
         window.setNavigationBarColor(navigationBarColor);
 
         typedArray.recycle();
+    }
+
+    /** Types of Immersive Mode supported by SUW */
+    public enum ImmersiveModeTypes {
+        IMMERSIVE,
+        IMMERSIVE_WITH_STATUS,
+        NON_IMMERSIVE,
+        SYSTEM_DEFAULT
     }
 
     private CarSetupWizardUiUtils() {
