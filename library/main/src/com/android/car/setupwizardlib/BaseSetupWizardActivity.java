@@ -28,6 +28,8 @@ import androidx.annotation.VisibleForTesting;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 
+import com.android.car.setupwizardlib.partner.PartnerConfig;
+import com.android.car.setupwizardlib.partner.PartnerConfigHelper;
 import com.android.car.setupwizardlib.util.CarDrivingStateMonitor;
 import com.android.car.setupwizardlib.util.CarSetupWizardUiUtils;
 import com.android.car.setupwizardlib.util.CarWizardManagerHelper;
@@ -111,7 +113,9 @@ abstract class BaseSetupWizardActivity extends FragmentActivity {
     protected void onStart() {
         super.onStart();
         // Must be done here so that the SystemUI is hidden when back button is clicked
-        CarSetupWizardUiUtils.hideSystemUI(this);
+        CarSetupWizardUiUtils.setWindowImmersiveMode(this.getWindow(),
+                PartnerConfigHelper.get(this).getString(
+                        this, PartnerConfig.CONFIG_IMMERSIVE_MODE));
         // Fragment commits are not allowed once the Activity's state has been saved. Once
         // onStart() has been called, the FragmentManager should now allow commits.
         mAllowFragmentCommits = true;
@@ -156,7 +160,9 @@ abstract class BaseSetupWizardActivity extends FragmentActivity {
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
         if (hasFocus) {
-            CarSetupWizardUiUtils.hideSystemUI(this);
+            CarSetupWizardUiUtils.setWindowImmersiveMode(this.getWindow(),
+                    PartnerConfigHelper.get(this).getString(
+                            this, PartnerConfig.CONFIG_IMMERSIVE_MODE));
         }
     }
 
