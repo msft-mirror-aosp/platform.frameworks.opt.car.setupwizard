@@ -28,6 +28,9 @@ public enum PartnerConfig {
     CONFIG_TOOLBAR_BUTTON_ICON_BACK(
             PartnerConfigKey.KEY_TOOLBAR_BUTTON_ICON_BACK, ResourceType.DRAWABLE),
 
+    CONFIG_TOOLBAR_BUTTON_ICON_CLOSE(
+            PartnerConfigKey.KEY_TOOLBAR_BUTTON_ICON_CLOSE, ResourceType.DRAWABLE),
+
     CONFIG_TOOLBAR_BUTTON_FONT_FAMILY(
             PartnerConfigKey.KEY_TOOLBAR_BUTTON_FONT_FAMILY, ResourceType.STRING),
 
