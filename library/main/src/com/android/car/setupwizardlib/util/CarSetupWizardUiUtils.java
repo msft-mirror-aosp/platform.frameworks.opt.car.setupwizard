@@ -17,33 +17,26 @@
 package com.android.car.setupwizardlib.util;
 
 import android.app.Activity;
-import android.util.Log;
 import android.view.View;
 
 import androidx.core.util.Preconditions;
 
-import com.android.car.setupwizardlib.partner.PartnerConfig;
-import com.android.car.setupwizardlib.partner.PartnerConfigHelper;
-
 /** Utilities to aid in UI for car setup wizard flow. */
 public final class CarSetupWizardUiUtils {
     private static final String TAG = CarSetupWizardUiUtils.class.getSimpleName();
-    private static final boolean VERBOSE = Log.isLoggable(TAG, Log.VERBOSE);
 
-    /** Hide system UI if configured as such by partner */
+    /** Hide system UI */
+    public static void hideSystemUI(Activity activity) {
+        maybeHideSystemUI(activity);
+    }
+
+    /** Hide system UI
+     * @deprecated Use {@code hideSystemUI}
+     **/
+    @Deprecated
     public static void maybeHideSystemUI(Activity activity) {
         Preconditions.checkNotNull(activity);
 
-        if (!PartnerConfigHelper.get(activity)
-                .getBoolean(activity, PartnerConfig.CONFIG_IS_IMMERSIVE, true)) {
-            if (VERBOSE) {
-                Log.v(TAG, "Immersive mode disabled");
-            }
-            return;
-        }
-        if (VERBOSE) {
-            Log.v(TAG, "Setting immersive mode for SystemUi");
-        }
         // See https://developer.android.com/training/system-ui/immersive#EnableFullscreen
         // Enables regular immersive mode.
         // For "lean back" mode, remove SYSTEM_UI_FLAG_IMMERSIVE.

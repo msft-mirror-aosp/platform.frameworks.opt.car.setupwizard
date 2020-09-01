@@ -111,7 +111,7 @@ abstract class BaseSetupWizardActivity extends FragmentActivity {
     protected void onStart() {
         super.onStart();
         // Must be done here so that the SystemUI is hidden when back button is clicked
-        CarSetupWizardUiUtils.maybeHideSystemUI(this);
+        CarSetupWizardUiUtils.hideSystemUI(this);
         // Fragment commits are not allowed once the Activity's state has been saved. Once
         // onStart() has been called, the FragmentManager should now allow commits.
         mAllowFragmentCommits = true;
@@ -156,7 +156,7 @@ abstract class BaseSetupWizardActivity extends FragmentActivity {
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
         if (hasFocus) {
-            CarSetupWizardUiUtils.maybeHideSystemUI(this);
+            CarSetupWizardUiUtils.hideSystemUI(this);
         }
     }
 
@@ -266,21 +266,14 @@ abstract class BaseSetupWizardActivity extends FragmentActivity {
      * Moves to the next Activity in the SetupWizard flow, and save the intent data.
      */
     protected void nextAction(int resultCode, Intent data) {
-        if (resultCode == RESULT_CANCELED) {
-            throw new IllegalArgumentException("Cannot call nextAction with RESULT_CANCELED");
-        }
-        setResultCode(resultCode, data);
-        if (mNextActionAlreadyTriggered) {
-            Log.v("CarSetupWizard",
-                    "BaseSetupWizardActivity: nextAction triggered multiple times without"
-                            + "page refresh, ignoring.");
-            return;
-        }
-        mNextActionAlreadyTriggered = true;
-        onNextActionInvoked();
-        Intent nextIntent =
-                CarWizardManagerHelper.getNextIntent(getIntent(), mResultCode, mResultData);
-        startActivity(nextIntent);
+        launchNextAction(resultCode, data, /* forResult= */ false);
+    }
+
+    /**
+     * Moves to the next Activity in the SetupWizard flow. Start next activity for result.
+     */
+    protected void nextActionForResult(int resultCode) {
+        launchNextAction(resultCode, null, /* forResult= */ true);
     }
 
     /**
@@ -463,24 +456,32 @@ abstract class BaseSetupWizardActivity extends FragmentActivity {
     }
 
     /**
-     * Adds elevation to the title bar in order to produce a drop shadow.
-     */
-    protected void addElevationToTitleBar(boolean animate) {
-        mCarSetupWizardLayout.addElevationToTitleBar(animate);
-    }
-
-    /**
-     * Removes the elevation from the title bar using an animation.
-     */
-    protected void removeElevationFromTitleBar(boolean animate) {
-        mCarSetupWizardLayout.removeElevationFromTitleBar(animate);
-    }
-
-    /**
      * Sets whether the progress bar is visible.
      */
     protected void setProgressBarVisible(boolean visible) {
         mCarSetupWizardLayout.setProgressBarVisible(visible);
+    }
+
+    private void launchNextAction(int resultCode, Intent data, boolean forResult) {
+        if (resultCode == RESULT_CANCELED) {
+            throw new IllegalArgumentException("Cannot call nextAction with RESULT_CANCELED");
+        }
+        setResultCode(resultCode, data);
+        if (mNextActionAlreadyTriggered) {
+            Log.v("CarSetupWizard",
+                    "BaseSetupWizardActivity: nextAction triggered multiple times without"
+                            + "page refresh, ignoring.");
+            return;
+        }
+        mNextActionAlreadyTriggered = true;
+        onNextActionInvoked();
+        Intent nextIntent =
+                CarWizardManagerHelper.getNextIntent(getIntent(), mResultCode, mResultData);
+        if (forResult) {
+            startActivityForResult(nextIntent, REQUEST_CODE_NEXT);
+        } else  {
+            startActivity(nextIntent);
+        }
     }
 
     @VisibleForTesting
