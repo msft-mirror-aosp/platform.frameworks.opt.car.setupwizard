@@ -75,13 +75,13 @@ public class PartnerSummaryActionsCollector {
 
     // Extra used as a key for the action id passed in to query summary action state.
     private static final String EXTRA_ACTION_ID = "action_id";
-    private static PartnerSummaryActionsCollector sPartnerSummaryActionsCollector;
-    private final Context mContext;
+    private static PartnerSummaryActionsCollector partnerSummaryActionsCollector;
+    private final Context context;
     private Uri mContentProviderUri;
 
     /** private constructor, should use getter. */
     private PartnerSummaryActionsCollector(Context context) {
-        mContext = context;
+        this.context = context;
         ResolveInfo resolveInfo = getSummaryContentProviderResolveInfo(context.getPackageManager());
 
         if (resolveInfo == null) {
@@ -98,10 +98,10 @@ public class PartnerSummaryActionsCollector {
 
     /** Gets the current instance of the {@link PartnerSummaryActionsCollector}. */
     public static PartnerSummaryActionsCollector get(Context context) {
-        if (sPartnerSummaryActionsCollector == null) {
-            sPartnerSummaryActionsCollector = new PartnerSummaryActionsCollector(context);
+        if (partnerSummaryActionsCollector == null) {
+            partnerSummaryActionsCollector = new PartnerSummaryActionsCollector(context);
         }
-        return sPartnerSummaryActionsCollector;
+        return partnerSummaryActionsCollector;
     }
 
     /**
@@ -330,7 +330,7 @@ public class PartnerSummaryActionsCollector {
      *                                  properly.
      */
     private ArrayList<String> getPartnerSummaryActionsFromContentProvider(Uri contentProviderUri) {
-        Bundle result = mContext.getContentResolver().call(
+        Bundle result = context.getContentResolver().call(
                 contentProviderUri,
                 METHOD_GET_SUMMARY_ACTIONS,
                 /* arg= */ null,
@@ -358,7 +358,7 @@ public class PartnerSummaryActionsCollector {
             String actionId, Uri contentProviderUri) {
         Bundle completionStateArgs = new Bundle();
         completionStateArgs.putString(EXTRA_ACTION_ID, actionId);
-        Bundle result = mContext.getContentResolver().call(
+        Bundle result = context.getContentResolver().call(
                 contentProviderUri,
                 METHOD_GET_ACTION_COMPLETION_STATE,
                 /* arg= */ null,
@@ -374,7 +374,7 @@ public class PartnerSummaryActionsCollector {
             Uri contentProviderUri) {
         Bundle summaryStateArgs = new Bundle();
         summaryStateArgs.putString(EXTRA_ACTION_ID, actionId);
-        Bundle result = mContext.getContentResolver().call(
+        Bundle result = context.getContentResolver().call(
                 contentProviderUri,
                 METHOD_GET_ACTION_SUMMARY_STATE,
                 /* arg= */ null,
@@ -392,7 +392,7 @@ public class PartnerSummaryActionsCollector {
         deferredStateArgs.putString(EXTRA_ACTION_ID, actionId);
         Bundle result;
         try {
-            result = mContext.getContentResolver().call(
+            result = context.getContentResolver().call(
                     contentProviderUri,
                     METHOD_GET_DEFERRED_ACTION_STATE,
                     /* arg= */ null,
