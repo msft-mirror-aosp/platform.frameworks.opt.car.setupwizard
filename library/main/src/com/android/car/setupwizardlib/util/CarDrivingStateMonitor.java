@@ -108,14 +108,14 @@ public class CarDrivingStateMonitor implements
      * Starts the monitor listening to driving state changes.
      */
     public synchronized void startMonitor() {
-        if (isVerboseLoggable()) {
-            Log.v(TAG, "Starting monitor");
-        }
         mMonitorStartedCount++;
         if (mMonitorStartedCount == 0) {
+            Log.w(TAG, "MonitorStartedCount was negative");
             return;
         }
         mHandler.removeCallbacks(mDisconnectRunnable);
+        Log.i(TAG, String.format(
+                "Starting monitor, MonitorStartedCount = %d", mMonitorStartedCount));
         if (mCar != null) {
             if (mCar.isConnected()) {
                 try {
@@ -189,12 +189,13 @@ public class CarDrivingStateMonitor implements
     }
 
     private void disconnectCarMonitor() {
-        if (isVerboseLoggable()) {
-            Log.v(TAG, "Timeout finished, disconnecting Car Monitor");
-        }
         if (mMonitorStartedCount > 0) {
+            if (isVerboseLoggable()) {
+                Log.v(TAG, "MonitorStartedCount > 0, do nothing");
+            }
             return;
         }
+        Log.i(TAG, "Disconnecting Car Monitor");
         try {
             if (mRestrictionsManager != null) {
                 mRestrictionsManager.unregisterListener();
