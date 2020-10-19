@@ -59,6 +59,8 @@ import java.util.Objects;
 class CarSetupWizardBaseLayout extends LinearLayout {
     private static final String TAG = CarSetupWizardBaseLayout.class.getSimpleName();
     private static final int INVALID_COLOR = 0;
+    // For mirroring an image
+    private static final float IMAGE_MIRROR_ROTATION = 180.0f;
 
     private View mBackButton;
     private View mCloseButton;
@@ -167,8 +169,9 @@ class CarSetupWizardBaseLayout extends LinearLayout {
         }
 
         LayoutInflater inflater = LayoutInflater.from(getContext());
-        inflater.inflate(R.layout.car_setup_wizard_layout, this);
-
+        View view = inflater.inflate(R.layout.car_setup_wizard_layout, this);
+        // The layout will not be mirrored in RTL
+        view.setLayoutDirection(View.LAYOUT_DIRECTION_LTR);
 
         setBackButton(findViewById(R.id.back_button));
         setCloseButton(findViewById(R.id.close_button));
@@ -183,6 +186,12 @@ class CarSetupWizardBaseLayout extends LinearLayout {
                 getContext(), PartnerConfig.CONFIG_TOOLBAR_BUTTON_ICON_CLOSE);
         if (closeButtonDrawable != null) {
             ((ImageView) mCloseButton).setImageDrawable(closeButtonDrawable);
+        }
+
+        if (shouldMirrorNavIcons()) {
+            Log.v(TAG, "Mirroring navigation icons");
+            mBackButton.setRotation(IMAGE_MIRROR_ROTATION);
+            mCloseButton.setRotation(IMAGE_MIRROR_ROTATION);
         }
 
         if (showBackButton && showCloseButton) {
@@ -577,7 +586,6 @@ class CarSetupWizardBaseLayout extends LinearLayout {
             return;
         }
         int direction = TextUtils.getLayoutDirectionFromLocale(locale);
-        setLayoutDirection(direction);
 
         mToolbarTitle.setTextLocale(locale);
         mToolbarTitle.setLayoutDirection(direction);
@@ -678,6 +686,15 @@ class CarSetupWizardBaseLayout extends LinearLayout {
         if (dimension != 0) {
             button.setTextSize(TypedValue.COMPLEX_UNIT_PX, dimension);
         }
+    }
+
+    @VisibleForTesting
+    boolean shouldMirrorNavIcons() {
+        return getResources().getConfiguration().getLayoutDirection() == View.LAYOUT_DIRECTION_RTL
+            && mPartnerConfigHelper.getBoolean(
+                getContext(),
+                PartnerConfig.CONFIG_TOOLBAR_NAV_ICON_MIRRORING_IN_RTL,
+                true);
     }
 
     /** Sets button type face with partner overlay if exists */
