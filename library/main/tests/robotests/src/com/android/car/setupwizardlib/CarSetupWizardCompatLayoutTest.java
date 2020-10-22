@@ -614,6 +614,8 @@ public class CarSetupWizardCompatLayoutTest extends BaseRobolectricTest {
                 .get();
 
         CarSetupWizardCompatLayout layout = activity.findViewById(R.id.car_setup_wizard_layout);
+        View toolbar = layout.findViewById(R.id.application_bar);
+        assertThat(toolbar.getTextDirection()).isEqualTo(View.TEXT_DIRECTION_LTR);
         assertThat(layout.shouldMirrorNavIcons()).isTrue();
     }
 

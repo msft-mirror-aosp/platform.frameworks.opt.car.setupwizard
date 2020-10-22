@@ -169,9 +169,10 @@ class CarSetupWizardBaseLayout extends LinearLayout {
         }
 
         LayoutInflater inflater = LayoutInflater.from(getContext());
-        View view = inflater.inflate(R.layout.car_setup_wizard_layout, this);
-        // The layout will not be mirrored in RTL
-        view.setLayoutDirection(View.LAYOUT_DIRECTION_LTR);
+        inflater.inflate(R.layout.car_setup_wizard_layout, this);
+        View toolbar = findViewById(R.id.application_bar);
+        // The toolbar will not be mirrored in RTL
+        toolbar.setLayoutDirection(View.LAYOUT_DIRECTION_LTR);
 
         setBackButton(findViewById(R.id.back_button));
         setCloseButton(findViewById(R.id.close_button));
