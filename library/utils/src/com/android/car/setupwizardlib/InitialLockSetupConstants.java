@@ -36,12 +36,14 @@ public interface InitialLockSetupConstants {
     @IntDef({
             LockTypes.PASSWORD,
             LockTypes.PIN,
-            LockTypes.PATTERN
+            LockTypes.PATTERN,
+            LockTypes.NONE
     })
     @interface LockTypes {
         int PASSWORD = 0;
         int PIN = 1;
         int PATTERN = 2;
+        int NONE = 3;
     }
 
     /**
