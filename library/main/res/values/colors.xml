@@ -27,7 +27,7 @@
     <!-- White -->
     <color name="suw_color_primary">@android:color/white</color>
     <!-- Material grey500 -->
-    <color name="suw_color_secondary">#9AA06A</color>
+    <color name="suw_color_secondary">#9AA0A6</color>
     <!-- Material blue300 -->
     <color name="suw_color_accent">#8AB4F8</color>
     <!-- Material grey200 -->
