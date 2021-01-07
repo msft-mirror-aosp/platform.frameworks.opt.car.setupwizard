@@ -31,6 +31,7 @@ import android.content.ServiceConnection;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
+import android.os.SystemProperties;
 import android.util.Log;
 
 import androidx.annotation.Nullable;
@@ -54,6 +55,10 @@ public class CarDrivingStateMonitor implements
     private static final long DISCONNECT_DELAY_MS = 700;
 
     private static final int GEAR_REVERSE = 2;
+
+    // System property used to enabled the UX_RESTRICTIONS_NO_SETUP check
+    private static final String KEY_ENABLE_UX_RESTRICTIONS_NO_SETUP_CHECK =
+             "aae.suw.ux_no_setup_check";
 
     private Car mCar;
     private CarUxRestrictionsManager mRestrictionsManager;
@@ -249,8 +254,27 @@ public class CarDrivingStateMonitor implements
     }
 
     private boolean checkIsSetupRestricted(@Nullable CarUxRestrictions restrictionInfo) {
-        return restrictionInfo != null && (restrictionInfo.getActiveRestrictions()
-                & CarUxRestrictions.UX_RESTRICTIONS_NO_SETUP) != 0;
+        if (restrictionInfo == null) {
+            if (isVerboseLoggable()) {
+                Log.v(TAG, "checkIsSetupRestricted restrictionInfo is null, returning false");
+            }
+            return false;
+        }
+        int activeRestrictions = restrictionInfo.getActiveRestrictions();
+        if (isUxRestrictionsNoSetupCheckEnabled()) {
+            if (isVerboseLoggable()) {
+                Log.v(TAG, "checkIsSetupRestricted UX_RESTRICTIONS_NO_SETUP enabled "
+                        + "activeRestrictions " + activeRestrictions);
+            }
+            return (restrictionInfo.getActiveRestrictions()
+                    & CarUxRestrictions.UX_RESTRICTIONS_NO_SETUP) != 0;
+        }
+        if (isVerboseLoggable()) {
+            Log.v(TAG, "checkIsSetupRestricted UX_RESTRICTIONS_NO_SETUP disabled "
+                    + "activeRestrictions " + activeRestrictions);
+        }
+        // There must be at least some restriction in place.
+        return restrictionInfo.getActiveRestrictions() != 0;
     }
 
     @Override
@@ -339,4 +363,9 @@ public class CarDrivingStateMonitor implements
         mContext.sendBroadcast(intent);
     }
 
+    private boolean isUxRestrictionsNoSetupCheckEnabled() {
+        return SystemProperties.getBoolean(KEY_ENABLE_UX_RESTRICTIONS_NO_SETUP_CHECK, false)
+                || SystemProperties.getBoolean(
+                "persist." + KEY_ENABLE_UX_RESTRICTIONS_NO_SETUP_CHECK, false);
+    }
 }
