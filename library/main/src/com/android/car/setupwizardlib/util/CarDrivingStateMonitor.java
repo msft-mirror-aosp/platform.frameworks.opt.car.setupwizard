@@ -225,8 +225,18 @@ public class CarDrivingStateMonitor implements
     }
 
     private boolean checkIsSetupRestricted(@Nullable CarUxRestrictions restrictionInfo) {
-        return restrictionInfo != null && (restrictionInfo.getActiveRestrictions()
-                & CarUxRestrictions.UX_RESTRICTIONS_NO_SETUP) != 0;
+        if (restrictionInfo == null) {
+            if (isVerboseLoggable()) {
+                Log.v(TAG, "checkIsSetupRestricted restrictionInfo is null, returning false");
+            }
+            return false;
+        }
+        int activeRestrictions = restrictionInfo.getActiveRestrictions();
+        if (isVerboseLoggable()) {
+            Log.v(TAG, "activeRestrictions are " + activeRestrictions);
+        }
+        // There must be at least some restriction in place.
+        return activeRestrictions != 0;
     }
 
     @Override
@@ -275,4 +285,5 @@ public class CarDrivingStateMonitor implements
     public static void replace(Context context, CarDrivingStateMonitor monitor) {
         CarHelperRegistry.getRegistry(context).putHelper(CarDrivingStateMonitor.class, monitor);
     }
+
 }
