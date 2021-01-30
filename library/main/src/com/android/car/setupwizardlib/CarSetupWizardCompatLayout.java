@@ -42,5 +42,7 @@ public class CarSetupWizardCompatLayout extends CarSetupWizardBaseLayout {
     public CarSetupWizardCompatLayout(Context context, @Nullable AttributeSet attrs,
             int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
+
+        setBackgroundColor(getResources().getColor(R.color.suw_color_background, null));
     }
 }
