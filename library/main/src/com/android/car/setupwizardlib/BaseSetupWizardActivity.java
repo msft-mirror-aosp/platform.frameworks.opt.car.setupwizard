@@ -20,6 +20,7 @@ import android.annotation.CallSuper;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 
 import androidx.annotation.LayoutRes;
@@ -91,11 +92,7 @@ abstract class BaseSetupWizardActivity extends FragmentActivity {
 
         mCarSetupWizardLayout = findViewById(R.id.car_setup_wizard_layout);
 
-        mCarSetupWizardLayout.setBackButtonListener(v -> {
-            if (!handleBackButton()) {
-                finish();
-            }
-        });
+        mCarSetupWizardLayout.setBackButtonListener(v -> handleBackButtonEvent());
 
         mCarSetupWizardLayout.setCloseButtonListener(v-> handleCloseButton());
 
@@ -246,6 +243,16 @@ abstract class BaseSetupWizardActivity extends FragmentActivity {
     }
 
     /**
+     * Method used when back button is pressed, if the back button wasn't handled by the activity
+     * finish() will be called.
+     */
+    private void handleBackButtonEvent() {
+        if (!handleBackButton()) {
+            finish();
+        }
+    }
+
+    /**
      * Method to be overwritten by subclasses wanting to implement their own back behavior.
      * Default behavior is to pop a fragment off of the backstack if one exists, otherwise call
      * finish()
@@ -254,6 +261,16 @@ abstract class BaseSetupWizardActivity extends FragmentActivity {
      */
     protected boolean handleBackButton() {
         return popBackStackImmediate();
+    }
+
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        if (event.getKeyCode() == KeyEvent.KEYCODE_BACK
+                && event.getAction() == KeyEvent.ACTION_UP) {
+            handleBackButtonEvent();
+            return true;
+        }
+        return super.dispatchKeyEvent(event);
     }
 
     /**
