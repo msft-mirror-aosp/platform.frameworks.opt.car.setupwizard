@@ -56,7 +56,7 @@ import java.util.Objects;
  * done through methods provided by this class unless that is not possible so as to keep the state
  * internally consistent.
  */
-class CarSetupWizardBaseLayout extends LinearLayout {
+class CarSetupWizardBaseLayout extends LinearLayout implements CarSetupWizardLayoutInterface {
     private static final String TAG = CarSetupWizardBaseLayout.class.getSimpleName();
     private static final int INVALID_COLOR = 0;
     // For mirroring an image
@@ -557,26 +557,80 @@ class CarSetupWizardBaseLayout extends LinearLayout {
         return mProgressBar;
     }
 
-    /**
-     * Sets the progress bar visibility to the given visibility.
-     */
+    @Override
     public void setProgressBarVisible(boolean visible) {
         setViewVisible(mProgressBar, visible);
     }
 
-    /**
-     * Sets the progress bar indeterminate/determinate state.
-     */
+    @Override
     public void setProgressBarIndeterminate(boolean indeterminate) {
         mProgressBar.setIndeterminate(indeterminate);
     }
 
-    /**
-     * Sets the progress bar's progress.
-     */
+    @Override
     public void setProgressBarProgress(int progress) {
         setProgressBarIndeterminate(false);
         mProgressBar.setProgress(progress);
+    }
+
+    @Override
+    public Button getPrimaryActionButton() {
+        return getPrimaryToolbarButton();
+    }
+
+    @Override
+    public void setPrimaryActionButtonVisible(boolean visible) {
+        setPrimaryToolbarButtonVisible(visible);
+    }
+
+    @Override
+    public void setPrimaryActionButtonEnabled(boolean enabled) {
+        setPrimaryToolbarButtonEnabled(enabled);
+    }
+
+    @Override
+    public void setPrimaryActionButtonText(String text) {
+        setPrimaryToolbarButtonText(text);
+    }
+
+    @Override
+    public void setPrimaryActionButtonListener(@Nullable View.OnClickListener listener) {
+        setPrimaryToolbarButtonListener(listener);
+    }
+
+    @Override
+    public void setPrimaryActionButtonFlat(boolean isFlat) {
+        setPrimaryToolbarButtonFlat(isFlat);
+    }
+
+    @Override
+    public boolean isPrimaryActionButtonFlat() {
+        return getPrimaryToolbarButtonFlat();
+    }
+
+    @Override
+    public Button getSecondaryActionButton() {
+        return getSecondaryToolbarButton();
+    }
+
+    @Override
+    public void setSecondaryActionButtonVisible(boolean visible) {
+        setSecondaryToolbarButtonVisible(visible);
+    }
+
+    @Override
+    public void setSecondaryActionButtonEnabled(boolean enabled) {
+        setSecondaryToolbarButtonEnabled(enabled);
+    }
+
+    @Override
+    public void setSecondaryActionButtonText(String text) {
+        setSecondaryToolbarButtonText(text);
+    }
+
+    @Override
+    public void setSecondaryActionButtonListener(@Nullable View.OnClickListener listener) {
+        setSecondaryToolbarButtonListener(listener);
     }
 
     /**
