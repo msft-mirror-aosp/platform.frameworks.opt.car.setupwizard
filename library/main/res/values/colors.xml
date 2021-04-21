@@ -36,4 +36,6 @@
     <color name="suw_color_divider">#3C4043</color>
     <!-- Material grey900 -->
     <color name="suw_color_background">#202124</color>
+    <!-- Material grey868 -->
+    <color name="suw_color_split_nav_toolbar_background">#282B2D</color>
 </resources>

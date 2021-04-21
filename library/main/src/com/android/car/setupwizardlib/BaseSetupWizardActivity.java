@@ -503,6 +503,10 @@ abstract class BaseSetupWizardActivity extends FragmentActivity {
         mCarSetupWizardLayout.setProgressBarVisible(visible);
     }
 
+    protected boolean isSplitNavLayoutSupported() {
+        return false;
+    }
+
     private void launchNextAction(int resultCode, Intent data, boolean forResult) {
         if (resultCode == RESULT_CANCELED) {
             throw new IllegalArgumentException("Cannot call nextAction with RESULT_CANCELED");

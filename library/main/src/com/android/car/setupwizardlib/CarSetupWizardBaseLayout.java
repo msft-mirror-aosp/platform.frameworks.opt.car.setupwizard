@@ -19,6 +19,7 @@ package com.android.car.setupwizardlib;
 import android.annotation.Nullable;
 import android.content.Context;
 import android.content.res.ColorStateList;
+import android.content.res.Configuration;
 import android.content.res.TypedArray;
 import android.graphics.Rect;
 import android.graphics.Typeface;
@@ -46,6 +47,7 @@ import androidx.annotation.VisibleForTesting;
 
 import com.android.car.setupwizardlib.partner.PartnerConfig;
 import com.android.car.setupwizardlib.partner.PartnerConfigHelper;
+import com.android.car.setupwizardlib.util.FeatureResolver;
 
 import java.util.Locale;
 import java.util.Objects;
@@ -67,6 +69,7 @@ class CarSetupWizardBaseLayout extends LinearLayout implements CarSetupWizardLay
     private View mTitleBar;
     private TextView mToolbarTitle;
     private PartnerConfigHelper mPartnerConfigHelper;
+    private boolean mSupportsSplitNavLayout;
 
     /* <p>The Primary Toolbar Button should always be used when there is only a single action that
      * moves the wizard to the next screen (e.g. Only need a 'Skip' button).
@@ -164,12 +167,18 @@ class CarSetupWizardBaseLayout extends LinearLayout implements CarSetupWizardLay
                     R.styleable.CarSetupWizardBaseLayout_showProgressBar, false);
             indeterminateProgressBar = attrArray.getBoolean(
                     R.styleable.CarSetupWizardBaseLayout_indeterminateProgressBar, true);
+            mSupportsSplitNavLayout = attrArray.getBoolean(
+                R.styleable.CarSetupWizardBaseLayout_supportsSplitNavLayout, false);
         } finally {
             attrArray.recycle();
         }
 
         LayoutInflater inflater = LayoutInflater.from(getContext());
-        inflater.inflate(R.layout.car_setup_wizard_layout, this);
+        int layoutId = isSplitNavLayoutUsed()
+                ? R.layout.split_nav_layout
+                : R.layout.car_setup_wizard_layout;
+        inflater.inflate(layoutId, this);
+
         View toolbar = findViewById(R.id.application_bar);
         // The toolbar will not be mirrored in RTL
         toolbar.setLayoutDirection(View.LAYOUT_DIRECTION_LTR);
@@ -206,10 +215,15 @@ class CarSetupWizardBaseLayout extends LinearLayout implements CarSetupWizardLay
 
         // Se the title bar.
         setTitleBar(findViewById(R.id.application_bar));
-        int toolbarBgColor =
-                mPartnerConfigHelper.getColor(getContext(), PartnerConfig.CONFIG_TOOLBAR_BG_COLOR);
-        if (toolbarBgColor != 0) {
-            mTitleBar.setBackgroundColor(toolbarBgColor);
+        if (isSplitNavLayoutUsed()) {
+            mTitleBar.setBackgroundColor(getResources()
+                    .getColor(R.color.suw_color_split_nav_toolbar_background, null));
+        } else {
+            int toolbarBgColor = mPartnerConfigHelper.getColor(
+                    getContext(), PartnerConfig.CONFIG_TOOLBAR_BG_COLOR);
+            if (toolbarBgColor != 0) {
+                mTitleBar.setBackgroundColor(toolbarBgColor);
+            }
         }
 
         // Set the toolbar title visibility and text based on the custom attributes.
@@ -264,7 +278,12 @@ class CarSetupWizardBaseLayout extends LinearLayout implements CarSetupWizardLay
         initDivider();
 
         // Set orientation programmatically since the inflated layout uses <merge>
-        setOrientation(LinearLayout.VERTICAL);
+        if (isSplitNavLayoutUsed() && getResources().getConfiguration().orientation
+                == Configuration.ORIENTATION_LANDSCAPE) {
+            setOrientation(LinearLayout.HORIZONTAL);
+        } else {
+            setOrientation(LinearLayout.VERTICAL);
+        }
     }
 
     /**
@@ -633,6 +652,12 @@ class CarSetupWizardBaseLayout extends LinearLayout implements CarSetupWizardLay
         setSecondaryToolbarButtonListener(listener);
     }
 
+    public boolean isSplitNavLayoutUsed() {
+        boolean isSplitNavLayoutEnabled = FeatureResolver.get(getContext())
+                .isSplitNavLayoutFeatureEnabled();
+        return mSupportsSplitNavLayout && isSplitNavLayoutEnabled;
+    }
+
     /**
      * Sets the locale to be used for rendering.
      */
@@ -816,6 +841,9 @@ class CarSetupWizardBaseLayout extends LinearLayout implements CarSetupWizardLay
 
     private void initDivider() {
         mDivider = findViewById(R.id.divider);
+        if (mDivider == null) {
+            return;
+        }
         float dividerHeight = mPartnerConfigHelper.getDimension(
                 getContext(),
                 PartnerConfig.CONFIG_TOOLBAR_DIVIDER_LINE_WEIGHT);

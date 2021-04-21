@@ -67,6 +67,9 @@
               of the progress bar -->
         <attr name="showProgressBar" format="boolean"/>
         <attr name="indeterminateProgressBar" format="boolean"/>
+
+        <!-- Attributes related to the split nav layout -->
+        <attr name="supportsSplitNavLayout" format="boolean"/>
     </declare-styleable>
 
 </resources>

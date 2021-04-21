@@ -542,7 +542,8 @@ public class CarSetupWizardCompatLayoutTest extends BaseRobolectricTest {
         CarSetupWizardCompatLayout layout = createCarSetupWizardCompatLayout();
 
         ColorDrawable bg = (ColorDrawable) layout.getBackground();
-        assertThat(bg).isNull();
+        assertThat(bg.getColor()).isEqualTo(
+                application.getResources().getColor(R.color.suw_color_background));
     }
 
     @Test
@@ -619,7 +620,7 @@ public class CarSetupWizardCompatLayoutTest extends BaseRobolectricTest {
 
         CarSetupWizardCompatLayout layout = activity.findViewById(R.id.car_setup_wizard_layout);
         View toolbar = layout.findViewById(R.id.application_bar);
-        assertThat(toolbar.getTextDirection()).isEqualTo(View.TEXT_DIRECTION_LTR);
+        assertThat(toolbar.getLayoutDirection()).isEqualTo(View.LAYOUT_DIRECTION_LTR);
         assertThat(layout.shouldMirrorNavIcons()).isTrue();
     }
 
