@@ -52,8 +52,7 @@
         android:id="@+id/layout_content_stub"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        android:inflatedId="@+id/body"/>
+        android:layout_weight="1"/>
 
     <include layout="@layout/action_bar"/>
   </LinearLayout>
