@@ -652,10 +652,16 @@ class CarSetupWizardBaseLayout extends LinearLayout implements CarSetupWizardLay
         setSecondaryToolbarButtonListener(listener);
     }
 
+    /** Returns whether split-nav layout is currently being used */
     public boolean isSplitNavLayoutUsed() {
         boolean isSplitNavLayoutEnabled = FeatureResolver.get(getContext())
                 .isSplitNavLayoutFeatureEnabled();
         return mSupportsSplitNavLayout && isSplitNavLayoutEnabled;
+    }
+
+    /** Returns the content ViewStub of the split-nav layout */
+    public ViewStub getSplitNavContentViewStub() {
+        return findViewById(R.id.layout_content_stub);
     }
 
     /**
