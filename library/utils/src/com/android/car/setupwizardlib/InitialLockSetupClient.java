@@ -348,7 +348,7 @@ public class InitialLockSetupClient implements ServiceConnection {
         @Override
         protected void onPostExecute(Map<Integer, LockConfig> map) {
             InitialLockListener listener = mInitialLockListener.get();
-            if (listener == null && Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
+            if (listener == null) {
                 return;
             }
             listener.onGetLockConfigs(map);
@@ -426,7 +426,7 @@ public class InitialLockSetupClient implements ServiceConnection {
                 return;
             }
             InitialLockListener listener = mInitialLockListener.get();
-            if (listener == null && Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
+            if (listener == null) {
                 return;
             }
             listener.onLockValidated(resultCode);
@@ -501,7 +501,7 @@ public class InitialLockSetupClient implements ServiceConnection {
         @Override
         protected void onPostExecute(Integer resultCode) {
             InitialLockListener listener = mInitialLockListener.get();
-            if (listener == null && Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
+            if (listener == null) {
                 return;
             }
             listener.onSetLockFinished(resultCode);
