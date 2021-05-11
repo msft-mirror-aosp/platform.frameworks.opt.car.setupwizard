@@ -70,6 +70,8 @@
 
         <!-- Attributes related to the split nav layout -->
         <attr name="supportsSplitNavLayout" format="boolean"/>
+        <!-- Attributes related to the rotary support -->
+        <attr name="supportsRotaryControl" format="boolean"/>
     </declare-styleable>
 
 </resources>
