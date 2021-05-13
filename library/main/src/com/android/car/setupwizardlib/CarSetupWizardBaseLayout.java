@@ -70,6 +70,7 @@ class CarSetupWizardBaseLayout extends LinearLayout implements CarSetupWizardLay
     private TextView mToolbarTitle;
     private PartnerConfigHelper mPartnerConfigHelper;
     private boolean mSupportsSplitNavLayout;
+    private boolean mSupportsRotaryControl;
 
     /* <p>The Primary Toolbar Button should always be used when there is only a single action that
      * moves the wizard to the next screen (e.g. Only need a 'Skip' button).
@@ -169,15 +170,14 @@ class CarSetupWizardBaseLayout extends LinearLayout implements CarSetupWizardLay
                     R.styleable.CarSetupWizardBaseLayout_indeterminateProgressBar, true);
             mSupportsSplitNavLayout = attrArray.getBoolean(
                 R.styleable.CarSetupWizardBaseLayout_supportsSplitNavLayout, false);
+            mSupportsRotaryControl = attrArray.getBoolean(
+                    R.styleable.CarSetupWizardBaseLayout_supportsRotaryControl, false);
         } finally {
             attrArray.recycle();
         }
 
         LayoutInflater inflater = LayoutInflater.from(getContext());
-        int layoutId = isSplitNavLayoutUsed()
-                ? R.layout.split_nav_layout
-                : R.layout.car_setup_wizard_layout;
-        inflater.inflate(layoutId, this);
+        inflater.inflate(getLayoutResourceId(), this);
 
         View toolbar = findViewById(R.id.application_bar);
         // The toolbar will not be mirrored in RTL
@@ -843,6 +843,18 @@ class CarSetupWizardBaseLayout extends LinearLayout implements CarSetupWizardLay
                 ? PartnerConfig.CONFIG_TOOLBAR_SECONDARY_BUTTON_TEXT_COLOR
                 : PartnerConfig.CONFIG_TOOLBAR_PRIMARY_BUTTON_TEXT_COLOR;
         setButtonTextColor(primaryButton, textColorConfig);
+    }
+
+    private int getLayoutResourceId() {
+        if (isSplitNavLayoutUsed()) {
+            return mSupportsRotaryControl
+                    ? R.layout.rotary_split_nav_layout
+                    : R.layout.split_nav_layout;
+        }
+
+        return mSupportsRotaryControl
+                ? R.layout.rotary_car_setup_wizard_layout
+                : R.layout.car_setup_wizard_layout;
     }
 
     private void initDivider() {
