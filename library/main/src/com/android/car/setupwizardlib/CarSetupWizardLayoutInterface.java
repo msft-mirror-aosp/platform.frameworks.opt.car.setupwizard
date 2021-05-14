@@ -15,9 +15,10 @@
  */
 package com.android.car.setupwizardlib;
 
-import android.annotation.Nullable;
 import android.view.View;
 import android.widget.Button;
+
+import androidx.annotation.Nullable;
 
 /**
  * The interface defines the functionality of the layouts used in CarSetupWizard. It

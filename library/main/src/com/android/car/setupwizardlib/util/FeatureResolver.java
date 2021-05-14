@@ -16,12 +16,13 @@
 
 package com.android.car.setupwizardlib.util;
 
-import android.annotation.NonNull;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
+
+import androidx.annotation.NonNull;
 
 import java.util.HashMap;
 import java.util.Map;
