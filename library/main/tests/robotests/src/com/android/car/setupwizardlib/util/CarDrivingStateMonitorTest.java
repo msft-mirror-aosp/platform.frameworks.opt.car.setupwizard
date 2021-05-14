@@ -132,7 +132,8 @@ public class CarDrivingStateMonitorTest extends BaseRobolectricTest {
         ShadowCar.setIsConnected(true);
         mCarDrivingStateMonitor.stopMonitor();
         mCarDrivingStateMonitor.startMonitor();
-        assertThat(mCarDrivingStateMonitor.mHandler.hasMessagesOrCallbacks()).isFalse();
+        assertThat(mCarDrivingStateMonitor.mHandler
+            .hasCallbacks(mCarDrivingStateMonitor.mDisconnectRunnable)).isFalse();
     }
 
     @Test
