@@ -891,7 +891,9 @@ class CarSetupWizardBaseLayout extends LinearLayout implements CarSetupWizardLay
             if (drawable instanceof InsetDrawable) {
                 return getGradientDrawableFromInsetDrawable((InsetDrawable) drawable);
             }
-            return (GradientDrawable) drawable;
+            if (drawable instanceof GradientDrawable) {
+                return (GradientDrawable) drawable;
+            }
         }
 
         return null;
