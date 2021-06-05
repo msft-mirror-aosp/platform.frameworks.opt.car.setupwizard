@@ -23,4 +23,5 @@
     app:showBackButton="true"
     app:showPrimaryToolbarButton="true"
     app:primaryToolbarButtonEnabled="true"
-    app:supportsSplitNavLayout="true"/>
+    app:supportsSplitNavLayout="true"
+    app:supportsRotaryControl="true"/>
