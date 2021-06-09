@@ -15,22 +15,13 @@
     limitations under the License.
 -->
 <com.android.car.ui.FocusArea xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/button_container"
     android:layout_width="match_parent"
     android:layout_height="@dimen/actionbar_height"
+    android:gravity="top"
+    android:paddingTop="@dimen/suw_padding_4"
     android:paddingHorizontal="@dimen/suw_padding_7"
-    android:orientation="vertical">
-  <!-- Divider -->
-  <ImageView
-      android:layout_width="match_parent"
-      android:layout_height="1dp"
-      android:background="@color/suw_color_divider"/>
-  <LinearLayout
-      android:id="@+id/button_container"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:orientation="horizontal"
-      android:gravity="top"
-      android:paddingTop="@dimen/suw_padding_4">
+    android:orientation="horizontal">
     <ViewStub
         android:id="@+id/primary_toolbar_button_stub"
         android:layout_width="wrap_content"
@@ -44,5 +35,4 @@
         android:layout_marginStart="@dimen/suw_padding_7"
         android:inflatedId="@+id/secondary_toolbar_button"
         android:layout="@layout/flat_button"/>
-  </LinearLayout>
 </com.android.car.ui.FocusArea>
