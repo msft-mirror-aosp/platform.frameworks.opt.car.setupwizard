@@ -23,8 +23,7 @@ import android.graphics.Color;
 import android.view.View;
 import android.view.Window;
 
-import com.android.car.setupwizardlib.robotests.R;
-import com.android.internal.util.XmlUtils;
+import com.android.car.setupwizardlib.test.R;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -57,8 +56,8 @@ public class CarSetupWizardUiUtilsTest {
 
     // Note that these colors are defined in the test theme
     private static final int TEST_THEME = R.style.NavAndStatusBarTestTheme;
-    private static final int EXPECTED_COLOR_STATUS_BAR = XmlUtils.convertValueToInt("#001", -1);
-    private static final int EXPECTED_COLOR_NAVIGATION_BAR = XmlUtils.convertValueToInt("#002", -1);
+    private static final int EXPECTED_COLOR_STATUS_BAR = Integer.decode("#001");
+    private static final int EXPECTED_COLOR_NAVIGATION_BAR = Integer.decode("#002");
 
     private Activity mActivity;
     private Window mWindow;
