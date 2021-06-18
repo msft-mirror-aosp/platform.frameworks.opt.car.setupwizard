@@ -310,7 +310,7 @@ public class PartnerSummaryActionsCollector {
                 if (deferredAction != null) {
                     deferredActions.add(deferredAction);
                 }
-            } catch (NullPointerException e) {
+            } catch (NullPointerException | IllegalArgumentException e) {
                 Log.e(
                         TAG,
                         "Unable to load the completion or config state for deferred action: "
