@@ -17,7 +17,6 @@
 
 package com.android.car.setupwizardlib.summary;
 
-import android.annotation.Nullable;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
@@ -28,6 +27,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
+
+import androidx.annotation.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -309,7 +310,7 @@ public class PartnerSummaryActionsCollector {
                 if (deferredAction != null) {
                     deferredActions.add(deferredAction);
                 }
-            } catch (NullPointerException e) {
+            } catch (NullPointerException | IllegalArgumentException e) {
                 Log.e(
                         TAG,
                         "Unable to load the completion or config state for deferred action: "
