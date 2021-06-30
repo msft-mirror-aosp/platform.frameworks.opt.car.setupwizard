@@ -169,7 +169,7 @@ class CarSetupWizardBaseLayout extends LinearLayout implements CarSetupWizardLay
             indeterminateProgressBar = attrArray.getBoolean(
                     R.styleable.CarSetupWizardBaseLayout_indeterminateProgressBar, true);
             mSupportsSplitNavLayout = attrArray.getBoolean(
-                R.styleable.CarSetupWizardBaseLayout_supportsSplitNavLayout, false);
+                    R.styleable.CarSetupWizardBaseLayout_supportsSplitNavLayout, false);
             mSupportsRotaryControl = attrArray.getBoolean(
                     R.styleable.CarSetupWizardBaseLayout_supportsRotaryControl, false);
         } finally {
@@ -652,15 +652,28 @@ class CarSetupWizardBaseLayout extends LinearLayout implements CarSetupWizardLay
         setSecondaryToolbarButtonListener(listener);
     }
 
-    /** Returns whether split-nav layout is currently being used */
+    /**
+     * Returns whether split-nav layout is currently being used. Do not use this API to determine
+     * whether content ViewStub should be inflated. Use {@code getContentViewStub} for that purpose.
+     */
     public boolean isSplitNavLayoutUsed() {
         boolean isSplitNavLayoutEnabled = FeatureResolver.get(getContext())
                 .isSplitNavLayoutFeatureEnabled();
         return mSupportsSplitNavLayout && isSplitNavLayoutEnabled;
     }
 
-    /** Returns the content ViewStub of the split-nav layout */
+    /**
+     * Returns the content ViewStub of the split-nav layout.
+     *
+     * @deprecated Use {@code getContentViewStub}.
+     */
+    @Deprecated
     public ViewStub getSplitNavContentViewStub() {
+        return findViewById(R.id.layout_content_stub);
+    }
+
+    /** Returns the content ViewStub when split-nav layout is used or rotary control is supported */
+    public ViewStub getContentViewStub() {
         return findViewById(R.id.layout_content_stub);
     }
 
@@ -777,10 +790,8 @@ class CarSetupWizardBaseLayout extends LinearLayout implements CarSetupWizardLay
     @VisibleForTesting
     boolean shouldMirrorNavIcons() {
         return getResources().getConfiguration().getLayoutDirection() == View.LAYOUT_DIRECTION_RTL
-            && mPartnerConfigHelper.getBoolean(
-                getContext(),
-                PartnerConfig.CONFIG_TOOLBAR_NAV_ICON_MIRRORING_IN_RTL,
-                true);
+                && mPartnerConfigHelper.getBoolean(
+                        getContext(), PartnerConfig.CONFIG_TOOLBAR_NAV_ICON_MIRRORING_IN_RTL, true);
     }
 
     /** Sets button type face with partner overlay if exists */
