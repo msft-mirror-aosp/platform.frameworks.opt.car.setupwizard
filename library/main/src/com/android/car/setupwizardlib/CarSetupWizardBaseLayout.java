@@ -63,6 +63,7 @@ class CarSetupWizardBaseLayout extends LinearLayout implements CarSetupWizardLay
     private static final int INVALID_COLOR = 0;
     // For mirroring an image
     private static final float IMAGE_MIRROR_ROTATION = 180.0f;
+    private static final float MIN_ULTRA_WIDE_CONTENT_WIDTH = 1240.0f;
 
     private View mBackButton;
     private View mCloseButton;
@@ -178,6 +179,8 @@ class CarSetupWizardBaseLayout extends LinearLayout implements CarSetupWizardLay
 
         LayoutInflater inflater = LayoutInflater.from(getContext());
         inflater.inflate(getLayoutResourceId(), this);
+
+        maybeSetUltraWideScreenContentWidth();
 
         View toolbar = findViewById(R.id.application_bar);
         // The toolbar will not be mirrored in RTL
@@ -915,5 +918,44 @@ class CarSetupWizardBaseLayout extends LinearLayout implements CarSetupWizardLay
             return (GradientDrawable) insetDrawable.getDrawable();
         }
         return null;
+    }
+
+    private void maybeSetUltraWideScreenContentWidth() {
+        View contentContainer = findViewById(R.id.ultra_wide_content_container);
+        if (contentContainer == null) {
+            return;
+        }
+
+        float configurableContentWidth = mPartnerConfigHelper.getDimension(
+                getContext(),
+                PartnerConfig.CONFIG_ULTRA_WIDE_SCREEN_CONTENT_WIDTH);
+
+        float pxMinWidth = TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP,
+                MIN_ULTRA_WIDE_CONTENT_WIDTH,
+                getResources().getDisplayMetrics());
+
+        if (configurableContentWidth >= pxMinWidth) {
+            ViewGroup.LayoutParams layoutParams = contentContainer.getLayoutParams();
+            layoutParams.width = (int) configurableContentWidth;
+            Log.d(TAG, String.format("Applying content width %f px", configurableContentWidth));
+            contentContainer.setLayoutParams(layoutParams);
+        } else {
+            if (configurableContentWidth != 0) {
+                Log.w(TAG, String.format("The minimum ultra wide screen content width is %d dp",
+                        (int) MIN_ULTRA_WIDE_CONTENT_WIDTH));
+            }
+
+            LinearLayout.LayoutParams contentParams = new LinearLayout.LayoutParams(
+                    0, LayoutParams.MATCH_PARENT);
+            contentParams.weight = 1;
+            contentContainer.setLayoutParams(contentParams);
+
+            LinearLayout.LayoutParams fillerParams = new LinearLayout.LayoutParams(
+                    0, LayoutParams.MATCH_PARENT);
+            fillerParams.weight = 0;
+            View filler = findViewById(R.id.ultra_wide_space_filler);
+            filler.setLayoutParams(fillerParams);
+        }
     }
 }
