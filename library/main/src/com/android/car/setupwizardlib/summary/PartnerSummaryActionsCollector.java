@@ -151,11 +151,13 @@ public class PartnerSummaryActionsCollector {
 
         String completedDescription =
                 summaryStateBundle.getString(EXTRA_SUMMARY_COMPLETED_DESCRIPTION, description);
+        SummaryActionState completeState = completed
+                ? SummaryActionState.COMPLETED : SummaryActionState.NOT_COMPLETED;
         return new SummaryAction(
                 title,
                 description,
                 requiresNetwork,
-                completed,
+                completeState,
                 priority,
                 scriptUri,
                 hasUnfinishedDependency,
