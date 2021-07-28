@@ -71,7 +71,6 @@ public class SplitNavLayoutTest extends BaseRobolectricTest {
         Activity activity = Robolectric.buildActivity(CarSetupWizardLayoutTestActivity.class)
                 .create()
                 .get();
-
         View contentContainer = activity.findViewById(R.id.ultra_wide_content_container);
         ViewGroup.LayoutParams layoutParams = contentContainer.getLayoutParams();
         assertThat(layoutParams.width).isEqualTo(PARTNER_CONTENT_WIDTH);
@@ -87,6 +86,34 @@ public class SplitNavLayoutTest extends BaseRobolectricTest {
         View contentContainer = activity.findViewById(R.id.ultra_wide_content_container);
         ViewGroup.LayoutParams layoutParams = contentContainer.getLayoutParams();
         assertThat(layoutParams.width).isEqualTo(0);
+    }
+
+    @Test
+    @Config(qualifiers = "iw-w1250dp-land")
+    public void test_layoutDirectionIsLtr_inRtrLocale() {
+        Activity activity = Robolectric.buildActivity(CarSetupWizardLayoutTestActivity.class)
+                .create()
+                .get();
+
+        View layout = activity.findViewById(R.id.car_setup_wizard_layout);
+        assertThat(layout.getLayoutDirection()).isEqualTo(View.LAYOUT_DIRECTION_LTR);
+
+        View buttonContainer = activity.findViewById(R.id.button_container);
+        assertThat(buttonContainer.getLayoutDirection()).isEqualTo(View.LAYOUT_DIRECTION_LTR);
+    }
+
+    @Test
+    @Config(qualifiers = "iw-w1760dp-land")
+    public void test_layoutDirectionIsLtrInUltraWide_isRtrLocale() {
+        Activity activity = Robolectric.buildActivity(CarSetupWizardLayoutTestActivity.class)
+                .create()
+                .get();
+
+        View layout = activity.findViewById(R.id.car_setup_wizard_layout);
+        assertThat(layout.getLayoutDirection()).isEqualTo(View.LAYOUT_DIRECTION_LTR);
+
+        View buttonContainer = activity.findViewById(R.id.button_container);
+        assertThat(buttonContainer.getLayoutDirection()).isEqualTo(View.LAYOUT_DIRECTION_LTR);
     }
 
     private List<ResourceEntry> prepareCustomContentWidth() {

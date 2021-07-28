@@ -284,6 +284,19 @@ class CarSetupWizardBaseLayout extends LinearLayout implements CarSetupWizardLay
         if (isSplitNavLayoutUsed() && getResources().getConfiguration().orientation
                 == Configuration.ORIENTATION_LANDSCAPE) {
             setOrientation(LinearLayout.HORIZONTAL);
+            // The vertical bar will not be mirrored in RTL
+            setLayoutDirection(View.LAYOUT_DIRECTION_LTR);
+
+            View contentContainer = getContentContainer();
+            if (contentContainer != null) {
+                // The content should be mirrored in RTL
+                contentContainer.setLayoutDirection(View.LAYOUT_DIRECTION_LOCALE);
+            }
+            View actionBar = findViewById(R.id.button_container);
+            if (actionBar != null) {
+                // The action bar will not be mirrored in RTL
+                actionBar.setLayoutDirection(View.LAYOUT_DIRECTION_LTR);
+            }
         } else {
             setOrientation(LinearLayout.VERTICAL);
         }
@@ -957,5 +970,15 @@ class CarSetupWizardBaseLayout extends LinearLayout implements CarSetupWizardLay
             View filler = findViewById(R.id.ultra_wide_space_filler);
             filler.setLayoutParams(fillerParams);
         }
+    }
+
+    private View getContentContainer() {
+        View contentContainer = findViewById(R.id.content_container);
+        if (contentContainer == null) {
+            // Try ultra-wide container
+            return findViewById(R.id.ultra_wide_content_container);
+
+        }
+        return contentContainer;
     }
 }
