@@ -26,6 +26,7 @@ import java.lang.annotation.RetentionPolicy;
         PartnerConfigKey.KEY_IMMERSIVE_MODE,
         PartnerConfigKey.KEY_TOOLBAR_BG_COLOR,
         PartnerConfigKey.KEY_TOOLBAR_BUTTON_ICON_BACK,
+        PartnerConfigKey.KEY_TOOLBAR_BUTTON_ICON_CLOSE,
         PartnerConfigKey.KEY_TOOLBAR_NAV_BUTTON_MIRRORING_IN_RTL,
         PartnerConfigKey.KEY_TOOLBAR_BUTTON_FONT_FAMILY,
         PartnerConfigKey.KEY_TOOLBAR_BUTTON_PADDING_HORIZONTAL,
@@ -54,6 +55,8 @@ public @interface PartnerConfigKey {
     String KEY_TOOLBAR_BG_COLOR = "suw_compat_toolbar_bg_color";
 
     String KEY_TOOLBAR_BUTTON_ICON_BACK = "suw_compat_toolbar_button_icon_back";
+
+    String KEY_TOOLBAR_BUTTON_ICON_CLOSE = "suw_compat_toolbar_button_icon_close";
 
     String KEY_TOOLBAR_NAV_BUTTON_MIRRORING_IN_RTL =
             "suw_compat_toolbar_nav_button_mirroring_in_rtl";
