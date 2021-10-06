@@ -27,7 +27,9 @@ import androidx.annotation.NonNull;
 import java.util.HashMap;
 import java.util.Map;
 
-/** A class to resolve feature enablement and versions */
+/**
+ * A class to resolve feature enablement and versions
+ */
 public class FeatureResolver {
 
     private static final String TAG = FeatureResolver.class.getSimpleName();
@@ -36,6 +38,7 @@ public class FeatureResolver {
     static final String AUTHORITY =
             CarSetupWizardUiUtils.SETUP_WIZARD_PACKAGE + ".feature_management";
     static final String GET_FEATURE_VERSION_METHOD = "getFeatureVersion";
+    static final String GET_FEATURE_ENABLEMENT_METHOD = "getFeatureEnablement";
     static final String SPLIT_NAV_LAYOUT_FEATURE = "split_nav_layout";
     static final String VALUE = "value";
 
@@ -43,7 +46,9 @@ public class FeatureResolver {
 
     private Map<String, Bundle> mResultMap = new HashMap<>();
 
-    /** Factory method to get an instance */
+    /**
+     * Factory method to get an instance
+     */
     public static FeatureResolver get(@NonNull Context context) {
         if (sInstance == null) {
             synchronized (FeatureResolver.class) {
@@ -55,30 +60,54 @@ public class FeatureResolver {
         return sInstance;
     }
 
-    /** Returns whether the alternative layout feature is enabled */
+    /**
+     * Returns whether the alternative layout feature is enabled
+     */
     public boolean isSplitNavLayoutFeatureEnabled() {
         Bundle bundle;
-        if (mResultMap.containsKey(SPLIT_NAV_LAYOUT_FEATURE)) {
-            bundle = mResultMap.get(SPLIT_NAV_LAYOUT_FEATURE);
+        String bundleKey = SPLIT_NAV_LAYOUT_FEATURE.concat(GET_FEATURE_ENABLEMENT_METHOD);
+        if (mResultMap.containsKey(bundleKey)) {
+            bundle = mResultMap.get(bundleKey);
         } else {
-            bundle = getFeatureBundle(SPLIT_NAV_LAYOUT_FEATURE);
-            mResultMap.put(SPLIT_NAV_LAYOUT_FEATURE, bundle);
+            bundle = getFeatureBundle(SPLIT_NAV_LAYOUT_FEATURE, GET_FEATURE_ENABLEMENT_METHOD);
+            mResultMap.put(bundleKey, bundle);
         }
-
-        return bundle != null && bundle.getBoolean(VALUE, false);
+        boolean isSplitNavLayoutFeatureEnabled = bundle != null
+                && bundle.getBoolean(VALUE, false);
+        Log.v(TAG, String.format("isSplitNavLayoutEnabled: %s", isSplitNavLayoutFeatureEnabled));
+        return isSplitNavLayoutFeatureEnabled;
     }
 
-    private Bundle getFeatureBundle(String feature) {
+    /**
+     * Returns the enabled version number of split-nav layout
+     */
+    public int getSplitNavLayoutFeatureVersion() {
+        Bundle bundle;
+        String bundleKey = SPLIT_NAV_LAYOUT_FEATURE.concat(GET_FEATURE_VERSION_METHOD);
+        if (mResultMap.containsKey(bundleKey)) {
+            bundle = mResultMap.get(bundleKey);
+        } else {
+            bundle = getFeatureBundle(SPLIT_NAV_LAYOUT_FEATURE, GET_FEATURE_VERSION_METHOD);
+            mResultMap.put(bundleKey, bundle);
+        }
+
+        int splitNavLayoutFeatureVersion = bundle != null
+                ? bundle.getInt(VALUE, 0) : 0;
+        Log.v(TAG, String.format("splitNavLayoutFeatureVersion: %s", splitNavLayoutFeatureVersion));
+        return splitNavLayoutFeatureVersion;
+    }
+
+    private Bundle getFeatureBundle(String feature, String method) {
         try {
             Uri contentUri =
                     new Uri.Builder()
-                    .scheme(ContentResolver.SCHEME_CONTENT)
-                    .authority(AUTHORITY)
-                    .appendPath(GET_FEATURE_VERSION_METHOD)
-                    .build();
+                            .scheme(ContentResolver.SCHEME_CONTENT)
+                            .authority(AUTHORITY)
+                            .appendPath(method)
+                            .build();
             return mContext.getContentResolver().call(
                     contentUri,
-                    GET_FEATURE_VERSION_METHOD,
+                    method,
                     feature,
                     /* extras= */ null);
         } catch (IllegalArgumentException exception) {
