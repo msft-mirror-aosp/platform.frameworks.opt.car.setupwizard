@@ -86,14 +86,14 @@ public class PartnerSummaryActionsCollector {
         ResolveInfo resolveInfo = getSummaryContentProviderResolveInfo(context.getPackageManager());
 
         if (resolveInfo == null) {
-            Log.e(TAG, "Could not find partner content provider, ignoring partner summary items.");
+            Log.i(TAG, "Could not find partner content provider, ignoring partner summary items.");
             return;
         }
 
         mContentProviderUri = getSummaryContentProviderUri(resolveInfo);
 
         if (mContentProviderUri == null) {
-            Log.e(TAG, "Could not fetch content provider URI, ignoring partner summary items.");
+            Log.i(TAG, "Could not fetch content provider URI, ignoring partner summary items.");
         }
     }
 

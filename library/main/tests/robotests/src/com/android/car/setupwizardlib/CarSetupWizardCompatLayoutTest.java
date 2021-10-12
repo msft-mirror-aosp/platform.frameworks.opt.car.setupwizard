@@ -104,8 +104,22 @@ public class CarSetupWizardCompatLayoutTest extends BaseRobolectricTest {
     }
 
     /**
+     * Test that {@link CarSetupWizardCompatLayout#setCloseButtonListener} does set the close button
+     * listener.
+     */
+    @Test
+    public void testSetCloseButtonListener() {
+        View.OnClickListener spyListener = TestHelper.createSpyListener();
+
+        mCarSetupWizardCompatLayout.setCloseButtonListener(spyListener);
+        mCarSetupWizardCompatLayout.getCloseButton().performClick();
+        Mockito.verify(spyListener).onClick(mCarSetupWizardCompatLayout.getCloseButton());
+    }
+
+    /**
      * Test that {@link CarSetupWizardCompatLayout#setBackButtonVisible} does set the view
-     * visible/not visible and calls updateBackButtonTouchDelegate.
+     * visible/not visible and calls
+     * {@link CarSetupWizardDesignLayout#updateNavigationButtonTouchDelegate(View, boolean)}.
      */
     @Test
     public void testSetBackButtonVisibleTrue() {
@@ -115,12 +129,18 @@ public class CarSetupWizardCompatLayoutTest extends BaseRobolectricTest {
         spyCarSetupWizardCompatLayout.setBackButtonVisible(true);
         View backButton = spyCarSetupWizardCompatLayout.getBackButton();
         TestHelper.assertViewVisible(backButton);
-        Mockito.verify(spyCarSetupWizardCompatLayout).updateBackButtonTouchDelegate(true);
+        Mockito.verify(spyCarSetupWizardCompatLayout)
+                .updateNavigationButtonTouchDelegate(backButton, true);
+        View closeButton = spyCarSetupWizardCompatLayout.getCloseButton();
+        TestHelper.assertViewNotVisible(closeButton);
+        Mockito.verify(spyCarSetupWizardCompatLayout)
+                .updateNavigationButtonTouchDelegate(closeButton, false);
     }
 
     /**
      * Test that {@link CarSetupWizardCompatLayout#setBackButtonVisible} does set the view
-     * visible/not visible and calls updateBackButtonTouchDelegate.
+     * visible/not visible and calls
+     * {@link CarSetupWizardDesignLayout#updateNavigationButtonTouchDelegate(View, boolean)}.
      */
     @Test
     public void testSetBackButtonVisibleFalse() {
@@ -130,7 +150,47 @@ public class CarSetupWizardCompatLayoutTest extends BaseRobolectricTest {
         spyCarSetupWizardCompatLayout.setBackButtonVisible(false);
         View backButton = spyCarSetupWizardCompatLayout.getBackButton();
         TestHelper.assertViewNotVisible(backButton);
-        Mockito.verify(spyCarSetupWizardCompatLayout).updateBackButtonTouchDelegate(false);
+        Mockito.verify(spyCarSetupWizardCompatLayout)
+                .updateNavigationButtonTouchDelegate(backButton, false);
+    }
+
+    /**
+     * Test that {@link CarSetupWizardCompatLayout#setCloseButtonVisible} does set the view
+     * visible/not visible and calls
+     * {@link CarSetupWizardDesignLayout#updateNavigationButtonTouchDelegate(View, boolean)}.
+     */
+    @Test
+    public void testSetCloseButtonVisibleTrue() {
+        CarSetupWizardCompatLayout spyCarSetupWizardCompatLayout =
+                Mockito.spy(mCarSetupWizardCompatLayout);
+
+        spyCarSetupWizardCompatLayout.setCloseButtonVisible(true);
+        View closeButton = spyCarSetupWizardCompatLayout.getCloseButton();
+        TestHelper.assertViewVisible(closeButton);
+        Mockito.verify(spyCarSetupWizardCompatLayout)
+                .updateNavigationButtonTouchDelegate(closeButton, true);
+        View backButton = spyCarSetupWizardCompatLayout.getBackButton();
+        TestHelper.assertViewNotVisible(backButton);
+        Mockito.verify(spyCarSetupWizardCompatLayout)
+                .updateNavigationButtonTouchDelegate(backButton, false);
+    }
+
+
+    /**
+     * Test that {@link CarSetupWizardCompatLayout#setCloseButtonVisible} does set the view
+     * visible/not visible and calls
+     * {@link CarSetupWizardDesignLayout#updateNavigationButtonTouchDelegate(View, boolean)}.
+     */
+    @Test
+    public void testSetCloseButtonVisibleFalse() {
+        CarSetupWizardCompatLayout spyCarSetupWizardCompatLayout =
+                Mockito.spy(mCarSetupWizardCompatLayout);
+
+        spyCarSetupWizardCompatLayout.setCloseButtonVisible(false);
+        View closeButton = spyCarSetupWizardCompatLayout.getCloseButton();
+        TestHelper.assertViewNotVisible(closeButton);
+        Mockito.verify(spyCarSetupWizardCompatLayout)
+                .updateNavigationButtonTouchDelegate(closeButton, false);
     }
 
     /**

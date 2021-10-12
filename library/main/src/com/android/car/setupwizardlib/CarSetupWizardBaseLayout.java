@@ -63,6 +63,7 @@ class CarSetupWizardBaseLayout extends LinearLayout {
     private static final float IMAGE_MIRROR_ROTATION = 180.0f;
 
     private View mBackButton;
+    private View mCloseButton;
     private View mTitleBar;
     private TextView mToolbarTitle;
     private PartnerConfigHelper mPartnerConfigHelper;
@@ -120,6 +121,7 @@ class CarSetupWizardBaseLayout extends LinearLayout {
      */
     private void init(TypedArray attrArray) {
         boolean showBackButton;
+        boolean showCloseButton;
 
         boolean showToolbarTitle;
         String toolbarTitleText;
@@ -138,6 +140,8 @@ class CarSetupWizardBaseLayout extends LinearLayout {
         try {
             showBackButton = attrArray.getBoolean(
                     R.styleable.CarSetupWizardBaseLayout_showBackButton, true);
+            showCloseButton = attrArray.getBoolean(
+                    R.styleable.CarSetupWizardBaseLayout_showCloseButton, false);
             showToolbarTitle = attrArray.getBoolean(
                     R.styleable.CarSetupWizardBaseLayout_showToolbarTitle, false);
             toolbarTitleText = attrArray.getString(
@@ -171,18 +175,34 @@ class CarSetupWizardBaseLayout extends LinearLayout {
         toolbar.setLayoutDirection(View.LAYOUT_DIRECTION_LTR);
 
         setBackButton(findViewById(R.id.back_button));
+        setCloseButton(findViewById(R.id.close_button));
+
         Drawable drawable = mPartnerConfigHelper.getDrawable(
                 getContext(), PartnerConfig.CONFIG_TOOLBAR_BUTTON_ICON_BACK);
         if (drawable != null) {
             ((ImageView) mBackButton).setImageDrawable(drawable);
         }
 
+        Drawable closeButtonDrawable = mPartnerConfigHelper.getDrawable(
+                getContext(), PartnerConfig.CONFIG_TOOLBAR_BUTTON_ICON_CLOSE);
+        if (closeButtonDrawable != null) {
+            ((ImageView) mCloseButton).setImageDrawable(closeButtonDrawable);
+        }
+
         if (shouldMirrorNavIcons()) {
             Log.v(TAG, "Mirroring navigation icons");
             mBackButton.setRotation(IMAGE_MIRROR_ROTATION);
+            mCloseButton.setRotation(IMAGE_MIRROR_ROTATION);
         }
 
+        if (showBackButton && showCloseButton) {
+            Log.w(TAG, "Showing Back and Close button simultaneously is not supported");
+        }
+
+        // Set the back button visibility based on the custom attribute.
         setBackButtonVisible(showBackButton);
+        // Set the close button visibility based on the custom attribute.
+        setCloseButtonVisible(showCloseButton);
 
         // Se the title bar.
         setTitleBar(findViewById(R.id.application_bar));
@@ -252,19 +272,25 @@ class CarSetupWizardBaseLayout extends LinearLayout {
      */
     @VisibleForTesting
     void setViewVisible(View view, boolean visible) {
+        if (view == null) {
+            return;
+        }
         view.setVisibility(visible ? View.VISIBLE : View.GONE);
     }
 
     // Add or remove the back button touch delegate depending on whether it is visible.
     @VisibleForTesting
-    void updateBackButtonTouchDelegate(boolean visible) {
+    void updateNavigationButtonTouchDelegate(View button, boolean visible) {
+        if (button == null) {
+            return;
+        }
         if (visible) {
             // Post this action in the parent's message queue to make sure the parent
             // lays out its children before getHitRect() is called
             this.post(() -> {
                 Rect delegateArea = new Rect();
 
-                mBackButton.getHitRect(delegateArea);
+                button.getHitRect(delegateArea);
 
                 /*
                  * Update the delegate area based on the difference between the current size and
@@ -283,17 +309,16 @@ class CarSetupWizardBaseLayout extends LinearLayout {
                 delegateArea.top -= sizeDifference;
 
                 // Set the TouchDelegate on the parent view
-                TouchDelegate touchDelegate = new TouchDelegate(delegateArea,
-                        mBackButton);
+                TouchDelegate touchDelegate = new TouchDelegate(delegateArea, button);
 
-                if (View.class.isInstance(mBackButton.getParent())) {
-                    ((View) mBackButton.getParent()).setTouchDelegate(touchDelegate);
+                if (View.class.isInstance(button.getParent())) {
+                    ((View) button.getParent()).setTouchDelegate(touchDelegate);
                 }
             });
         } else {
             // Set the TouchDelegate to null if the back button is not visible.
-            if (View.class.isInstance(mBackButton.getParent())) {
-                ((View) mBackButton.getParent()).setTouchDelegate(null);
+            if (View.class.isInstance(button.getParent())) {
+                ((View) button.getParent()).setTouchDelegate(null);
             }
         }
     }
@@ -322,8 +347,41 @@ class CarSetupWizardBaseLayout extends LinearLayout {
      * Set the back button visibility to the given visibility.
      */
     public void setBackButtonVisible(boolean visible) {
+        if (visible) {
+            setViewVisible(mCloseButton, false);
+            updateNavigationButtonTouchDelegate(mCloseButton, false);
+        }
         setViewVisible(mBackButton, visible);
-        updateBackButtonTouchDelegate(visible);
+        updateNavigationButtonTouchDelegate(mBackButton, visible);
+    }
+
+    public View getCloseButton() {
+        return mCloseButton;
+    }
+
+    @VisibleForTesting
+    final void setCloseButton(View closeButton) {
+        mCloseButton = closeButton;
+    }
+
+    /**
+     * Set the close button onClickListener to given listener. Can be null if the listener should
+     * be overridden so no callback is made.
+     */
+    public void setCloseButtonListener(@Nullable View.OnClickListener listener) {
+        mCloseButton.setOnClickListener(listener);
+    }
+
+    /**
+     * Set the back button visibility to the given visibility.
+     */
+    public void setCloseButtonVisible(boolean visible) {
+        if (visible) {
+            setViewVisible(mBackButton, false);
+            updateNavigationButtonTouchDelegate(mBackButton, false);
+        }
+        setViewVisible(mCloseButton, visible);
+        updateNavigationButtonTouchDelegate(mCloseButton, visible);
     }
 
     /**
