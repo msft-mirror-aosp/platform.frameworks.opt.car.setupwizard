@@ -21,6 +21,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.ViewStub;
 
 import androidx.annotation.CallSuper;
 import androidx.annotation.LayoutRes;
@@ -49,6 +50,8 @@ import com.android.car.setupwizardlib.util.CarWizardManagerHelper;
  * component attributes
  */
 abstract class BaseSetupWizardActivity extends FragmentActivity {
+    private static final String TAG = BaseSetupWizardActivity.class.getSimpleName();
+
     @VisibleForTesting
     static final String CONTENT_FRAGMENT_TAG = "CONTENT_FRAGMENT_TAG";
     /**
@@ -94,7 +97,7 @@ abstract class BaseSetupWizardActivity extends FragmentActivity {
 
         mCarSetupWizardLayout.setBackButtonListener(v -> handleBackButtonEvent());
 
-        mCarSetupWizardLayout.setCloseButtonListener(v-> handleCloseButton());
+        mCarSetupWizardLayout.setCloseButtonListener(v -> handleCloseButton());
 
         resetPrimaryToolbarButtonOnClickListener();
         resetSecondaryToolbarButtonOnClickListener();
@@ -174,7 +177,7 @@ abstract class BaseSetupWizardActivity extends FragmentActivity {
     protected void setContentFragmentWithBackstack(Fragment fragment) {
         if (mAllowFragmentCommits) {
             getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.car_setup_wizard_layout, fragment, CONTENT_FRAGMENT_TAG)
+                    .replace(getFragmentContainerViewId(), fragment, CONTENT_FRAGMENT_TAG)
                     .addToBackStack(null)
                     .commit();
             getSupportFragmentManager().executePendingTransactions();
@@ -202,7 +205,7 @@ abstract class BaseSetupWizardActivity extends FragmentActivity {
                             android.R.animator.fade_out,
                             android.R.animator.fade_in,
                             android.R.animator.fade_out)
-                    .replace(R.id.car_setup_wizard_layout, fragment, CONTENT_FRAGMENT_TAG)
+                    .replace(getFragmentContainerViewId(), fragment, CONTENT_FRAGMENT_TAG)
                     .commitNow();
             onContentFragmentSet(getContentFragment());
         }
@@ -527,6 +530,21 @@ abstract class BaseSetupWizardActivity extends FragmentActivity {
         } else {
             startActivity(nextIntent);
         }
+    }
+
+    @VisibleForTesting
+    int getFragmentContainerViewId() {
+        if (isSplitNavLayoutSupported()) {
+            ViewStub viewStub = findViewById(R.id.layout_content_stub);
+            viewStub.setLayoutResource(R.layout.empty_fragment_frame_layout);
+            viewStub.inflate();
+            Log.v(TAG, "fragmentContainerViewId: "
+                    + getResources().getResourceEntryName(R.id.empty_fragment_frame_layout));
+            return R.id.empty_fragment_frame_layout;
+        }
+        Log.v(TAG, "fragmentContainerViewId: "
+                + getResources().getResourceEntryName(R.id.car_setup_wizard_layout));
+        return R.id.car_setup_wizard_layout;
     }
 
     @VisibleForTesting
