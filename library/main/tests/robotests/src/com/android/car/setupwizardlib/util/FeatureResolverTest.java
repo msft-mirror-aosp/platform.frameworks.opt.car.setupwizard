@@ -104,32 +104,32 @@ public class FeatureResolverTest extends BaseRobolectricTest {
     }
 
     @Test
-    public void testGetSplitNavLayoutFeatureVersion_whenVersionNumber1() {
+    public void testGetGModalVersion_whenVersionNumber1() {
         Bundle bundle = new Bundle();
         bundle.putInt(VALUE, 1);
         doReturn(bundle).when(mContentResolver).call((Uri) any(), any(), any(), any());
 
-        int splitNavLayoutFeatureVersion = mFeatureResolver.getSplitNavLayoutFeatureVersion();
+        int splitNavLayoutFeatureVersion = mFeatureResolver.getGModalVersion();
 
         assertThat(splitNavLayoutFeatureVersion).isEqualTo(1);
     }
 
     @Test
-    public void testGetSplitNavLayoutFeatureVersion_whenVersionNumber0() {
+    public void testGModalVersion_whenVersionNumber0() {
         Bundle bundle = new Bundle();
         bundle.putInt(VALUE, 0);
         doReturn(bundle).when(mContentResolver).call((Uri) any(), any(), any(), any());
 
-        int splitNavLayoutFeatureVersion = mFeatureResolver.getSplitNavLayoutFeatureVersion();
+        int splitNavLayoutFeatureVersion = mFeatureResolver.getGModalVersion();
 
         assertThat(splitNavLayoutFeatureVersion).isEqualTo(0);
     }
 
     @Test
-    public void testGetSplitNavLayoutFeatureVersion_whenReturnsBundleNull() {
+    public void testGetGModalVersion_whenReturnsBundleNull() {
         doReturn(null).when(mContentResolver).call((Uri) any(), any(), any(), any());
 
-        int splitNavLayoutFeatureVersion = mFeatureResolver.getSplitNavLayoutFeatureVersion();
+        int splitNavLayoutFeatureVersion = mFeatureResolver.getGModalVersion();
 
         assertThat(splitNavLayoutFeatureVersion).isEqualTo(0);
     }
