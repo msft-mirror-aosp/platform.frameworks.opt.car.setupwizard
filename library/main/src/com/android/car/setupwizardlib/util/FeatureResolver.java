@@ -38,8 +38,8 @@ public class FeatureResolver {
     static final String AUTHORITY =
             CarSetupWizardUiUtils.SETUP_WIZARD_PACKAGE + ".feature_management";
     static final String GET_FEATURE_VERSION_METHOD = "getFeatureVersion";
-    static final String GET_FEATURE_ENABLEMENT_METHOD = "getFeatureEnablement";
     static final String SPLIT_NAV_LAYOUT_FEATURE = "split_nav_layout";
+    static final String G_MODAL_FEATURE = "g_modal";
     static final String VALUE = "value";
 
     private Context mContext;
@@ -65,12 +65,11 @@ public class FeatureResolver {
      */
     public boolean isSplitNavLayoutFeatureEnabled() {
         Bundle bundle;
-        String bundleKey = SPLIT_NAV_LAYOUT_FEATURE.concat(GET_FEATURE_ENABLEMENT_METHOD);
-        if (mResultMap.containsKey(bundleKey)) {
-            bundle = mResultMap.get(bundleKey);
+        if (mResultMap.containsKey(SPLIT_NAV_LAYOUT_FEATURE)) {
+            bundle = mResultMap.get(SPLIT_NAV_LAYOUT_FEATURE);
         } else {
-            bundle = getFeatureBundle(SPLIT_NAV_LAYOUT_FEATURE, GET_FEATURE_ENABLEMENT_METHOD);
-            mResultMap.put(bundleKey, bundle);
+            bundle = getFeatureBundle(SPLIT_NAV_LAYOUT_FEATURE);
+            mResultMap.put(SPLIT_NAV_LAYOUT_FEATURE, bundle);
         }
         boolean isSplitNavLayoutFeatureEnabled = bundle != null
                 && bundle.getBoolean(VALUE, false);
@@ -79,35 +78,33 @@ public class FeatureResolver {
     }
 
     /**
-     * Returns the enabled version number of split-nav layout
+     * Returns the gModalVersion
      */
-    public int getSplitNavLayoutFeatureVersion() {
+    public int getGModalVersion() {
         Bundle bundle;
-        String bundleKey = SPLIT_NAV_LAYOUT_FEATURE.concat(GET_FEATURE_VERSION_METHOD);
-        if (mResultMap.containsKey(bundleKey)) {
-            bundle = mResultMap.get(bundleKey);
+        if (mResultMap.containsKey(G_MODAL_FEATURE)) {
+            bundle = mResultMap.get(G_MODAL_FEATURE);
         } else {
-            bundle = getFeatureBundle(SPLIT_NAV_LAYOUT_FEATURE, GET_FEATURE_VERSION_METHOD);
-            mResultMap.put(bundleKey, bundle);
+            bundle = getFeatureBundle(G_MODAL_FEATURE);
+            mResultMap.put(G_MODAL_FEATURE, bundle);
         }
 
-        int splitNavLayoutFeatureVersion = bundle != null
-                ? bundle.getInt(VALUE, 0) : 0;
-        Log.v(TAG, String.format("splitNavLayoutFeatureVersion: %s", splitNavLayoutFeatureVersion));
-        return splitNavLayoutFeatureVersion;
+        int gModalVersion = bundle != null ? bundle.getInt(VALUE, 0) : 0;
+        Log.v(TAG, String.format("gModalVersion: %s", gModalVersion));
+        return gModalVersion;
     }
 
-    private Bundle getFeatureBundle(String feature, String method) {
+    private Bundle getFeatureBundle(String feature) {
         try {
             Uri contentUri =
                     new Uri.Builder()
                             .scheme(ContentResolver.SCHEME_CONTENT)
                             .authority(AUTHORITY)
-                            .appendPath(method)
+                            .appendPath(GET_FEATURE_VERSION_METHOD)
                             .build();
             return mContext.getContentResolver().call(
                     contentUri,
-                    method,
+                    GET_FEATURE_VERSION_METHOD,
                     feature,
                     /* extras= */ null);
         } catch (IllegalArgumentException exception) {
