@@ -100,7 +100,7 @@ class CarSetupWizardBaseLayout extends LinearLayout implements CarSetupWizardLay
     }
 
     CarSetupWizardBaseLayout(Context context, @Nullable AttributeSet attrs,
-            int defStyleAttr) {
+                             int defStyleAttr) {
         this(context, attrs, defStyleAttr, 0);
     }
 
@@ -109,7 +109,7 @@ class CarSetupWizardBaseLayout extends LinearLayout implements CarSetupWizardLay
      * the custom views that can be set by the user (e.g. back button, continue button).
      */
     CarSetupWizardBaseLayout(Context context, @Nullable AttributeSet attrs,
-            int defStyleAttr, int defStyleRes) {
+                             int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
 
         mPartnerConfigHelper = PartnerConfigHelper.get(context);
@@ -435,6 +435,9 @@ class CarSetupWizardBaseLayout extends LinearLayout implements CarSetupWizardLay
      * Sets the header title visibility to given value.
      */
     public void setToolbarTitleVisible(boolean visible) {
+        if (mToolbarTitle == null) {
+            return;
+        }
         setViewVisible(mToolbarTitle, visible);
     }
 
@@ -442,6 +445,9 @@ class CarSetupWizardBaseLayout extends LinearLayout implements CarSetupWizardLay
      * Sets the header title text to the provided text.
      */
     public void setToolbarTitleText(String text) {
+        if (mToolbarTitle == null) {
+            return;
+        }
         mToolbarTitle.setText(text);
     }
 
@@ -449,6 +455,9 @@ class CarSetupWizardBaseLayout extends LinearLayout implements CarSetupWizardLay
      * Sets the style for the toolbar title.
      */
     public void setToolbarTitleStyle(@StyleRes int style) {
+        if (mToolbarTitle == null) {
+            return;
+        }
         mToolbarTitle.setTextAppearance(style);
     }
 
@@ -688,7 +697,9 @@ class CarSetupWizardBaseLayout extends LinearLayout implements CarSetupWizardLay
         return findViewById(R.id.layout_content_stub);
     }
 
-    /** Returns the content ViewStub when split-nav layout is used or rotary control is supported */
+    /**
+     * Returns the content ViewStub when split-nav layout is used or rotary control is supported
+     */
     public ViewStub getContentViewStub() {
         return findViewById(R.id.layout_content_stub);
     }
@@ -702,8 +713,10 @@ class CarSetupWizardBaseLayout extends LinearLayout implements CarSetupWizardLay
         }
         int direction = TextUtils.getLayoutDirectionFromLocale(locale);
 
-        mToolbarTitle.setTextLocale(locale);
-        mToolbarTitle.setLayoutDirection(direction);
+        if (mToolbarTitle != null) {
+            mToolbarTitle.setTextLocale(locale);
+            mToolbarTitle.setLayoutDirection(direction);
+        }
 
         mPrimaryToolbarButton.setTextLocale(locale);
         mPrimaryToolbarButton.setLayoutDirection(direction);
@@ -755,7 +768,9 @@ class CarSetupWizardBaseLayout extends LinearLayout implements CarSetupWizardLay
         }
     }
 
-    /** Sets button text color using partner overlay if exists */
+    /**
+     * Sets button text color using partner overlay if exists
+     */
     @VisibleForTesting
     void setButtonTextColor(TextView button, PartnerConfig config) {
         ColorStateList colorStateList =
@@ -783,7 +798,9 @@ class CarSetupWizardBaseLayout extends LinearLayout implements CarSetupWizardLay
         }
     }
 
-    /** Sets button background color using partner overlay if exists */
+    /**
+     * Sets button background color using partner overlay if exists
+     */
     @VisibleForTesting
     void setBackgroundColor(View button, PartnerConfig config) {
         ColorStateList color = mPartnerConfigHelper.getColorStateList(getContext(), config);
@@ -792,7 +809,9 @@ class CarSetupWizardBaseLayout extends LinearLayout implements CarSetupWizardLay
         }
     }
 
-    /** Sets button text size using partner overlay if exists */
+    /**
+     * Sets button text size using partner overlay if exists
+     */
     @VisibleForTesting
     void setButtonTextSize(TextView button) {
         float dimension = mPartnerConfigHelper.getDimension(
@@ -807,10 +826,12 @@ class CarSetupWizardBaseLayout extends LinearLayout implements CarSetupWizardLay
     boolean shouldMirrorNavIcons() {
         return getResources().getConfiguration().getLayoutDirection() == View.LAYOUT_DIRECTION_RTL
                 && mPartnerConfigHelper.getBoolean(
-                        getContext(), PartnerConfig.CONFIG_TOOLBAR_NAV_ICON_MIRRORING_IN_RTL, true);
+                getContext(), PartnerConfig.CONFIG_TOOLBAR_NAV_ICON_MIRRORING_IN_RTL, true);
     }
 
-    /** Sets button type face with partner overlay if exists */
+    /**
+     * Sets button type face with partner overlay if exists
+     */
     private void setButtonTypeFace(TextView button) {
         String fontFamily = mPartnerConfigHelper.getString(
                 getContext(),
@@ -828,7 +849,9 @@ class CarSetupWizardBaseLayout extends LinearLayout implements CarSetupWizardLay
         button.setTypeface(typeface);
     }
 
-    /** Sets button radius using partner overlay if exists */
+    /**
+     * Sets button radius using partner overlay if exists
+     */
     private void setButtonRadius(Button button) {
         float radius = mPartnerConfigHelper.getDimension(
                 getContext(),
