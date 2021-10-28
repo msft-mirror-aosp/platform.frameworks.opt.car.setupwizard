@@ -24,6 +24,7 @@ import android.app.Activity;
 import android.content.res.ColorStateList;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -240,6 +241,38 @@ public class CarSetupWizardCompatLayoutTest extends BaseRobolectricTest {
         ShadowTextView shadowTextView =
                 Shadows.shadowOf(mCarSetupWizardCompatLayout.getToolbarTitle());
         assertThat(shadowTextView.getTextAppearanceId()).isEqualTo(newStyle);
+    }
+
+    /**
+     * Test that any call to setToolbarTitle calls toolbar's setText when split-nav is enabled.
+     */
+    @Test
+    public void testSetToolbarTitleWhenSplitNavEnabled() {
+        CarSetupWizardCompatLayout spyCarSetupWizardCompatLayout =
+                Mockito.spy(mCarSetupWizardCompatLayout);
+        TextView spyToolbar = Mockito.spy(mCarSetupWizardCompatLayout.getToolbarTitle());
+        spyCarSetupWizardCompatLayout.setToolbarTitle(null);
+
+        spyCarSetupWizardCompatLayout.setToolbarTitleText("test title");
+
+        Mockito.verify(spyToolbar, Mockito.never()).setText("test title");
+    }
+
+    /**
+     * Test that any call to setToolbarTitleStyle calls toolbar's setTextAppearance when split-nav
+     * is enabled.
+     */
+    @Test
+    public void testSetToolbarStyleWhenSplitNavEnabled() {
+        @StyleRes int newStyle = R.style.TextAppearance_Car_Body2;
+        CarSetupWizardCompatLayout spyCarSetupWizardCompatLayout =
+                Mockito.spy(mCarSetupWizardCompatLayout);
+        TextView spyToolbar = Mockito.spy(mCarSetupWizardCompatLayout.getToolbarTitle());
+        spyCarSetupWizardCompatLayout.setToolbarTitle(null);
+
+        spyCarSetupWizardCompatLayout.setToolbarTitleStyle(newStyle);
+
+        Mockito.verify(spyToolbar, Mockito.never()).setTextAppearance(newStyle);
     }
 
     /**
@@ -477,6 +510,20 @@ public class CarSetupWizardCompatLayoutTest extends BaseRobolectricTest {
     }
 
     @Test
+    public void testApplyUpdatedLocaleWhenSplitNavEnabled() {
+        CarSetupWizardCompatLayout spyCarSetupWizardCompatLayout =
+                Mockito.spy(mCarSetupWizardCompatLayout);
+        TextView spyToolbar = Mockito.spy(mCarSetupWizardCompatLayout.getToolbarTitle());
+        spyCarSetupWizardCompatLayout.setToolbarTitle(null);
+
+        spyCarSetupWizardCompatLayout.applyLocale(LOCALE_EN_US);
+
+        Mockito.verify(spyToolbar, Mockito.never()).setTextLocale(LOCALE_EN_US);
+        Mockito.verify(spyToolbar, Mockito.never())
+                .setLayoutDirection(TextUtils.getLayoutDirectionFromLocale(LOCALE_EN_US));
+    }
+
+    @Test
     public void testGetBackButton() {
         assertThat(mCarSetupWizardLayoutInterface.getPrimaryActionButton()).isEqualTo(
                 mCarSetupWizardCompatLayout.findViewById(R.id.primary_toolbar_button));
@@ -515,8 +562,8 @@ public class CarSetupWizardCompatLayoutTest extends BaseRobolectricTest {
         // Verify primary button background
         Button primary = layout.getPrimaryActionButton();
         Drawable expected = application.getResources().getDrawable(R.drawable.button_ripple_bg);
-        assertThat(getDrawbleDefaultColor(primary.getBackground()))
-                .isEqualTo(getDrawbleDefaultColor(expected));
+        assertThat(getDrawableDefaultColor(primary.getBackground()))
+                .isEqualTo(getDrawableDefaultColor(expected));
 
         // Verify primary button text size
         assertThat(primary.getTextSize())
@@ -572,8 +619,8 @@ public class CarSetupWizardCompatLayoutTest extends BaseRobolectricTest {
                 PartnerConfig.CONFIG_TOOLBAR_SECONDARY_BUTTON_BG_COLOR);
 
         Drawable expected = application.getResources().getDrawable(R.drawable.button_ripple_bg);
-        assertThat(getDrawbleDefaultColor(secondary.getBackground()))
-                .isEqualTo(getDrawbleDefaultColor(expected));
+        assertThat(getDrawableDefaultColor(secondary.getBackground()))
+                .isEqualTo(getDrawableDefaultColor(expected));
     }
 
     @Test
@@ -637,7 +684,7 @@ public class CarSetupWizardCompatLayoutTest extends BaseRobolectricTest {
         return activity.findViewById(R.id.car_setup_wizard_layout);
     }
 
-    private @ColorRes int getDrawbleDefaultColor(Drawable drawable) {
+    private @ColorRes int getDrawableDefaultColor(Drawable drawable) {
         Drawable.ConstantState state = drawable.getConstantState();
         ColorStateList colorStateList = ReflectionHelpers.getField(state, "mColor");
         return colorStateList.getDefaultColor();
