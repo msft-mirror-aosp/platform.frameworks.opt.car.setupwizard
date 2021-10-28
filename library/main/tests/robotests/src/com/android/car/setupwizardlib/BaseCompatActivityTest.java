@@ -19,8 +19,10 @@ package com.android.car.setupwizardlib;
 import static com.google.common.truth.Truth.assertThat;
 
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import android.app.Activity;
 import android.car.Car;
@@ -28,7 +30,9 @@ import android.car.CarNotConnectedException;
 import android.car.drivingstate.CarUxRestrictions;
 import android.car.drivingstate.CarUxRestrictionsManager;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewStub;
 import android.widget.Button;
 import android.widget.ImageView;
 
@@ -297,9 +301,47 @@ public class BaseCompatActivityTest extends BaseRobolectricTest {
      */
     @Test
     public void testSetContentLayout() {
-        mBaseCompatActivity.setContentLayout(R.layout.base_activity_test_layout);
-        View contentLayout = mBaseCompatActivity.findViewById(R.id.content_layout);
+        BaseCompatActivity spyBaseCompatActivity = Mockito.spy(mBaseCompatActivity);
+
+        spyBaseCompatActivity.setContentLayout(R.layout.base_activity_test_layout);
+        View contentLayout = spyBaseCompatActivity.findViewById(R.id.content_layout);
+
         assertThat(contentLayout).isNotNull();
+    }
+
+    /**
+     * Test that {@link BaseSetupWizardActivity#setContentLayout(int)} adds the specified layout
+     * to the main content when layout_content_stub is null.
+     */
+    @Test
+    public void testSetContentLayoutWhenViewStubIsNull() {
+        BaseCompatActivity spyBaseCompatActivity = Mockito.spy(mBaseCompatActivity);
+        LayoutInflater mockLayoutInflater = mock(LayoutInflater.class);
+        when(spyBaseCompatActivity.findViewById(R.id.layout_content_stub)).thenReturn(null);
+        when(spyBaseCompatActivity.getLayoutInflater()).thenReturn(mockLayoutInflater);
+
+        spyBaseCompatActivity.setContentLayout(R.layout.base_activity_test_layout);
+
+        verify(mockLayoutInflater, times(1))
+                .inflate(R.layout.base_activity_test_layout,
+                        mBaseCompatActivity.getCarSetupWizardLayout());
+    }
+
+    /**
+     * Test that {@link BaseCompatActivity#setContentLayout(int)} adds the specified layout to
+     * the main content when layout_content_stub is not null.
+     */
+    @Test
+    public void testSetContentLayoutWhenViewStubNotNull() {
+        BaseCompatActivity spyBaseCompatActivity = Mockito.spy(mBaseCompatActivity);
+        ViewStub mockViewStub = mock(ViewStub.class);
+        when(spyBaseCompatActivity.findViewById(R.id.layout_content_stub)).thenReturn(mockViewStub);
+
+        spyBaseCompatActivity.setContentLayout(R.layout.base_activity_test_layout);
+
+        verify(mockViewStub, times(1))
+                .setLayoutResource(R.layout.base_activity_test_layout);
+        verify(mockViewStub, times(1)).inflate();
     }
 
     /**

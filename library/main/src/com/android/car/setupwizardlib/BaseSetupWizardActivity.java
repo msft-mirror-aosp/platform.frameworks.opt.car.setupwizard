@@ -242,6 +242,11 @@ abstract class BaseSetupWizardActivity extends FragmentActivity {
      */
     @CallSuper
     protected View setContentLayout(@LayoutRes int id) {
+        ViewStub viewStub = findViewById(R.id.layout_content_stub);
+        if (viewStub != null) {
+            viewStub.setLayoutResource(id);
+            return viewStub.inflate();
+        }
         return getLayoutInflater().inflate(id, mCarSetupWizardLayout);
     }
 
