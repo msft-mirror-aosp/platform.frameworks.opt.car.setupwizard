@@ -176,6 +176,7 @@ abstract class BaseSetupWizardActivity extends FragmentActivity {
     @CallSuper
     protected void setContentFragmentWithBackstack(Fragment fragment) {
         if (mAllowFragmentCommits) {
+            inflateEmptyFragmentFrameLayout();
             getSupportFragmentManager().beginTransaction()
                     .replace(getFragmentContainerViewId(), fragment, CONTENT_FRAGMENT_TAG)
                     .addToBackStack(null)
@@ -199,6 +200,7 @@ abstract class BaseSetupWizardActivity extends FragmentActivity {
     @CallSuper
     protected void setContentFragment(Fragment fragment) {
         if (mAllowFragmentCommits) {
+            inflateEmptyFragmentFrameLayout();
             getSupportFragmentManager().beginTransaction()
                     .setCustomAnimations(
                             android.R.animator.fade_in,
@@ -539,17 +541,26 @@ abstract class BaseSetupWizardActivity extends FragmentActivity {
 
     @VisibleForTesting
     int getFragmentContainerViewId() {
-        if (isSplitNavLayoutSupported()) {
-            ViewStub viewStub = findViewById(R.id.layout_content_stub);
+        // Check if the inflated frame layout is still available. Add the fragment to frame
+        // layout only if it's available. Otherwise, fall back to default layout to attach
+        // fragment. Note that frame layout might not be available if hosting activity inflated
+        // viewStub already with other views than before calling setFragmentContent().
+        View frameLayout = findViewById(R.id.empty_fragment_frame_layout);
+        int containerViewId = frameLayout == null ? R.id.car_setup_wizard_layout :
+                R.id.empty_fragment_frame_layout;
+        Log.v(TAG, "fragmentContainerViewId: "
+                + getResources().getResourceEntryName(containerViewId));
+        return containerViewId;
+
+    }
+
+    @VisibleForTesting
+    void inflateEmptyFragmentFrameLayout() {
+        ViewStub viewStub = findViewById(R.id.layout_content_stub);
+        if (viewStub != null) {
             viewStub.setLayoutResource(R.layout.empty_fragment_frame_layout);
             viewStub.inflate();
-            Log.v(TAG, "fragmentContainerViewId: "
-                    + getResources().getResourceEntryName(R.id.empty_fragment_frame_layout));
-            return R.id.empty_fragment_frame_layout;
         }
-        Log.v(TAG, "fragmentContainerViewId: "
-                + getResources().getResourceEntryName(R.id.car_setup_wizard_layout));
-        return R.id.car_setup_wizard_layout;
     }
 
     @VisibleForTesting
