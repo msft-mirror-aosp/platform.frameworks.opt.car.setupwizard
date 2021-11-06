@@ -34,6 +34,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewStub;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 
 import androidx.annotation.StyleRes;
@@ -625,5 +626,62 @@ public class BaseCompatActivityTest extends BaseRobolectricTest {
         spyBaseCompatActivity.onResume();
         spyBaseCompatActivity.nextAction(Activity.RESULT_OK);
         verify(spyBaseCompatActivity, times(2)).startActivity(Mockito.any());
+    }
+
+    /**
+     * Test that {@link BaseCompatActivity#getFragmentContainerViewId()} returns
+     * layout_content_fragment when split-nav is enabled and view stub is not inflated yet.
+     */
+    @Test
+    public void testGetFragmentContainerViewId_viewStubNotInflated() {
+        BaseCompatActivity spyBaseCompatActivity = createSpyBaseCompatActivity();
+        FrameLayout mockFrameLayout = mock(FrameLayout.class);
+        ViewStub mockViewStub = mock(ViewStub.class);
+        when(spyBaseCompatActivity.findViewById(R.id.empty_fragment_frame_layout))
+                .thenReturn(mockFrameLayout);
+        when(spyBaseCompatActivity.findViewById(R.id.layout_content_stub)).thenReturn(mockViewStub);
+
+        int fragmentContainerViewId = spyBaseCompatActivity.getFragmentContainerViewId();
+
+        verify(mockViewStub, times(1)).inflate();
+        assertThat(fragmentContainerViewId).isEqualTo(R.id.empty_fragment_frame_layout);
+    }
+
+    /**
+     * Test that {@link BaseCompatActivity#getFragmentContainerViewId()} returns
+     * layout_content_fragment when split-nav is enabled and view stub is already inflated
+     * with frame layout for fragment attachment.
+     */
+    @Test
+    public void testGetFragmentContainerViewId_viewStubInflatedFrameLayout() {
+        BaseCompatActivity spyBaseCompatActivity = createSpyBaseCompatActivity();
+        FrameLayout mockFrameLayout = mock(FrameLayout.class);
+        when(spyBaseCompatActivity.findViewById(R.id.empty_fragment_frame_layout))
+                .thenReturn(mockFrameLayout);
+        when(spyBaseCompatActivity.findViewById(R.id.layout_content_stub))
+                .thenReturn(null);
+
+        int fragmentContainerViewId = spyBaseCompatActivity.getFragmentContainerViewId();
+
+        assertThat(fragmentContainerViewId).isEqualTo(R.id.empty_fragment_frame_layout);
+    }
+
+    /**
+     * Test that {@link BaseCompatActivity#getFragmentContainerViewId()} returns
+     * layout_content_fragment when split-nav is enabled and view stub is already inflated
+     * with some other view than fragment layout. The frame layout is not available for fragment
+     * attachment.
+     */
+    @Test
+    public void testGetFragmentContainerViewId_frameLayoutNotAvailable() {
+        BaseCompatActivity spyBaseCompatActivity = createSpyBaseCompatActivity();
+        when(spyBaseCompatActivity.findViewById(R.id.layout_content_stub))
+                .thenReturn(null);
+        when(spyBaseCompatActivity.findViewById(R.id.empty_fragment_frame_layout))
+                .thenReturn(null);
+
+        int fragmentContainerViewId = spyBaseCompatActivity.getFragmentContainerViewId();
+
+        assertThat(fragmentContainerViewId).isEqualTo(R.id.car_setup_wizard_layout);
     }
 }
