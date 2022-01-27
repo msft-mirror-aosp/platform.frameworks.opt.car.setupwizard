@@ -27,9 +27,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
-
 import androidx.annotation.Nullable;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
