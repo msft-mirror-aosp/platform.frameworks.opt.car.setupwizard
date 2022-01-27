@@ -18,7 +18,6 @@ package com.android.car.setupwizardlib;
 
 import android.content.Context;
 import android.util.AttributeSet;
-
 import androidx.annotation.Nullable;
 
 /**

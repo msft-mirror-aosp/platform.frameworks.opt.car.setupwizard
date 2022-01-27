@@ -17,7 +17,6 @@ package com.android.car.setupwizardlib;
 
 import android.view.View;
 import android.widget.Button;
-
 import androidx.annotation.Nullable;
 
 /**
