@@ -40,15 +40,12 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-
 import androidx.annotation.Nullable;
 import androidx.annotation.StyleRes;
 import androidx.annotation.VisibleForTesting;
-
 import com.android.car.setupwizardlib.partner.PartnerConfig;
 import com.android.car.setupwizardlib.partner.PartnerConfigHelper;
 import com.android.car.setupwizardlib.util.FeatureResolver;
-
 import java.util.Locale;
 import java.util.Objects;
 
