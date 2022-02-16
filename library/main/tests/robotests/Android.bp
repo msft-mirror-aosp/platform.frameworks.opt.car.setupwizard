@@ -14,7 +14,7 @@ android_app {
 
     privileged: true,
 
-    libs: ["android.car-system-stubs"],
+    libs: ["android.car"],
 
     static_libs: ["car-setup-wizard-lib"],
 }
@@ -30,7 +30,7 @@ android_robolectric_test {
     java_resource_dirs: ["config"],
 
     libs: [
-        "android.car-system-stubs",
+        "android.car",
     ],
 
     instrumentation_for: "CarSetupWizardLib",
