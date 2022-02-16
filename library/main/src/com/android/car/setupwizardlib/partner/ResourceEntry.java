@@ -18,6 +18,7 @@ package com.android.car.setupwizardlib.partner;
 
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
 
