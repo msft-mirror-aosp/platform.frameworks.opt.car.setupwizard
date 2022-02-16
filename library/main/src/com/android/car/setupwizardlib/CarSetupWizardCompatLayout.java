@@ -18,6 +18,7 @@ package com.android.car.setupwizardlib;
 
 import android.content.Context;
 import android.util.AttributeSet;
+
 import androidx.annotation.Nullable;
 
 /**
@@ -42,7 +43,5 @@ public class CarSetupWizardCompatLayout extends CarSetupWizardBaseLayout {
     public CarSetupWizardCompatLayout(Context context, @Nullable AttributeSet attrs,
             int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
-
-        setBackgroundColor(getResources().getColor(R.color.suw_color_background, null));
     }
 }
