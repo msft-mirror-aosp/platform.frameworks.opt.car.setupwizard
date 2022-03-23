@@ -19,9 +19,7 @@ package com.android.car.setupwizardlib;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.View;
-import android.view.ViewStub;
 
 import androidx.annotation.CallSuper;
 import androidx.annotation.LayoutRes;
@@ -50,8 +48,6 @@ import com.android.car.setupwizardlib.util.CarWizardManagerHelper;
  * component attributes
  */
 abstract class BaseSetupWizardActivity extends FragmentActivity {
-    private static final String TAG = BaseSetupWizardActivity.class.getSimpleName();
-
     @VisibleForTesting
     static final String CONTENT_FRAGMENT_TAG = "CONTENT_FRAGMENT_TAG";
     /**
@@ -95,9 +91,13 @@ abstract class BaseSetupWizardActivity extends FragmentActivity {
 
         mCarSetupWizardLayout = findViewById(R.id.car_setup_wizard_layout);
 
-        mCarSetupWizardLayout.setBackButtonListener(v -> handleBackButtonEvent());
+        mCarSetupWizardLayout.setBackButtonListener(v -> {
+            if (!handleBackButton()) {
+                finish();
+            }
+        });
 
-        mCarSetupWizardLayout.setCloseButtonListener(v -> handleCloseButton());
+        mCarSetupWizardLayout.setCloseButtonListener(v-> handleCloseButton());
 
         resetPrimaryToolbarButtonOnClickListener();
         resetSecondaryToolbarButtonOnClickListener();
@@ -176,9 +176,8 @@ abstract class BaseSetupWizardActivity extends FragmentActivity {
     @CallSuper
     protected void setContentFragmentWithBackstack(Fragment fragment) {
         if (mAllowFragmentCommits) {
-            inflateEmptyFragmentFrameLayout();
             getSupportFragmentManager().beginTransaction()
-                    .replace(getFragmentContainerViewId(), fragment, CONTENT_FRAGMENT_TAG)
+                    .replace(R.id.car_setup_wizard_layout, fragment, CONTENT_FRAGMENT_TAG)
                     .addToBackStack(null)
                     .commit();
             getSupportFragmentManager().executePendingTransactions();
@@ -200,14 +199,13 @@ abstract class BaseSetupWizardActivity extends FragmentActivity {
     @CallSuper
     protected void setContentFragment(Fragment fragment) {
         if (mAllowFragmentCommits) {
-            inflateEmptyFragmentFrameLayout();
             getSupportFragmentManager().beginTransaction()
                     .setCustomAnimations(
                             android.R.animator.fade_in,
                             android.R.animator.fade_out,
                             android.R.animator.fade_in,
                             android.R.animator.fade_out)
-                    .replace(getFragmentContainerViewId(), fragment, CONTENT_FRAGMENT_TAG)
+                    .replace(R.id.car_setup_wizard_layout, fragment, CONTENT_FRAGMENT_TAG)
                     .commitNow();
             onContentFragmentSet(getContentFragment());
         }
@@ -244,22 +242,7 @@ abstract class BaseSetupWizardActivity extends FragmentActivity {
      */
     @CallSuper
     protected View setContentLayout(@LayoutRes int id) {
-        ViewStub viewStub = findViewById(R.id.layout_content_stub);
-        if (viewStub != null) {
-            viewStub.setLayoutResource(id);
-            return viewStub.inflate();
-        }
         return getLayoutInflater().inflate(id, mCarSetupWizardLayout);
-    }
-
-    /**
-     * Method used when back button is pressed, if the back button wasn't handled by the activity
-     * finish() will be called.
-     */
-    private void handleBackButtonEvent() {
-        if (!handleBackButton()) {
-            finish();
-        }
     }
 
     /**
@@ -271,16 +254,6 @@ abstract class BaseSetupWizardActivity extends FragmentActivity {
      */
     protected boolean handleBackButton() {
         return popBackStackImmediate();
-    }
-
-    @Override
-    public boolean dispatchKeyEvent(KeyEvent event) {
-        if (event.getKeyCode() == KeyEvent.KEYCODE_BACK
-                && event.getAction() == KeyEvent.ACTION_UP) {
-            handleBackButtonEvent();
-            return true;
-        }
-        return super.dispatchKeyEvent(event);
     }
 
     /**
@@ -513,10 +486,6 @@ abstract class BaseSetupWizardActivity extends FragmentActivity {
         mCarSetupWizardLayout.setProgressBarVisible(visible);
     }
 
-    protected boolean isSplitNavLayoutSupported() {
-        return false;
-    }
-
     private void launchNextAction(int resultCode, Intent data, boolean forResult) {
         if (resultCode == RESULT_CANCELED) {
             throw new IllegalArgumentException("Cannot call nextAction with RESULT_CANCELED");
@@ -536,30 +505,6 @@ abstract class BaseSetupWizardActivity extends FragmentActivity {
             startActivityForResult(nextIntent, REQUEST_CODE_NEXT);
         } else {
             startActivity(nextIntent);
-        }
-    }
-
-    @VisibleForTesting
-    int getFragmentContainerViewId() {
-        // Check if the inflated frame layout is still available. Add the fragment to frame
-        // layout only if it's available. Otherwise, fall back to default layout to attach
-        // fragment. Note that frame layout might not be available if hosting activity inflated
-        // viewStub already with other views than before calling setFragmentContent().
-        View frameLayout = findViewById(R.id.empty_fragment_frame_layout);
-        int containerViewId = frameLayout == null ? R.id.car_setup_wizard_layout :
-                R.id.empty_fragment_frame_layout;
-        Log.v(TAG, "fragmentContainerViewId: "
-                + getResources().getResourceEntryName(containerViewId));
-        return containerViewId;
-
-    }
-
-    @VisibleForTesting
-    void inflateEmptyFragmentFrameLayout() {
-        ViewStub viewStub = findViewById(R.id.layout_content_stub);
-        if (viewStub != null) {
-            viewStub.setLayoutResource(R.layout.empty_fragment_frame_layout);
-            viewStub.inflate();
         }
     }
 
