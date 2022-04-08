@@ -16,10 +16,9 @@
 
 package com.android.car.setupwizardlib;
 
+import android.annotation.Nullable;
 import android.content.Context;
 import android.util.AttributeSet;
-
-import androidx.annotation.Nullable;
 
 import com.android.car.setupwizardlib.partner.PartnerConfig;
 import com.android.car.setupwizardlib.partner.PartnerConfigHelper;

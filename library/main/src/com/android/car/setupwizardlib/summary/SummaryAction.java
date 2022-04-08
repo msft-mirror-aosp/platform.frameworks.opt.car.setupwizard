@@ -16,7 +16,7 @@
 
 package com.android.car.setupwizardlib.summary;
 
-import androidx.annotation.NonNull;
+import android.annotation.NonNull;
 
 /** An instance that represents a single summary action item and all of its state. */
 public class SummaryAction implements Comparable<SummaryAction> {

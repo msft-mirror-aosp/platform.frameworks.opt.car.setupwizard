@@ -13,10 +13,6 @@
 // limitations under the License.
 //
 
-package {
-    default_applicable_licenses: ["Android-Apache-2.0"],
-}
-
 android_library {
     name: "car-setup-wizard-lib",
     srcs: ["src/**/*.java"],
@@ -26,5 +22,5 @@ android_library {
     optimize: {
         enabled: false,
     },
-    min_sdk_version: "28",
+    min_sdk_version: "26",
 }

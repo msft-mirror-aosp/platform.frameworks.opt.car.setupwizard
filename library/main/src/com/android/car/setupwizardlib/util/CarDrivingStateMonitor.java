@@ -18,13 +18,8 @@ package com.android.car.setupwizardlib.util;
 
 import android.car.Car;
 import android.car.CarNotConnectedException;
-import android.car.VehicleAreaType;
-import android.car.VehicleGear;
-import android.car.VehiclePropertyIds;
 import android.car.drivingstate.CarUxRestrictions;
 import android.car.drivingstate.CarUxRestrictionsManager;
-import android.car.hardware.CarPropertyValue;
-import android.car.hardware.property.CarPropertyManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -48,15 +43,11 @@ public class CarDrivingStateMonitor implements
     public static final String EXIT_BROADCAST_ACTION =
             "com.android.car.setupwizardlib.driving_exit";
 
-    public static final String INTENT_EXTRA_REASON = "reason";
-    public static final String REASON_GEAR_REVERSAL = "gear_reversal";
-
     private static final String TAG = "CarDrivingStateMonitor";
     private static final long DISCONNECT_DELAY_MS = 700;
 
     private Car mCar;
     private CarUxRestrictionsManager mRestrictionsManager;
-    private CarPropertyManager mCarPropertyManager;
     // Need to track the number of times the monitor is started so a single stopMonitor call does
     // not override them all.
     private int mMonitorStartedCount;
@@ -69,25 +60,6 @@ public class CarDrivingStateMonitor implements
     final Handler mHandler = new Handler(Looper.getMainLooper());
     @VisibleForTesting
     final Runnable mDisconnectRunnable = this::disconnectCarMonitor;
-
-    private final CarPropertyManager.CarPropertyEventCallback mGearChangeCallback =
-            new CarPropertyManager.CarPropertyEventCallback() {
-        @SuppressWarnings("rawtypes")
-        @Override
-        public void onChangeEvent(CarPropertyValue value) {
-            switch (value.getPropertyId()) {
-                case VehiclePropertyIds.GEAR_SELECTION:
-                    if ((Integer) value.getValue() == VehicleGear.GEAR_REVERSE) {
-                        Log.v(TAG, "Gear has reversed, exiting SetupWizard.");
-                        broadcastGearReversal();
-                    }
-                    break;
-            }
-        }
-
-        @Override
-        public void onErrorEvent(int propertyId, int zone) {}
-    };
 
     private CarDrivingStateMonitor(Context context) {
         mContext = context.getApplicationContext();
@@ -107,14 +79,14 @@ public class CarDrivingStateMonitor implements
      * Starts the monitor listening to driving state changes.
      */
     public synchronized void startMonitor() {
+        if (isVerboseLoggable()) {
+            Log.v(TAG, "Starting monitor");
+        }
         mMonitorStartedCount++;
         if (mMonitorStartedCount == 0) {
-            Log.w(TAG, "MonitorStartedCount was negative");
             return;
         }
         mHandler.removeCallbacks(mDisconnectRunnable);
-        Log.i(TAG, String.format(
-                "Starting monitor, MonitorStartedCount = %d", mMonitorStartedCount));
         if (mCar != null) {
             if (mCar.isConnected()) {
                 try {
@@ -136,9 +108,18 @@ public class CarDrivingStateMonitor implements
             @Override
             public void onServiceConnected(ComponentName name, IBinder service) {
                 try {
-                    registerPropertyManager();
-                    registerRestrictionsManager();
-
+                    mRestrictionsManager = (CarUxRestrictionsManager)
+                            mCar.getCarManager(Car.CAR_UX_RESTRICTION_SERVICE);
+                    if (mRestrictionsManager == null) {
+                        Log.e(TAG, "Unable to get CarUxRestrictionsManager");
+                        return;
+                    }
+                    onUxRestrictionsChanged(mRestrictionsManager.getCurrentCarUxRestrictions());
+                    mRestrictionsManager.registerListener(CarDrivingStateMonitor.this);
+                    if (mStopMonitorAfterUxCheck) {
+                        mStopMonitorAfterUxCheck = false;
+                        stopMonitor();
+                    }
                 } catch (CarNotConnectedException e) {
                     Log.e(TAG, "Car not connected", e);
                 }
@@ -188,21 +169,16 @@ public class CarDrivingStateMonitor implements
     }
 
     private void disconnectCarMonitor() {
+        if (isVerboseLoggable()) {
+            Log.v(TAG, "Timeout finished, disconnecting Car Monitor");
+        }
         if (mMonitorStartedCount > 0) {
-            if (isVerboseLoggable()) {
-                Log.v(TAG, "MonitorStartedCount > 0, do nothing");
-            }
             return;
         }
-        Log.i(TAG, "Disconnecting Car Monitor");
         try {
             if (mRestrictionsManager != null) {
                 mRestrictionsManager.unregisterListener();
                 mRestrictionsManager = null;
-            }
-            if (mCarPropertyManager != null) {
-                mCarPropertyManager.unregisterCallback(mGearChangeCallback);
-                mCarPropertyManager = null;
             }
         } catch (CarNotConnectedException e) {
             Log.e(TAG, "Car not connected for unregistering listener", e);
@@ -248,18 +224,8 @@ public class CarDrivingStateMonitor implements
     }
 
     private boolean checkIsSetupRestricted(@Nullable CarUxRestrictions restrictionInfo) {
-        if (restrictionInfo == null) {
-            if (isVerboseLoggable()) {
-                Log.v(TAG, "checkIsSetupRestricted restrictionInfo is null, returning false");
-            }
-            return false;
-        }
-        int activeRestrictions = restrictionInfo.getActiveRestrictions();
-        if (isVerboseLoggable()) {
-            Log.v(TAG, "activeRestrictions are " + activeRestrictions);
-        }
-        // There must be at least some restriction in place.
-        return activeRestrictions != 0;
+        return restrictionInfo != null && (restrictionInfo.getActiveRestrictions()
+                & CarUxRestrictions.UX_RESTRICTIONS_NO_SETUP) != 0;
     }
 
     @Override
@@ -307,50 +273,5 @@ public class CarDrivingStateMonitor implements
     @VisibleForTesting
     public static void replace(Context context, CarDrivingStateMonitor monitor) {
         CarHelperRegistry.getRegistry(context).putHelper(CarDrivingStateMonitor.class, monitor);
-    }
-
-    private void registerRestrictionsManager() {
-        mRestrictionsManager = (CarUxRestrictionsManager)
-                mCar.getCarManager(Car.CAR_UX_RESTRICTION_SERVICE);
-        if (mRestrictionsManager == null) {
-            Log.e(TAG, "Unable to get CarUxRestrictionsManager");
-            return;
-        }
-        onUxRestrictionsChanged(mRestrictionsManager.getCurrentCarUxRestrictions());
-        mRestrictionsManager.registerListener(CarDrivingStateMonitor.this);
-        if (mStopMonitorAfterUxCheck) {
-            mStopMonitorAfterUxCheck = false;
-            stopMonitor();
-        }
-    }
-
-    private void registerPropertyManager() {
-        mCarPropertyManager = (CarPropertyManager) mCar.getCarManager(Car.PROPERTY_SERVICE);
-        if (mCarPropertyManager == null) {
-            Log.e(TAG, "Unable to get CarPropertyManager");
-            return;
-        }
-        mCarPropertyManager.registerCallback(
-                mGearChangeCallback, VehiclePropertyIds.GEAR_SELECTION,
-                CarPropertyManager.SENSOR_RATE_ONCHANGE);
-        CarPropertyValue<Integer> gearSelection =
-                mCarPropertyManager.getProperty(Integer.class, VehiclePropertyIds.GEAR_SELECTION,
-                    VehicleAreaType.VEHICLE_AREA_TYPE_GLOBAL);
-        if (gearSelection != null
-                && gearSelection.getStatus() == CarPropertyValue.STATUS_AVAILABLE) {
-            if (gearSelection.getValue() == VehicleGear.GEAR_REVERSE) {
-                Log.v(TAG, "SetupWizard started when gear is in reverse, exiting.");
-                broadcastGearReversal();
-            }
-        } else {
-            Log.e(TAG, "GEAR_SELECTION is not available.");
-        }
-    }
-
-    private void broadcastGearReversal() {
-        Intent intent = new Intent();
-        intent.setAction(EXIT_BROADCAST_ACTION);
-        intent.putExtra(INTENT_EXTRA_REASON, REASON_GEAR_REVERSAL);
-        mContext.sendBroadcast(intent);
     }
 }

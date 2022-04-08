@@ -16,12 +16,12 @@
 
 package com.android.car.setupwizardlib;
 
+import android.annotation.CallSuper;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 
-import androidx.annotation.CallSuper;
 import androidx.annotation.LayoutRes;
 import androidx.annotation.StyleRes;
 import androidx.annotation.VisibleForTesting;
@@ -96,8 +96,6 @@ abstract class BaseSetupWizardActivity extends FragmentActivity {
                 finish();
             }
         });
-
-        mCarSetupWizardLayout.setCloseButtonListener(v-> handleCloseButton());
 
         resetPrimaryToolbarButtonOnClickListener();
         resetSecondaryToolbarButtonOnClickListener();
@@ -257,14 +255,6 @@ abstract class BaseSetupWizardActivity extends FragmentActivity {
     }
 
     /**
-     * Method to be overwritten by subclasses wanting to implement their own close behavior.
-     * Default behavior is finishAction.
-     */
-    protected void handleCloseButton() {
-        finishAction();
-    }
-
-    /**
      * Called when nextAction has been invoked, should be overridden on derived class when it is
      * needed perform work when nextAction has been invoked.
      */
@@ -357,14 +347,6 @@ abstract class BaseSetupWizardActivity extends FragmentActivity {
      */
     protected void setBackButtonVisible(boolean visible) {
         mCarSetupWizardLayout.setBackButtonVisible(visible);
-    }
-
-    /**
-     * Sets whether the close button is visible. If this value is {@code true}, clicking the button
-     * will finish the current flow.
-     */
-    protected void setCloseButtonVisible(boolean visible) {
-        mCarSetupWizardLayout.setCloseButtonVisible(visible);
     }
 
     /**
