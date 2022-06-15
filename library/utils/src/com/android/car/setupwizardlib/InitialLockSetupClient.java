@@ -316,7 +316,7 @@ public class InitialLockSetupClient implements ServiceConnection {
                     new LockConfig(
                         /* enabled= */ true,
                         km.getMinLockLength(
-                            /* isPin= */ true, PasswordComplexity.PASSWORD_COMPLEXITY_MEDIUM));
+                            /* isPin= */ true, PasswordComplexity.PASSWORD_COMPLEXITY_LOW));
                 patternConfig =
                     new LockConfig(
                         /* enabled= */ true,
