@@ -18,6 +18,8 @@ package com.android.car.setupwizardlib;
 
 import com.android.car.setupwizardlib.InitialLockSetupConstants.ValidateLockFlags;
 
+import java.nio.charset.StandardCharsets;
+
 /**
  * Provides helper methods for the usage of the InitialLockSetupService.
  */
@@ -54,18 +56,13 @@ public class InitialLockSetupHelper {
     }
 
     /**
-     * Converts a {@link CharSequence} into an array of bytes. This is for security reasons to avoid
-     * storing strings in memory.
+     * Converts a {@link CharSequence} into an array of bytes.
      */
     public static byte[] charSequenceToByteArray(CharSequence chars) {
         if (chars == null) {
             return null;
         }
-        byte[] byteArray = new byte[chars.length()];
-        for (int i = 0; i < chars.length(); i++) {
-            byteArray[i] = (byte) chars.charAt(i);
-        }
-        return byteArray;
+        return chars.toString().getBytes(StandardCharsets.UTF_8);
     }
 
     /**
@@ -75,11 +72,7 @@ public class InitialLockSetupHelper {
         if (input == null) {
             return null;
         }
-        StringBuffer charSequence = new StringBuffer();
-        for (int i = 0; i < input.length; i++) {
-            charSequence.append((char) input[i]);
-        }
-        return charSequence;
+        return new String(input, StandardCharsets.UTF_8);
     }
 
     /** Return an ASCII-equivalent array of character digits for a numeric byte input. */
