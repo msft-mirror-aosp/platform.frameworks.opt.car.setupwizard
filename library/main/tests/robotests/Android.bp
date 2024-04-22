@@ -2,6 +2,7 @@
 // CarSetupWizardLib app just for Robolectric test target.     #
 //##############################################################
 package {
+    default_team: "trendy_team_automotive",
     default_applicable_licenses: ["Android-Apache-2.0"],
 }
 
