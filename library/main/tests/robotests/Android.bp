@@ -36,4 +36,5 @@ android_robolectric_test {
 
     instrumentation_for: "CarSetupWizardLib",
     upstream: true,
+    strict_mode: false,
 }
